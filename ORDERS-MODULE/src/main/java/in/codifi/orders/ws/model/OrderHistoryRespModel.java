@@ -1,0 +1,33 @@
+package in.codifi.orders.ws.model;
+
+import java.io.Serializable;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class OrderHistoryRespModel implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@JsonProperty("status")
+	private String status;
+	@JsonProperty("code")
+	private String code;
+	@JsonProperty("message")
+	private String message;
+	@JsonProperty("data")
+	private List<OrderHistoryRespData> data;
+	@JsonProperty("metadata")
+	private OrderHisMetadata metadata;
+
+}
