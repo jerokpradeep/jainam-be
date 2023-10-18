@@ -893,13 +893,21 @@ public class AuthService implements AuthServiceSpec {
 				Log.info("Tok-" + ssoToken);
 				if (StringUtil.isNotNullOrEmpty(ssoToken)) {
 					HazelcastConfig.getInstance().getRestUserSsoToken().put(ssoToken, authmodel.getUserId());
+//					restReq.setUser_id(authmodel.getUserId());
+//					restReq.setLogin_type("TP_TOKEN");
+//					restReq.setPassword(ssoToken);
+//					restReq.setSecond_auth("");
+////					restReq.setApi_key(
+////							"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJDdXN0b21lcklkIjoiMjE0IiwiZXhwIjoxNjkxNzYxMTQwLCJpYXQiOjE2NjAyMjUxOTd9.LzXW_BBI8CJR9clDDTTXezwbr5bnAHJgpPWgI-Tg1RQ");
+//					restReq.setApi_key(props.getApiKey());
+//					restReq.setSource("MOBILEAPI");
 					restReq.setUser_id(authmodel.getUserId());
 					restReq.setLogin_type("TP_TOKEN");
 					restReq.setPassword(ssoToken);
 					restReq.setSecond_auth("");
-//					restReq.setApi_key(
-//							"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJDdXN0b21lcklkIjoiMjE0IiwiZXhwIjoxNjkxNzYxMTQwLCJpYXQiOjE2NjAyMjUxOTd9.LzXW_BBI8CJR9clDDTTXezwbr5bnAHJgpPWgI-Tg1RQ");
-					restReq.setApi_key(props.getApiKey());
+					restReq.setApi_key(
+							"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJDdXN0b21lcklkIjoiNDE5IiwiU3ViVGVuYW50SWQiOiIiLCJQcm9kdWN0U291cmNlIjoiV0FWRUFQSSIsImV4cCI6MTgyMDgzMTI4MCwiaWF0IjoxNjkxMjMxMjkzfQ.60MCUj7dsUOZ9WExE3EkoyYKNFbGEKa5WX5iCODdmAk");
+//					restReq.setApi_key(props.getApiKey());
 					restReq.setSource("MOBILEAPI");
 				}
 			}
