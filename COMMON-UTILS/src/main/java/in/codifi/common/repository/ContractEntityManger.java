@@ -20,7 +20,7 @@ public class ContractEntityManger {
 
 //	@Named("chola")
 	@Inject
-	@PersistenceUnit("chola")
+	@PersistenceUnit("jainam")
 	EntityManager entityManager;
 
 	/**

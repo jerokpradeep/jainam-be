@@ -1,5 +1,7 @@
 package in.codifi.auth.controller;
 
+import java.util.Date;
+
 import javax.inject.Inject;
 import javax.ws.rs.Path;
 
@@ -304,5 +306,12 @@ public class AuthController implements AuthControllerSpec {
 		if (authReq == null)
 			return prepareResponse.prepareFailedResponse(AppConstants.INVALID_PARAMETER);
 		return authServiceSpec.verifyTotp(authReq);
+	}
+
+
+	@Override
+	public RestResponse<GenericResponse> email(AuthReq authReq) {
+		System.out.println("Method invoked ::: "+new Date());
+		return null;
 	}
 }
