@@ -272,4 +272,11 @@ public interface AuthControllerSpec {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	RestResponse<GenericResponse> verifyTotp(AuthReq authReq);
+	
+	
+	@Path("/email")
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	RestResponse<GenericResponse> email(AuthReq authReq);
 }
