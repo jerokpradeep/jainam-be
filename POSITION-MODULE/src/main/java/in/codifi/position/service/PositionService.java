@@ -50,7 +50,8 @@ public class PositionService implements IPositionService {
 		try {
 			String type = "all";
 			/** Get user session from cache **/
-			String userSession = AppUtil.getUserSession(info.getUserId());
+//			String userSession = AppUtil.getUserSession(info.getUserId());
+			String userSession = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6NzA3MDcwLCJ1c2VyaWQiOjcwNzA3MCwidGVuYW50aWQiOjcwNzA3MCwibWVtYmVySW5mbyI6eyJ0ZW5hbnRJZCI6IjQxOSIsImdyb3VwSWQiOiJITyIsInVzZXJJZCI6IkozMyIsInRlbXBsYXRlSWQiOiJVQVQiLCJ1ZElkIjoiIiwib2NUb2tlbiI6IjB4MDE1RDFGOEFFREVDMENGRDkxQkMyRTAxRkNFNTUzIiwidXNlckNvZGUiOiJOWlNQSSIsImdyb3VwQ29kZSI6IkFBQUFBIiwiYXBpa2V5RGF0YSI6eyJDdXN0b21lcklkIjoiNDE5IiwiU3ViVGVuYW50SWQiOiIiLCJQcm9kdWN0U291cmNlIjoiV0FWRUFQSSIsImV4cCI6MTgyMDgzMTI4MCwiaWF0IjoxNjkxMjMxMjkzfSwic291cmNlIjoiTU9CSUxFQVBJIn0sImV4cCI6MTY5ODc3Njk5OSwiaWF0IjoxNjk4NzUxMjU3fQ.JYrO8M2bnLLs27sRVWqwX_XfIRkpObThBOnEJl6IbsM";
 			if (StringUtil.isNullOrEmpty(userSession))
 				return prepareResponse.prepareUnauthorizedResponse();
 
@@ -172,7 +173,7 @@ public class PositionService implements IPositionService {
 		RestConversionReq reqModel = new RestConversionReq();
 		try {
 			ObjectMapper mapper = new ObjectMapper();
-			if(model.getExchange().equalsIgnoreCase(AppConstants.NSE)) {
+			if (model.getExchange().equalsIgnoreCase(AppConstants.NSE)) {
 				reqModel.setExch(AppConstants.NSE_EQ);
 			} else if (model.getExchange().equalsIgnoreCase(AppConstants.BSE)) {
 				reqModel.setExch(AppConstants.BSE_EQ);
@@ -182,13 +183,14 @@ public class PositionService implements IPositionService {
 				reqModel.setExch(AppConstants.NSE_CUR);
 			}
 			reqModel.setScripToken(Integer.parseInt(model.getToken()));
-			if(model.getTransType().equalsIgnoreCase("B")) {
+			if (model.getTransType().equalsIgnoreCase("B")) {
 				reqModel.setTransType("BUY");
 			} else {
 				reqModel.setTransType("SELL");
 			}
 			reqModel.setQty(Integer.parseInt(model.getQty()));
-			System.out.println("old pro-- "+HazelcastConfig.getInstance().getProductTypes().get(model.getPrevProduct()));
+			System.out.println(
+					"old pro-- " + HazelcastConfig.getInstance().getProductTypes().get(model.getPrevProduct()));
 			reqModel.setOldPrdType(HazelcastConfig.getInstance().getProductTypes().get(model.getPrevProduct()));
 			reqModel.setNewPrdType(HazelcastConfig.getInstance().getProductTypes().get(model.getProduct()));
 			reqModel.setBoOrderId("");

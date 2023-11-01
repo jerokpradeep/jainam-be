@@ -42,6 +42,7 @@ public class AppConstants {
 	public static final String STR_PT = "PT";
 
 	public static final String COVER_MARGINPLUS = "MARGINPLUS";
+	public static final String RL_MKT = "RL-MKT";
 
 	public static final String SUCCESS_STATUS = "Success";
 	public static final String FAILED_STATUS = "Failed";

@@ -1,7 +1,15 @@
 package in.codifi.admin.service;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -12,12 +20,21 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jboss.resteasy.reactive.RestResponse;
 
+import in.codifi.admin.config.ApplicationProperties;
 import in.codifi.admin.config.KeyCloakConfig;
 import in.codifi.admin.entity.DeviceMappingEntity;
 import in.codifi.admin.entity.UserNotification;
 import in.codifi.admin.entity.VendorAppEntity;
+import in.codifi.admin.model.request.PasswordForceUpdateReq;
 import in.codifi.admin.model.request.SendNoficationReqModel;
 import in.codifi.admin.model.request.UserReqModel;
 import in.codifi.admin.model.response.GenericResponse;
@@ -61,9 +78,10 @@ public class CommonService implements CommonServiceSpec {
 	KcAdminRest kcAdminRest;
 	@Inject
 	KeyCloakConfig keycloakConfig;
-
 	@Inject
 	UserNotificationSpec userNotificationSpec;
+	@Inject
+	ApplicationProperties props;
 
 	/**
 	 * Method to send recommendation message
@@ -271,7 +289,7 @@ public class CommonService implements CommonServiceSpec {
 	 * @return
 	 */
 	private boolean validateUpdateVersionParam(MobVersionReqModel model) {
-		if (StringUtil.isNotNullOrEmpty(model.getVersion()) && model.getUpdateAvailable() > 0) {
+		if (StringUtil.isNotNullOrEmpty(model.getVersion()) && model.getUpdateAvailable() >= 0) {
 			return true;
 		}
 		return false;
@@ -450,15 +468,99 @@ public class CommonService implements CommonServiceSpec {
 		/** Method to get user count in keyclock */
 		int count = kcAdminRest.getCount();
 
-		String min = "0";
-		String max = "10000";
-		if (count >= 1000) {
-			int counts = count / 10000;
-			List<GetUserInfoResp> userInfo = kcAdminRest.getKcAllUserDetails(min, Integer.toString(count));
-		} else {
-
+		System.out.println("Total user count in keycloak - " + count);
+		if (count > 0) {
+			int min = 0;
+			int max = 10000;
+			while (min < count) {
+//				List<GetUserInfoResp> userInfo = kcAdminRest.getKcAllUserDetails(min, Integer.toString(count));
+				List<GetUserInfoResp> userInfo = kcAdminRest.getKcAllUserDetails(String.valueOf(min),
+						String.valueOf(max));
+				insertUserintoExcel(userInfo, min, max);
+				min = min + max;
+			}
 		}
 		return null;
+	}
+
+	/**
+	 * Method to
+	 */
+	@SuppressWarnings("resource")
+	private void insertUserintoExcel(List<GetUserInfoResp> userInfo, int min, int max) {
+
+		try {
+			// Create a new workbook (Excel file)
+			Workbook workbook = new XSSFWorkbook();
+			// Create a new sheet
+			Sheet sheet = workbook.createSheet("UserDetails");
+			// Create a header row
+			Row headerRow = sheet.createRow(0);
+			// Create cell styles for the header row
+			CellStyle headerCellStyle = workbook.createCellStyle();
+			Font headerFont = workbook.createFont();
+			headerFont.setBold(true);
+			headerCellStyle.setFont(headerFont);
+			// Define header titles
+			String[] headers = { "UserId", "Name", "Email", "Mobil", "UCC", "PAN", "Enabled" };
+			// Populate the header row with headers
+			for (int i = 0; i < headers.length; i++) {
+				Cell cell = headerRow.createCell(i);
+				cell.setCellValue(headers[i]);
+				cell.setCellStyle(headerCellStyle);
+			}
+
+			int rowNum = 1;
+			for (GetUserInfoResp info : userInfo) {
+				Row row = sheet.createRow(rowNum++);
+
+				String pan = "";
+				String ucc = "";
+				String mobile = "";
+
+				if (info.getAttributes() != null) {
+
+					if (info.getAttributes().getMobile() != null && info.getAttributes().getMobile().size() > 0) {
+						mobile = info.getAttributes().getMobile().get(0);
+					}
+					if (info.getAttributes().getPan() != null && info.getAttributes().getPan().size() > 0) {
+						pan = info.getAttributes().getPan().get(0);
+					}
+					if (info.getAttributes().getUcc() != null && info.getAttributes().getUcc().size() > 0) {
+						ucc = info.getAttributes().getUcc().get(0);
+					}
+				}
+
+				String name = info.getFirstName();
+				if (StringUtil.isNotNullOrEmpty(info.getLastName())) {
+					name = name + info.getLastName();
+				}
+
+				row.createCell(0).setCellValue(info.getUsername());
+				row.createCell(1).setCellValue(name);
+				row.createCell(2).setCellValue(info.getEmail());
+				row.createCell(3).setCellValue(mobile);
+				row.createCell(4).setCellValue(ucc);
+				row.createCell(5).setCellValue(pan);
+				row.createCell(6).setCellValue(info.getEnabled());
+			}
+
+			String filePath = props.getUseDumpPath();
+			File fileDir = new File(filePath);
+			if (!fileDir.exists()) {
+				fileDir.mkdirs();
+			}
+
+			String date = new SimpleDateFormat("ddMMYY").format(new Date());
+			String fileName = date + "_UserDetails_" + String.valueOf(min + max) + ".xlsx";
+			FileOutputStream fileOut = new FileOutputStream(filePath + fileName);
+			workbook.write(fileOut);
+			System.out.println("Excel file created successfully at: " + filePath + "as file name:" + fileName);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	/**
@@ -641,6 +743,228 @@ public class CommonService implements CommonServiceSpec {
 			Log.error(e.getMessage());
 		}
 		return prepareResponse.prepareFailedResponse(AppConstants.FAILED_STATUS);
+	}
+
+	/**
+	 * Method to password Force Update
+	 * 
+	 * @author Gowthaman
+	 * @return
+	 */
+	@Override
+	public RestResponse<GenericResponse> passwordForceUpdate(PasswordForceUpdateReq reqModel) {
+
+		if (StringUtil.isListNullOrEmpty(reqModel.getUserId()))
+			return prepareResponse.prepareFailedResponse(AppConstants.INVALID_PARAMETER);
+
+		ExecutorService pool = Executors.newSingleThreadExecutor();
+		pool.execute(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					List<GetUserInfoResp> usersInfo = new ArrayList<>();
+					for (String req : reqModel.getUserId()) {
+						List<GetUserInfoResp> userInfo = kcAdminRest.getUserInfo(req);
+						usersInfo.addAll(userInfo);
+					}
+					List<String> saveListMessage = new ArrayList<>();
+					for (GetUserInfoResp user : usersInfo) {
+						CreateUserRequestModel model = new CreateUserRequestModel();
+						UserAttribute attribute = new UserAttribute();
+						if (StringUtil.isListNotNullOrEmpty(user.getAttributes().getGender())) {
+							attribute.setGender(user.getAttributes().getGender().get(0));
+						}
+						if (StringUtil.isListNotNullOrEmpty(user.getAttributes().getMaritalStatus())) {
+							attribute.setMaritalStatus(user.getAttributes().getMaritalStatus().get(0));
+						}
+						if (StringUtil.isListNotNullOrEmpty(user.getAttributes().getMobile())) {
+							attribute.setMobile(user.getAttributes().getMobile().get(0));
+						}
+						if (StringUtil.isListNotNullOrEmpty(user.getAttributes().getPan())) {
+							attribute.setPan(user.getAttributes().getPan().get(0));
+						}
+						if (StringUtil.isListNotNullOrEmpty(user.getAttributes().getUcc())) {
+							attribute.setUcc(user.getAttributes().getUcc().get(0));
+						}
+
+						model.setAttributes(attribute);
+						model.setEmail(user.getEmail());
+						model.setEmailVerified(user.getEmailVerified());
+						model.setEnabled(user.getEnabled());
+						model.setFirstName(user.getFirstName());
+						model.setLastName(user.getLastName());
+						List<Object> ra = new ArrayList<>();
+						String requiredActions = AppConstants.UPDATE_PASSWORD;
+						ra.add(requiredActions);
+						model.setRequiredActions(ra);
+						model.setUsername(user.getUsername());
+
+						RestResponse<GenericResponse> response = updateKcUserDetails(model);
+						Object res = response.getEntity().getResult();
+						String saveMessage = user.getUsername() + "________" + res.toString();
+						saveListMessage.add(saveMessage);
+					}
+					writeResultIntoFile(saveListMessage, "passwordForceUpdate");
+				} catch (Exception e) {
+					e.printStackTrace();
+					Log.error("password Force Update -- " + e.getMessage());
+				} finally {
+					pool.shutdown();
+				}
+			}
+		});
+		return prepareResponse.prepareSuccessResponseObject(AppConstants.SUCCESS_STATUS);
+
+	}
+
+	private void writeResultIntoFile(List<String> createUser, String fileName) {
+		try {
+
+			String date = new SimpleDateFormat("ddMMYY-hhmm").format(new Date());
+			String responseFileName = props.getClientResultPath() + fileName + date + AppConstants.TEXT_FILE_FORMATS;
+			File fileDir = new File(props.getClientResultPath());
+			if (!fileDir.exists()) {
+				fileDir.mkdirs();
+			}
+			Path filePath = Path.of(responseFileName);
+			BufferedWriter writer = Files.newBufferedWriter(filePath, StandardOpenOption.CREATE);
+			for (String data : createUser) {
+				writer.write(data);
+				writer.newLine();
+			}
+			writer.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			Log.error(e.getMessage());
+		}
+	}
+
+	/**
+	 * Method to add New User in keyclock
+	 * 
+	 * @author Gowthaman
+	 * @param req
+	 * @return
+	 */
+	@SuppressWarnings("unused")
+	@Override
+	public RestResponse<GenericResponse> addNewEmpUser(CreateUserRequestModel user) {
+		try {
+			if (StringUtil.isNotNullOrEmpty(user.getUsername())) {
+
+//				if (appUtils.isMobileNumber(user.getUserId())) {
+//					return verifyClientByAttribute(AppConstants.ATTRIBUTE_MOBILE, req.getUserId());
+//				} else if (appUtils.isEmail(req.getUserId())) {
+//					return verifyClientByAttribute(AppConstants.ATTRIBUTE_MAIL, req.getUserId());
+//				}
+
+				CreateUserRequestModel requestModel = new CreateUserRequestModel();
+				UserAttribute attribute = new UserAttribute();
+				List<CreateUserCredentialsModel> userCredentilList = new ArrayList<>();
+				CreateUserCredentialsModel credentialsModel = new CreateUserCredentialsModel();
+				List<CreateUserRequestModel> activeList = new ArrayList<>();
+
+				requestModel.setUsername(user.getUsername());
+				String firstName = "";
+				if (StringUtil.isNullOrEmpty(user.getFirstName())) {
+					firstName = user.getUsername();
+				} else {
+					firstName = user.getFirstName();
+				}
+
+				String fName = "";
+
+				requestModel.setFirstName(firstName);
+				requestModel.setLastName(user.getLastName());
+				requestModel.setEnabled(user.getEnabled());
+				requestModel.setEmail(user.getEmail());
+				requestModel.setEmailVerified(user.getEmailVerified());
+
+				attribute.setGender(user.getAttributes().getGender());
+				attribute.setMaritalStatus(user.getAttributes().getMaritalStatus());
+				attribute.setMobile(user.getAttributes().getMobile());
+				attribute.setPan(user.getAttributes().getPan());
+				attribute.setUcc(user.getAttributes().getUcc());
+				requestModel.setAttributes(attribute);
+
+				credentialsModel.setType("password");
+				credentialsModel.setValue("CholaEmp@123");
+				userCredentilList.add(credentialsModel);
+				requestModel.setCredentials(userCredentilList);
+
+				activeList.add(requestModel);
+
+				String activeUserFileName = "ActiveUser";
+				List<String> createActiveUserIntoKeycoack = insertEmp(activeList, "Active");
+				return prepareResponse.prepareSuccessResponseObject(createActiveUserIntoKeycoack.get(0));
+			} else {
+				return prepareResponse.prepareFailedResponse(AppConstants.INVALID_PARAMETER);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			Log.error(e.getMessage());
+		}
+		return prepareResponse.prepareFailedResponse(AppConstants.FAILED_STATUS);
+	}
+
+	/**
+	 * Method to insert new user
+	 * 
+	 * @author Gowthaman
+	 * @param requestModel
+	 * @param role
+	 * @return
+	 */
+	public List<String> insertEmp(List<CreateUserRequestModel> requestModel, String role) {
+		List<Callable<String>> tasks = new ArrayList<>();
+		for (CreateUserRequestModel model : requestModel) {
+			Callable<String> task = () -> {
+				String message = kcAdminRest.addNewUser(model);
+
+				if (message.equals("User Created")) {
+					if (role.equalsIgnoreCase("Active")) {
+						empRoleMapping(model.getUsername());
+					}
+					return "User Created - " + model.getUsername();
+				} else if (message.equals("User already exists")) {
+					return "User already exists - " + model.getUsername();
+				}
+				return "Failed to Created - " + model.getUsername();
+			};
+			tasks.add(task);
+		}
+		return tasks.stream().map(callable -> {
+			try {
+				return callable.call();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}).collect(Collectors.toList());
+	}
+	
+	/**
+	 * Method to active User Role Mapping
+	 * 
+	 * @param userId
+	 */
+	public void empRoleMapping(String userId) {
+		try {
+			List<UserRoleMapReqModel> mapReqModels = new ArrayList<>();
+			UserRoleMapReqModel model = new UserRoleMapReqModel();
+			model.setId(keycloakConfig.getEmpActiveRoleId());
+			model.setName(keycloakConfig.getEmpActiveRoleName());
+			mapReqModels.add(model);
+			String message = kcAdminRest.userRoleMapping(mapReqModels, userId, keycloakConfig.getClientCholaId());
+			if (StringUtil.isNotNullOrEmpty(message)) {
+				Log.info("Role Mapping - " + message);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			Log.error(e.getMessage());
+		}
 	}
 
 }

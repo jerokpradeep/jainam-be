@@ -145,6 +145,7 @@ public class LogsDatabaseConnection {
 					}
 				}
 			}
+			connection.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -204,11 +205,11 @@ public class LogsDatabaseConnection {
 						}
 					}
 				}
+				connection.close();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}
-		else {
+		} else {
 			try {
 				Connection connection = dataSource.getConnection();
 				String databaseName = "logs_db";
@@ -247,6 +248,7 @@ public class LogsDatabaseConnection {
 						}
 					}
 				}
+				connection.close();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -326,12 +328,13 @@ public class LogsDatabaseConnection {
 								PaginationList = getPaginationList(response, pageNo, pageSize);
 							}
 						}
+						statement.close();
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
 
 				}
-
+				connection.close();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -378,7 +381,7 @@ public class LogsDatabaseConnection {
 					}
 
 				}
-
+				connection.close();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -425,7 +428,7 @@ public class LogsDatabaseConnection {
 					}
 
 				}
-
+				connection.close();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -469,7 +472,7 @@ public class LogsDatabaseConnection {
 					}
 
 				}
-
+				connection.close();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

@@ -46,7 +46,7 @@ public class PaymentController implements PaymentControllerSpec {
 			return prepareResponse.prepareFailedResponse(AppConstants.GUEST_USER_ERROR);
 		}
 //		ClinetInfoModel info = new ClinetInfoModel();
-//		info.setUserId("EA0725");
+//		info.setUserId("108055");
 		return paymentService.createNewPayment(limitOrderEntity, info);
 	}
 
@@ -100,7 +100,7 @@ public class PaymentController implements PaymentControllerSpec {
 			return prepareResponse.prepareFailedResponse(AppConstants.GUEST_USER_ERROR);
 		}
 //		ClinetInfoModel info = new ClinetInfoModel();
-//		info.setUserId("S00096");
+//		info.setUserId("108055");
 		return paymentService.getPaymentDetails(info);
 	}
 
@@ -177,7 +177,7 @@ public class PaymentController implements PaymentControllerSpec {
 			return prepareResponse.prepareFailedResponse(AppConstants.GUEST_USER_ERROR);
 		}
 //		ClinetInfoModel info = new ClinetInfoModel();
-//		info.setUserId("111560");
+//		info.setUserId("117995");
 		return paymentService.payOut(info, model);
 	}
 

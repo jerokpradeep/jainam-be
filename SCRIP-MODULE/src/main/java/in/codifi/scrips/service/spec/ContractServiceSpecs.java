@@ -42,9 +42,9 @@ public interface ContractServiceSpecs {
 	 * @return
 	 */
 	RestResponse<GenericResponse> reloadContractMasterFile();
-	
+
 	/**
-	 * Method to Load fiftytwoWeekData 
+	 * Method to Load fiftytwoWeekData
 	 * 
 	 * @author Gowthaman
 	 * @return
@@ -58,5 +58,20 @@ public interface ContractServiceSpecs {
 	 * @return
 	 */
 	RestResponse<GenericResponse> loadMTFData();
+
+	/**
+	 * method to add index value
+	 * 
+	 * @author LOKESH
+	 */
+	RestResponse<GenericResponse> addIndexValue();
+
+	/**
+	 * Method to create Archive Table For Contract Master
+	 * 
+	 * @author LOKESH
+	 * @return
+	 */
+	RestResponse<GenericResponse> createArchiveTableForContractMaster();
 
 }

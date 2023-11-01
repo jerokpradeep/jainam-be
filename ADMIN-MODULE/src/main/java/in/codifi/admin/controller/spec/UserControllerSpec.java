@@ -21,8 +21,7 @@ public interface UserControllerSpec {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	RestResponse<GenericResponse> getUserLoggedInDetails();
-	
-	
+
 	/**
 	 * Method to Truncate user logged in details
 	 * 
@@ -33,4 +32,5 @@ public interface UserControllerSpec {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	RestResponse<GenericResponse> truncateUserLoggedInDetails();
+
 }

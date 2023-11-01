@@ -47,4 +47,13 @@ public interface ContractServiceSpec {
 	 * @return
 	 */
 	RestResponse<GenericResponse> getDuplicateList();
+
+	/**
+	 * Method to load contract master
+	 * 
+	 * @author Dinesh Kumar
+	 *
+	 * @return
+	 */
+	RestResponse<GenericResponse> loadContractMaster();
 }

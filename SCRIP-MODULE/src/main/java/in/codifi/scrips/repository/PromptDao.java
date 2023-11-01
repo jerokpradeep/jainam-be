@@ -66,7 +66,8 @@ public class PromptDao {
 					}
 				}
 			}
-
+			conn.close();
+			rSet.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 			Log.error(e.getMessage());

@@ -457,9 +457,9 @@ public class AnalysisController implements AnalysisControllerSpec {
 			return prepareResponse.prepareFailedResponse(AppConstants.INVALID_EXCH);
 		}
 
-//		ClinetInfoModel info = appUtil.getClientInfo();
-		ClinetInfoModel info = new ClinetInfoModel();
-		info.setUserId("C00008");
+		ClinetInfoModel info = appUtil.getClientInfo();
+//		ClinetInfoModel info = new ClinetInfoModel();
+//		info.setUserId("C00008");
 		return analysisService.getSupportAndResistance(req, info);
 	}
 

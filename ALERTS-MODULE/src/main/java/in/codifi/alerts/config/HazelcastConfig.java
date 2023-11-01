@@ -8,6 +8,7 @@ import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.core.HazelcastInstance;
 
+import in.codifi.cache.model.ContractMasterModel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -38,5 +39,6 @@ public class HazelcastConfig {
 	}
 
 	private Map<String, String> restUserSession = getHz().getMap("restUserSession");
+	private Map<String, ContractMasterModel> contractMaster = getHz().getMap("contractMaster");
 
 }

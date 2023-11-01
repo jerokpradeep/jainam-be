@@ -32,6 +32,7 @@ import in.codifi.holdings.utility.StringUtil;
 import in.codifi.holdings.ws.model.EdisSummaryResponse;
 import in.codifi.holdings.ws.model.Fail;
 import in.codifi.holdings.ws.model.HoldingsRestRespModel;
+import in.codifi.holdings.ws.model.SummaryResponse;
 import in.codifi.holdings.ws.remodeling.HoldingsRemodeling;
 import io.quarkus.logging.Log;
 
@@ -173,6 +174,7 @@ public class HoldingsRestService {
 			String request = props.getEdisSummaryUrl() + info.getUserId() + "/" + req.getSellQty() + "/"
 					+ req.getSegId() + "/" + req.getToken() + "/" + depository + "/" + req.getSummaryMktSegId() + "/"
 					+ req.getProductType();
+			System.out.println("request -- " + request);
 			accessLogModel.setReqBody(request);
 			CodifiUtil.trustedManagement();
 			URL url = new URL(request);
@@ -199,6 +201,82 @@ public class HoldingsRestService {
 				insertRestAccessLogs(accessLogModel);
 				if (output.contains("Summary fetched successfully")) {
 					summaryResponse = mapper.readValue(output, EdisSummaryResponse.class);
+					System.out.println("response -- " + summaryResponse);
+					return prepareResponse.prepareSuccessResponseObject(summaryResponse.getData());
+				} else {
+					return prepareResponse.prepareFailedResponse(AppConstants.NOT_FOUND);
+				}
+
+			} else {
+				bufferedReader = new BufferedReader(new InputStreamReader((conn.getErrorStream())));
+				output = bufferedReader.readLine();
+				accessLogModel.setResBody(output);
+				insertRestAccessLogs(accessLogModel);
+				if (StringUtil.isNotNullOrEmpty(output)) {
+					Fail fail = mapper.readValue(output, Fail.class);
+					if (StringUtil.isNotNullOrEmpty(fail.getEmsg()))
+						System.out.println("Error Connection in Get EdisSummary api. Rsponse code -" + fail.getEmsg());
+					return prepareResponse.prepareFailedResponse(fail.getEmsg());
+				}
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			Log.error("Get EdisSummary -- " + e.getMessage());
+		}
+		return prepareResponse.prepareFailedResponse(AppConstants.FAILED_STATUS);
+	}
+
+	/**
+	 * Method to get EdisSummary
+	 * 
+	 * @author Gowthaman
+	 * @param req
+	 * @param info
+	 * @return
+	 */
+	public RestResponse<GenericResponse> getEdisSummarys(ClinetInfoModel info, String userSession) {
+		SummaryResponse summaryResponse = new SummaryResponse();
+		RestAccessLogModel accessLogModel = new RestAccessLogModel();
+		ObjectMapper mapper = new ObjectMapper();
+		Log.info("Get EdisSummary" + userSession);
+
+		try {
+			accessLogModel.setMethod("getEdisSummarys");
+			accessLogModel.setModule(AppConstants.MODULE_HOLDINGS);
+			accessLogModel.setUrl(props.getHoldingsUrl());
+			accessLogModel.setUserId(info.getUserId());
+			accessLogModel.setInTime(new Timestamp(new Date().getTime()));
+
+			String request = props.getEdisSummarysUrl();
+			System.out.println("request -- " + request);
+			accessLogModel.setReqBody(request);
+			CodifiUtil.trustedManagement();
+			URL url = new URL(request);
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.setRequestMethod(AppConstants.GET_METHOD);
+			conn.setRequestProperty(AppConstants.ACCEPT, AppConstants.APPLICATION_JSON);
+			conn.setRequestProperty(AppConstants.AUTHORIZATION, AppConstants.BEARER_WITH_SPACE + userSession);
+			conn.setRequestProperty(AppConstants.X_API_KEY_NAME, props.getXApiKey());
+			conn.setDoOutput(true);
+			int responseCode = conn.getResponseCode();
+			System.out.println("getEdisSummarys responseCode -- " + responseCode);
+			accessLogModel.setOutTime(new Timestamp(new Date().getTime()));
+			BufferedReader bufferedReader;
+			String output = null;
+			if (responseCode == 401) {
+				Log.error("Unauthorized error in Get EdisSummary");
+				accessLogModel.setResBody(AppConstants.UNAUTHORIZED);
+				insertRestAccessLogs(accessLogModel);
+				return prepareResponse.prepareUnauthorizedResponse();
+			} else if (responseCode == 200) {
+				bufferedReader = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+				output = bufferedReader.readLine();
+				Log.info("Odin Get EdisSummary response" + output);
+				accessLogModel.setResBody(output);
+				insertRestAccessLogs(accessLogModel);
+				if (output.contains("Summary fetched successfully")) {
+					summaryResponse = mapper.readValue(output, SummaryResponse.class);
 					return prepareResponse.prepareSuccessResponseObject(summaryResponse.getData());
 				} else {
 					return prepareResponse.prepareFailedResponse(AppConstants.NOT_FOUND);

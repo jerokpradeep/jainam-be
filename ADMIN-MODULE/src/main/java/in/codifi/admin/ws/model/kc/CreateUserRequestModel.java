@@ -40,6 +40,9 @@ public class CreateUserRequestModel implements Serializable {
 
 	@JsonProperty("attributes")
 	private UserAttribute attributes;
+	
+	@JsonProperty("requiredActions")
+	private List<Object> requiredActions;
 
 //	@JsonProperty("clientRoles")
 //	public ClientRoles clientRoles;

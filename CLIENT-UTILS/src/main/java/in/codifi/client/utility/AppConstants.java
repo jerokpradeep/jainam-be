@@ -93,4 +93,11 @@ public class AppConstants {
 	
 	public static final String CLIENT_INFO_IS_NULL = "Client info is null";
 	
+	//ERP
+	public static final String ERP_AUTHORIZATION_TOKEN = "token 64ffb3da7ea0934:4bda8b7c2bca9cd";
+	public static final String SUBJECT = "subject";
+	public static final String RAISED_BY = "raised_by";
+	public static final String DESCRIPTION = "description";
+	public static final String INVALID_MOBILE = "Invalid Mobile Number";
+	
 }

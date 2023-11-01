@@ -20,5 +20,18 @@ public class AppUtil extends DefaultRestController {
 		ClinetInfoModel model = clientInfo();
 		return model;
 	}
+	
+	/**
+	 * 
+	 * Method to get token
+	 * 
+	 * @author Dinesh Kumar
+	 *
+	 * @return
+	 */
+	public String getToken() {
+		String token = rawToken();
+		return token;
+	}
 
 }

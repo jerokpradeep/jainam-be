@@ -118,6 +118,7 @@ public class PrepareResponse {
 		GenericResponse responseObject = new GenericResponse();
 		responseObject.setStatus(AppConstants.STATUS_OK);
 		responseObject.setMessage(message);
+		responseObject.setResult(AppConstants.EMPTY_ARRAY);
 		return RestResponse.ResponseBuilder.create(Status.OK, responseObject).build();
 	}
 

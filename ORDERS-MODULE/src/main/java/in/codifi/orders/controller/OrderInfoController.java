@@ -85,5 +85,27 @@ public class OrderInfoController implements OrderInfoControllerSpec {
 		}
 		return orderInfoService.getOrderHistory(req, info);
 	}
+	
+	/**
+	 * Method to get Gtd order book details
+	 * 
+	 * @author Gowthaman M
+	 * @param orderReqModel
+	 * @return
+	 */
+	@Override
+	public RestResponse<GenericResponse> getGtdOrderBookInfo() {
+		
+		ClinetInfoModel info = appUtil.getClientInfo();
+		if (info == null || StringUtil.isNullOrEmpty(info.getUserId())) {
+			Log.error(AppConstants.CLIENT_INFO_IS_NULL);
+			return prepareResponse.prepareFailedResponse(AppConstants.FAILED_STATUS);
+		} else if (StringUtil.isNullOrEmpty(info.getUcc())) {
+			return prepareResponse.prepareFailedResponse(AppConstants.GUEST_USER_ERROR);
+		}
+//		ClinetInfoModel info = new ClinetInfoModel();
+//		info.setUserId("117995");
+		return orderInfoService.getGtdOrderBookInfo(info); 
+	}
 
 }

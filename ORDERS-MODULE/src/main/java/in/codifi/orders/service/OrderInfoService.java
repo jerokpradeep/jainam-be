@@ -48,7 +48,7 @@ public class OrderInfoService implements OrderInfoServiceSpec {
 		try {
 			/** Verify session **/
 			String userSession = AppUtil.getUserSession(info.getUserId());
-//			String userSession = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6NzA3MDcwLCJ1c2VyaWQiOjcwNzA3MCwidGVuYW50aWQiOjcwNzA3MCwibWVtYmVySW5mbyI6eyJ0ZW5hbnRJZCI6IjIxNCIsImdyb3VwSWQiOiJITyIsInVzZXJJZCI6IjExMTU2MCIsInRlbXBsYXRlSWQiOiJETlMiLCJ1ZElkIjoiIiwib2NUb2tlbiI6IjB4MDE4Mjk4Q0I0MUZCOEUwNTNDNEM4OEUwMjczM0UyIiwidXNlckNvZGUiOiJBRVVQQSIsImdyb3VwQ29kZSI6IkFBQUFBIiwiYXBpa2V5RGF0YSI6eyJDdXN0b21lcklkIjoiMjE0IiwiZXhwIjoxNjkxNzYxMTQwLCJpYXQiOjE2NjAyMjUxOTd9LCJzb3VyY2UiOiJNT0JJTEVBUEkifSwiZXhwIjoxNjg5MTAwMTk5LCJpYXQiOjE2ODkwODMwODd9.RFjL8dFEZlx7lmhiFvWy1UUJnQCmaEsfk_JwHydTGYQ";
+//			String userSession = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6NzA3MDcwLCJ1c2VyaWQiOjcwNzA3MCwidGVuYW50aWQiOjcwNzA3MCwibWVtYmVySW5mbyI6eyJ0ZW5hbnRJZCI6IjQxOSIsImdyb3VwSWQiOiJITyIsInVzZXJJZCI6IkozMyIsInRlbXBsYXRlSWQiOiJVQVQiLCJ1ZElkIjoiIiwib2NUb2tlbiI6IjB4MDFFMEI2NjkzOTg0Rjg4Rjc2QTkyNjgyNjFFMzA4IiwidXNlckNvZGUiOiJOWlNQSSIsImdyb3VwQ29kZSI6IkFBQUFBIiwiYXBpa2V5RGF0YSI6eyJDdXN0b21lcklkIjoiNDE5IiwiU3ViVGVuYW50SWQiOiIiLCJQcm9kdWN0U291cmNlIjoiV0FWRUFQSSIsImV4cCI6MTgyMDgzMTI4MCwiaWF0IjoxNjkxMjMxMjkzfSwic291cmNlIjoiTU9CSUxFQVBJIn0sImV4cCI6MTY5ODg2MzM5OSwiaWF0IjoxNjk4ODIwNzI1fQ.5QE2raEwcpAN0Kxgu0gpEXUJituJllMsKlYz-LKJErU";
 			if (StringUtil.isNullOrEmpty(userSession))
 				return prepareResponse.prepareUnauthorizedResponse();
 
@@ -125,6 +125,7 @@ public class OrderInfoService implements OrderInfoServiceSpec {
 		try {
 			/** Verify session **/
 			String userSession = AppUtil.getUserSession(info.getUserId());
+//			String userSession = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6NzA3MDcwLCJ1c2VyaWQiOjcwNzA3MCwidGVuYW50aWQiOjcwNzA3MCwibWVtYmVySW5mbyI6eyJ0ZW5hbnRJZCI6IjQxOSIsImdyb3VwSWQiOiJITyIsInVzZXJJZCI6IkozMyIsInRlbXBsYXRlSWQiOiJVQVQiLCJ1ZElkIjoiIiwib2NUb2tlbiI6IjB4MDFFMEI2NjkzOTg0Rjg4Rjc2QTkyNjgyNjFFMzA4IiwidXNlckNvZGUiOiJOWlNQSSIsImdyb3VwQ29kZSI6IkFBQUFBIiwiYXBpa2V5RGF0YSI6eyJDdXN0b21lcklkIjoiNDE5IiwiU3ViVGVuYW50SWQiOiIiLCJQcm9kdWN0U291cmNlIjoiV0FWRUFQSSIsImV4cCI6MTgyMDgzMTI4MCwiaWF0IjoxNjkxMjMxMjkzfSwic291cmNlIjoiTU9CSUxFQVBJIn0sImV4cCI6MTY5ODg2MzM5OSwiaWF0IjoxNjk4ODIwNzI1fQ.5QE2raEwcpAN0Kxgu0gpEXUJituJllMsKlYz-LKJErU";
 			if (StringUtil.isNullOrEmpty(userSession))
 				return prepareResponse.prepareUnauthorizedResponse();
 
@@ -135,7 +136,7 @@ public class OrderInfoService implements OrderInfoServiceSpec {
 		}
 		return prepareResponse.prepareFailedResponse(AppConstants.FAILED_STATUS);
 	}
-	
+
 	/**
 	 * Method to get Order History
 	 * 
@@ -153,6 +154,30 @@ public class OrderInfoService implements OrderInfoServiceSpec {
 
 			/** Get Trade book **/
 			return ordersRestService.getOrderHistory(req, userSession, info);
+		} catch (Exception e) {
+			Log.error(e);
+		}
+		return prepareResponse.prepareFailedResponse(AppConstants.FAILED_STATUS);
+	}
+	
+	/**
+	 * Method to get Gtd order book details
+	 * 
+	 * @author Gowthaman M
+	 * @return
+	 */
+	@Override
+	public RestResponse<GenericResponse> getGtdOrderBookInfo(ClinetInfoModel info) {
+		try {
+			/** Verify session **/
+//			String userSession = AppUtil.getUserSession(info.getUserId());
+			String userSession = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6OTA5MDkwLCJ1c2VyaWQiOjkwOTA5MCwidGVuYW50aWQiOjkwOTA5MCwibWVtYmVySW5mbyI6eyJ0ZW5hbnRJZCI6IjIxNCIsImdyb3VwSWQiOiJITyIsInVzZXJJZCI6IjExNzk5NSIsInRlbXBsYXRlSWQiOiJETlMiLCJ1ZElkIjoiYjcwZDZmMTM4MWVjNzUyMSIsIm9jVG9rZW4iOiIweDAxMzczMTIxMTBBQzE4RjkyQTRDNTM3QzM1NDNDOCIsInVzZXJDb2RlIjoiQUZET0IiLCJncm91cENvZGUiOiJBQUFBQSIsImFwaWtleURhdGEiOnsiQ3VzdG9tZXJJZCI6IjIxNCIsImV4cCI6MTc3NjE1OTcyMCwiaWF0IjoxNjg5NzU5NzY3fSwic291cmNlIjoiTU9CSUxFQVBJIn0sImV4cCI6MTY5ODY5MDU5OSwiaWF0IjoxNjk4NjY4MDM2fQ.27QxEj_JjgHH7XiFq2gmxv8KTHPRV3ptm3eCCGJfoXM";
+			if (StringUtil.isNullOrEmpty(userSession))
+				return prepareResponse.prepareUnauthorizedResponse();
+
+			/** Get Order Book **/
+			return ordersRestService.getGtdOrderBookInfo(userSession, info);
+
 		} catch (Exception e) {
 			Log.error(e);
 		}

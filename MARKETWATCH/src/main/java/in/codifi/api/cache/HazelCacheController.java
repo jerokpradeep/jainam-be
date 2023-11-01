@@ -3,12 +3,12 @@ package in.codifi.api.cache;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.microprofile.config.ConfigProvider;
-import org.json.simple.JSONObject;
-
 import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.core.HazelcastInstance;
+
+import org.eclipse.microprofile.config.ConfigProvider;
+import org.json.simple.JSONObject;
 
 import in.codifi.api.entity.primary.PredefinedMwEntity;
 import in.codifi.api.entity.primary.PredefinedMwScripsEntity;
@@ -16,6 +16,7 @@ import in.codifi.api.entity.primary.TickerTapeEntity;
 import in.codifi.api.model.AdvancedMWModel;
 import in.codifi.api.model.CacheMwAdvDetailsModel;
 import in.codifi.api.model.UserPerferencePreDefModel;
+import in.codifi.cache.model.AdminPreferenceModel;
 import in.codifi.cache.model.AnalysisRespModel;
 import in.codifi.cache.model.ContractMasterModel;
 import in.codifi.cache.model.EventDataModel;
@@ -70,9 +71,13 @@ public class HazelCacheController {
 
 	private Map<String, PredefinedMwScripsEntity> predefinedMwScripsEntity = getHz().getMap("predefinedMwScripsEntity");
 	private Map<String, CacheMwAdvDetailsModel> cacheMwAdvDetailsModel = getHz().getMap("cacheMwAdvDetailsModel");
-	
+
 	// For sort scrips
-	private Map<String, PredefinedMwScripsEntity> sortPredefinedMwScripsEntity = getHz().getMap("sortPredefinedMwScripsEntity");
+	private Map<String, PredefinedMwScripsEntity> sortPredefinedMwScripsEntity = getHz()
+			.getMap("sortPredefinedMwScripsEntity");
+
+	// for preference
+	private Map<String, AdminPreferenceModel> adminPreferenceModel = getHz().getMap("adminPreferenceModel");
 
 	public Map<String, UserPerferencePreDefModel> getUserPerferenceModel() {
 		return userPerferenceModel;
@@ -269,5 +274,13 @@ public class HazelCacheController {
 	public void setSortPredefinedMwScripsEntity(Map<String, PredefinedMwScripsEntity> sortPredefinedMwScripsEntity) {
 		this.sortPredefinedMwScripsEntity = sortPredefinedMwScripsEntity;
 	}
-	
+
+	public Map<String, AdminPreferenceModel> getAdminPreferenceModel() {
+		return adminPreferenceModel;
+	}
+
+	public void setAdminPreferenceModel(Map<String, AdminPreferenceModel> adminPreferenceModel) {
+		this.adminPreferenceModel = adminPreferenceModel;
+	}
+
 }

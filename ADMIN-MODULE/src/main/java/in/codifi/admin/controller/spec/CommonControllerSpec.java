@@ -9,6 +9,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.jboss.resteasy.reactive.RestResponse;
 
+import in.codifi.admin.model.request.PasswordForceUpdateReq;
 import in.codifi.admin.model.request.SendNoficationReqModel;
 import in.codifi.admin.model.request.UserReqModel;
 import in.codifi.admin.model.response.GenericResponse;
@@ -169,5 +170,30 @@ public interface CommonControllerSpec {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	RestResponse<GenericResponse> getUserNotificationList(UserReqModel reqModel);
+	
+	/**
+	 * Method to password Force Update
+	 * 
+	 * @author Gowthaman
+	 * @return
+	 */
+	@Path("/passwordForceUpdate")
+	@POST
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	RestResponse<GenericResponse> passwordForceUpdate(PasswordForceUpdateReq reqModel);
+	
+	/**
+	 * Method to add New employee User in keyclock
+	 * 
+	 * @author Gowthaman
+	 * @param req
+	 * @return
+	 */
+	@Path("/addNewEmpUser")
+	@POST
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public RestResponse<GenericResponse> addNewEmpUser(CreateUserRequestModel user);
 
 }

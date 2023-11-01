@@ -2,6 +2,7 @@ package in.codifi.admin.service.spec;
 
 import org.jboss.resteasy.reactive.RestResponse;
 
+import in.codifi.admin.model.request.PasswordForceUpdateReq;
 import in.codifi.admin.model.request.SendNoficationReqModel;
 import in.codifi.admin.model.request.UserReqModel;
 import in.codifi.admin.model.response.GenericResponse;
@@ -117,7 +118,6 @@ public interface CommonServiceSpec {
 	 */
 	RestResponse<GenericResponse> addNewUser(CreateUserRequestModel user);
 	
-	
 	/**
 	 * 
 	 @author babin
@@ -126,5 +126,23 @@ public interface CommonServiceSpec {
 	 @return
 	 */
 	RestResponse<GenericResponse> getUserNotificationList(UserReqModel reqModel);
+	
+	/**
+	 * Method to password Force Update
+	 * 
+	 * @author Gowthaman
+	 * @return
+	 */
+	RestResponse<GenericResponse> passwordForceUpdate(PasswordForceUpdateReq reqModel);
+	
+	/**
+	 * Method to add New Employee User in keyclock
+	 * 
+	 * @author Gowthaman
+	 * @param req
+	 * @return
+	 */
+	RestResponse<GenericResponse> addNewEmpUser(CreateUserRequestModel user);
+
 
 }

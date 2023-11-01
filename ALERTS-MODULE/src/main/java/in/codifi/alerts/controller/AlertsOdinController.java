@@ -6,14 +6,13 @@ import javax.ws.rs.Path;
 import org.jboss.resteasy.reactive.RestResponse;
 
 import in.codifi.alerts.controller.spec.AlertsOdinControllerSpec;
+import in.codifi.alerts.model.request.RequestModel;
 import in.codifi.alerts.model.response.GenericResponse;
 import in.codifi.alerts.service.spec.AlertsOdinServiceSpec;
 import in.codifi.alerts.utility.AppConstants;
 import in.codifi.alerts.utility.AppUtil;
 import in.codifi.alerts.utility.PrepareResponse;
 import in.codifi.alerts.utility.StringUtil;
-import in.codifi.alerts.ws.model.AlertsReqModel;
-import in.codifi.alerts.ws.model.ModifyAlertsReqModel;
 import in.codifi.cache.model.ClientInfoModel;
 import io.quarkus.logging.Log;
 
@@ -55,7 +54,7 @@ public class AlertsOdinController implements AlertsOdinControllerSpec {
 	 * @return
 	 */
 	@Override
-	public RestResponse<GenericResponse> createAlerts(AlertsReqModel req) {
+	public RestResponse<GenericResponse> createAlerts(RequestModel req) {
 		ClientInfoModel info = appUtil.getClientInfo();
 		if (info == null || StringUtil.isNullOrEmpty(info.getUserId())) {
 			Log.error("Client info is null");
@@ -63,9 +62,27 @@ public class AlertsOdinController implements AlertsOdinControllerSpec {
 		} else if (StringUtil.isNullOrEmpty(info.getUcc())) {
 			return prepareResponse.prepareFailedResponse(AppConstants.GUEST_USER_ERROR);
 		}
-//		ClientInfoModel info = new ClientInfoModel();
-//		info.setUserId("117995");
-		return alertsService.createAlerts(req, info);
+		if (StringUtil.isNotNullOrEmpty(req.getExch())) {
+			String operatorString = req.getOperator();
+			if (operatorString.equalsIgnoreCase("greater")) {
+				req.setOperator(">");
+			} else if (operatorString.equalsIgnoreCase("equal")) {
+				req.setOperator(">= or <=");
+			} else if (operatorString.equalsIgnoreCase("lesser")) {
+				req.setOperator("<");
+			} else if (operatorString.equalsIgnoreCase("greaterequal")) {
+				req.setOperator(">=");
+			} else if (operatorString.equalsIgnoreCase("lesserequal")) {
+				req.setOperator("<=");
+			} else {
+				return prepareResponse.prepareFailedResponse(AppConstants.INVALID_PARAMETER);
+			}
+//			ClientInfoModel info = new ClientInfoModel();
+//			info.setUserId("117995");
+			return alertsService.createAlerts(req, info);
+		} else {
+			return prepareResponse.prepareFailedResponse(AppConstants.INVALID_PARAMETER);
+		}
 	}
 
 	/**
@@ -78,7 +95,7 @@ public class AlertsOdinController implements AlertsOdinControllerSpec {
 	 * @return
 	 */
 	@Override
-	public RestResponse<GenericResponse> updateAlerts(ModifyAlertsReqModel req) {
+	public RestResponse<GenericResponse> updateAlerts(RequestModel req) {
 		ClientInfoModel info = appUtil.getClientInfo();
 		if (info == null || StringUtil.isNullOrEmpty(info.getUserId())) {
 			Log.error("Client info is null");
@@ -86,10 +103,31 @@ public class AlertsOdinController implements AlertsOdinControllerSpec {
 		} else if (StringUtil.isNullOrEmpty(info.getUcc())) {
 			return prepareResponse.prepareFailedResponse(AppConstants.GUEST_USER_ERROR);
 		}
+
+		if (StringUtil.isNotNullOrEmpty(req.getExch()) && StringUtil.isNotNullOrEmpty(req.getAlertId())) {
+			String operatorString = req.getOperator();
+			if (operatorString.equalsIgnoreCase("greater")) {
+				req.setOperator(">");
+			} else if (operatorString.equalsIgnoreCase("equal")) {
+				req.setOperator(">= or <=");
+			} else if (operatorString.equalsIgnoreCase("lesser")) {
+				req.setOperator("<");
+			} else if (operatorString.equalsIgnoreCase("greaterequal")) {
+				req.setOperator(">=");
+			} else if (operatorString.equalsIgnoreCase("lesserequal")) {
+				req.setOperator("<=");
+			} else {
+				return prepareResponse.prepareFailedResponse(AppConstants.INVALID_PARAMETER);
+			}
+
 //		ClientInfoModel info = new ClientInfoModel();
 //		info.setUserId("117995");
-		return alertsService.updateAlerts(req, info);
+			return alertsService.updateAlerts(req, info);
+		} else {
+			return prepareResponse.prepareFailedResponse(AppConstants.INVALID_PARAMETER);
+		}
 	}
+
 	/**
 	 * Method to delete alert
 	 * 

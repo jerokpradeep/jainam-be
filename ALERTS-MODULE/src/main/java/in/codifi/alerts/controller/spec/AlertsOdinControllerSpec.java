@@ -5,15 +5,14 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.jboss.resteasy.reactive.RestResponse;
 
+import in.codifi.alerts.model.request.RequestModel;
 import in.codifi.alerts.model.response.GenericResponse;
-import in.codifi.alerts.ws.model.AlertsReqModel;
-import in.codifi.alerts.ws.model.ModifyAlertsReqModel;
 
 public interface AlertsOdinControllerSpec {
 
@@ -40,7 +39,7 @@ public interface AlertsOdinControllerSpec {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	RestResponse<GenericResponse> createAlerts(AlertsReqModel req);
+	RestResponse<GenericResponse> createAlerts(RequestModel req);
 
 	/**
 	 * Method to update Alerts
@@ -54,7 +53,7 @@ public interface AlertsOdinControllerSpec {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	RestResponse<GenericResponse> updateAlerts(ModifyAlertsReqModel req);
+	RestResponse<GenericResponse> updateAlerts(RequestModel req);
 
 	/**
 	 * Method to delete alert
@@ -64,9 +63,10 @@ public interface AlertsOdinControllerSpec {
 	 * @param alertId
 	 * @return
 	 */
-	@Path("/delete/{alertId}")
+	@Path("/delete/{id}")
 	@DELETE
+	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	RestResponse<GenericResponse> deleteAlert(@QueryParam("alertId") String alertId);
+	RestResponse<GenericResponse> deleteAlert(@PathParam("id") String alertId);
 
 }

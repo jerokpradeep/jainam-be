@@ -14,11 +14,11 @@ import java.util.stream.Stream;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.jboss.resteasy.reactive.RestResponse;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import in.codifi.api.cache.HazelCacheController;
 import in.codifi.api.config.ApplicationProperties;
@@ -43,6 +43,7 @@ import in.codifi.api.service.spec.IAdvanceMWService;
 import in.codifi.api.util.AppConstants;
 import in.codifi.api.util.PrepareResponse;
 import in.codifi.api.util.StringUtil;
+import in.codifi.cache.model.AdminPreferenceModel;
 import in.codifi.cache.model.AnalysisRespModel;
 import in.codifi.cache.model.ClinetInfoModel;
 import in.codifi.cache.model.ContractMasterModel;
@@ -767,6 +768,7 @@ public class AdvanceMWService implements IAdvanceMWService {
 	@SuppressWarnings("unchecked")
 	public List<JSONObject> prepareScreeners(List<JSONObject> result, UserPerferencePreDefModel userPref) {
 		/** logic to add mtf margin **/
+		AdminPreferenceModel adminpreference = HazelCacheController.getInstance().getAdminPreferenceModel().get("mtf");
 		for (JSONObject model : result) {
 			if (model.get("preDef") != null) {
 				List<JSONObject> tempList = (List<JSONObject>) model.get("scrips");
@@ -774,6 +776,7 @@ public class AdvanceMWService implements IAdvanceMWService {
 					for (JSONObject tempModel : tempList) {
 						String key = tempModel.get("exchange") + "_" + tempModel.get("token");
 						AdvancedMWModel advanceModel = HazelCacheController.getInstance().getAdvPredefinedMW().get(key);
+
 						if (advanceModel != null) {
 							if (advanceModel.getScreeners() != null
 									&& advanceModel.getScreeners().getColorCode() != null
@@ -796,7 +799,7 @@ public class AdvanceMWService implements IAdvanceMWService {
 								tempModel.put("research", advanceModel.isResearch());
 								System.out.println("research put successfully" + tempModel.get("research"));
 							}
-							if (userPref.getMtfMargin() == 1) {
+							if (adminpreference.getAdminValue() == 1) {
 								tempModel.put("mtfMargin", advanceModel.getMtfMargin());
 								System.out.println("mtf put successfully" + tempModel.get("mtfMargin"));
 							}
@@ -838,7 +841,7 @@ public class AdvanceMWService implements IAdvanceMWService {
 							key = tempModel.getExchange() + "_" + tempModel.getToken();
 
 							/** logic to add MTF Margin **/
-							if (userPref.getMtfMargin() == 1) {
+							if (adminpreference.getAdminValue() == 1) {
 								MtfDataModel mtfData = HazelCacheController.getInstance().getMtfDataModel().get(key);
 								if (mtfData != null && mtfData.getMtfMargin() > 0) {
 
@@ -938,6 +941,8 @@ public class AdvanceMWService implements IAdvanceMWService {
 	private UserPerferencePreDefModel prepareUserPreferenceList(String pUserId, String source) {
 		UserPerferencePreDefModel predefModel = new UserPerferencePreDefModel();
 		try {
+			AdminPreferenceModel adminPreferenceModel = HazelCacheController.getInstance().getAdminPreferenceModel()
+					.get("mtf");
 			/** Based on user preference set predefined MW List **/
 			if (HazelCacheController.getInstance().getPerference().get(pUserId + "_" + source) != null) {
 				List<PreferenceModel> userPreferenceDetails = HazelCacheController.getInstance().getPerference()
@@ -951,20 +956,29 @@ public class AdvanceMWService implements IAdvanceMWService {
 					} else if (entity.getTag().equalsIgnoreCase("rvs") && entity.getValue().equalsIgnoreCase("1")) {
 						predefModel.setResearch(1);
 					} else if (entity.getTag().equalsIgnoreCase("mtf") && entity.getValue().equalsIgnoreCase("1")) {
-						predefModel.setMtfMargin(1);
+						if (adminPreferenceModel.getAdminValue() == 0) {
+							predefModel.setMtfMargin(0);
+						} else {
+							predefModel.setMtfMargin(1);
+						}
 					}
 					HazelCacheController.getInstance().getUserPerferenceModel().put(pUserId + "_" + source,
 							predefModel);
 				}
 			} else {
 				predefModel.setEvent(1);
-				predefModel.setMtfMargin(1);
+				if (adminPreferenceModel.getAdminValue() == 0) {
+					predefModel.setMtfMargin(0);
+				} else {
+					predefModel.setMtfMargin(1);
+				}
 				predefModel.setResearch(1);
 				predefModel.setScreeners(1);
 
 			}
 		} catch (Exception e) {
-			Log.error(e);
+			e.printStackTrace();
+			Log.error("prepare UserPreference List -- " + e.getMessage());
 		}
 		return predefModel;
 	}

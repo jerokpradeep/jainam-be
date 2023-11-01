@@ -57,5 +57,8 @@ public class AlertsEntity extends CommonEntity implements Serializable {
 
 	@Column(name = "EXCH_SEG")
 	private String exchSeg;
+	
+	@Column(name = "ALERT_ID")
+	private String alertId;
 
 }

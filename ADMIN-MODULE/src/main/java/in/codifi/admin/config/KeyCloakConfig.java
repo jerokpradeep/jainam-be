@@ -26,6 +26,18 @@ public class KeyCloakConfig {
 
 	@ConfigProperty(name = "auth.org.server.role.active.name")
 	private String activeRoleName;
+	
+	@ConfigProperty(name = "auth.org.server.role.mfactive.id")
+	private String mfActiveRoleId;
+
+	@ConfigProperty(name = "auth.org.server.role.mfactive.name")
+	private String mfActiveRoleName;
+	
+	@ConfigProperty(name = "auth.org.server.role.empactive.id")
+	private String empActiveRoleId;
+
+	@ConfigProperty(name = "auth.org.server.role.empactive.name")
+	private String empActiveRoleName;
 
 	@ConfigProperty(name = "auth.org.server.role.dormant.name")
 	private String dormatRoleName;

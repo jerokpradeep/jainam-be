@@ -48,6 +48,8 @@ public class ClientService implements ClientServiceSpec {
 	KeyCloakAdminRestService keyCloakAdminRestService;
 	@Inject
 	KeyCloakConfig keycloakConfig;
+	@Inject
+	CommonService commonService;
 
 	/**
 	 * Method to create existing user in keycloak
@@ -135,12 +137,15 @@ public class ClientService implements ClientServiceSpec {
 
 				if (message.equals("User Created")) {
 					if (role.equalsIgnoreCase("Active")) {
-						activeUserRoleMapping(model.getUsername());
+//						activeUserRoleMapping(model.getUsername());
+						mfActiveUserRoleMapping(model.getUsername());
 					} else {
 						dormatUserRoleMapping(model.getUsername());
 					}
 					return "User Created - " + model.getUsername();
 				} else if (message.equals("User already exists")) {
+					mfActiveUserRoleMapping(model.getUsername());
+//					commonService.updateKcUserDetails(model);
 					return "User already exists - " + model.getUsername();
 				}
 				return "Failed to Created - " + model.getUsername();
@@ -174,7 +179,8 @@ public class ClientService implements ClientServiceSpec {
 			while ((strLine = br.readLine()) != null) {
 				String[] values = strLine.trim().split("\\|");
 				CreateUserRequestModel requestModel = new CreateUserRequestModel();
-				if (values.length == 10) {
+//				if (values.length == 10) {
+				if (values.length == 9) {
 					List<CreateUserCredentialsModel> userCredentilList = new ArrayList<>();
 					UserAttribute attribute = new UserAttribute();
 					requestModel.setUsername(values[0]);
@@ -184,20 +190,24 @@ public class ClientService implements ClientServiceSpec {
 					} else {
 						firstName = values[2];
 					}
-					if (values[1] == null || values[1].isEmpty()) {
-						if (values[7].contains("MARRIED") && values[8].contains("F")) {
-							fName = "MRS" + " " + firstName;
-							requestModel.setFirstName(fName);
-						} else if (values[7].contains("SINGLE") && values[8].contains("F")) {
-							fName = "MS" + " " + firstName;
-							requestModel.setFirstName(fName);
-						} else if (values[8].contains("M")) {
-							fName = "MR" + " " + firstName;
-							requestModel.setFirstName(fName);
-						}
-					} else {
-						requestModel.setFirstName(values[1] + " " + firstName);
-					}
+//					if (values[1] == null || values[1].isEmpty()) {
+//						if (values[7].contains("MARRIED") && values[8].contains("F")) {
+//							fName = "MRS" + " " + firstName;
+//							requestModel.setFirstName(fName);
+//						} else if (values[7].contains("SINGLE") && values[8].contains("F")) {
+//							fName = "MS" + " " + firstName;
+//							requestModel.setFirstName(fName);
+//						} else if (values[8].contains("M")) {
+//							fName = "MR" + " " + firstName;
+//							requestModel.setFirstName(fName);
+//						}
+//					} else {
+//						requestModel.setFirstName(values[1] + " " + firstName);
+//					}
+					
+//					requestModel.setFirstName(values[1] + " " + firstName);
+					requestModel.setFirstName(firstName);
+					
 					requestModel.setLastName(values[3]);
 					attribute.setMobile(values[4]);
 					requestModel.setEmail(values[5]);
@@ -206,16 +216,16 @@ public class ClientService implements ClientServiceSpec {
 					attribute.setUcc(values[0]);
 					attribute.setPan(values[6]);
 					attribute.setMaritalStatus(values[7]);
-					attribute.setGender(values[8]);
+					attribute.setGender("");
 					requestModel.setAttributes(attribute);
 					CreateUserCredentialsModel credentialsModel = new CreateUserCredentialsModel();
 					credentialsModel.setType("password");
 					credentialsModel.setValue("Abc@1234");
 					userCredentilList.add(credentialsModel);
 					requestModel.setCredentials(userCredentilList);
-					if (values[9].contains("Active")) {
+					if (values[8].contains("Active")) {
 						activeList.add(requestModel);
-					} else if (values[9].contains("Dormant")) {
+					} else if (values[8].contains("Dormant")) {
 						dormatList.add(requestModel);
 					}
 				}
@@ -260,6 +270,31 @@ public class ClientService implements ClientServiceSpec {
 			UserRoleMapReqModel model = new UserRoleMapReqModel();
 			model.setId(keycloakConfig.getActiveRoleId());
 			model.setName(keycloakConfig.getActiveRoleName());
+			mapReqModels.add(model);
+			String message = keyCloakAdminRestService.userRoleMapping(mapReqModels, userId,
+					keycloakConfig.getClientCholaId());
+			if (StringUtil.isNotNullOrEmpty(message)) {
+				Log.info("Role Mapping - " + message);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			Log.error(e.getMessage());
+		}
+	}
+	
+	/**
+	 * method to active user role mapping
+	 * 
+	 * @author SOWMIYA
+	 * @param userId
+	 */
+	public void mfActiveUserRoleMapping(String userId) {
+		try {
+			List<UserRoleMapReqModel> mapReqModels = new ArrayList<>();
+			UserRoleMapReqModel model = new UserRoleMapReqModel();
+			model.setId(keycloakConfig.getMfActiveRoleId());
+			model.setName(keycloakConfig.getMfActiveRoleName());
 			mapReqModels.add(model);
 			String message = keyCloakAdminRestService.userRoleMapping(mapReqModels, userId,
 					keycloakConfig.getClientCholaId());

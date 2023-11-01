@@ -31,6 +31,7 @@ public class AccessLogModel {
 	private String contentType;
 	private String session;
 	private Date elapsed_time;
+	private String tableName;
 	private Timestamp createdOn;
 	private Timestamp updatedOn;
 	private Timestamp totalTime;

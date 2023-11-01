@@ -29,9 +29,12 @@ public class InitialLoader extends HttpServlet {
 	ScripsService scripsService;
 
 	public void init(@Observes StartupEvent ev) throws ServletException {
-		Log.info("Started scrips Initial Loader");
+		Log.info("Started scrips Initial Loaders");
 		Log.info("Started to Index contract scrips");
 		HazelcastConfig.getInstance().getFetchDataFromCache().put(AppConstants.FETCH_DATA_FROM_CACHE, true);
+		Log.info("Start to loaded Fiftytwo Week Data successfully");
+		contractService.loadFiftytwoWeekData();
+		Log.info("Fiftytwo Week Data are loaded successfully");
 		scripSearchRepo.loadDistintValue(2);
 		scripSearchRepo.loadIndexValue();
 		Log.info("Started to loading contract master");
@@ -39,20 +42,14 @@ public class InitialLoader extends HttpServlet {
 		contractService.loadContractMaster();
 		contractService.loadMTFData();
 		Log.info("All the pre-Lodings are ended");
-		Log.info("Started to delete BSE contract master");
 		contractEntityManager.deleteBSEContract();
-		Log.info("Delete BSE contract master ended");
 		scripsService.loadAsmGsm();
 		Log.info("AsmGsm loaded successfully");
-		
+
 		contractService.loadPromptData();
-		
-		Log.info("Start to loaded Fiftytwo Week Data successfully");
-		contractService.loadFiftytwoWeekData();
-		Log.info("Fiftytwo Week Data are loaded successfully");
-		
+
 		Log.info("Ended scrips Initial Loader");
-		
+
 	}
 
 }

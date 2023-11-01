@@ -6,13 +6,12 @@ import lombok.Setter;
 @Getter
 @Setter
 public class LogDetailsResponseModel {
-	private int uniqueMobileLogin;
-	private int uniqueWebLogin;
-	private int uniqueApiLogin;
-	private int totalMobileLogin;
-	private int totalWebLogin;
-	private int totalApiLogin;
-	private int totalLogin;
+	private String uniqueMob;
+	private String uniqueWeb;
+	private String uniqueApi;
+	private String totalMobile;
+	private String totalWeb;
+	private String totalApi;
 	private String date;
 
 }

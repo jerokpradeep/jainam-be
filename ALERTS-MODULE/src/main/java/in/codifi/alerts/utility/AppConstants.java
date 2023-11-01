@@ -70,5 +70,12 @@ public class AppConstants {
 	public static final String PUT_METHOD = "PUT";
 	public static final String No_RECORDS_FOUND = "No Records Found";
 	public static final String UNAUTHORIZED = "Unauthorized";
+	public static final String NSE = "NSE";
+	public static final String BSE = "BSE";
+	public static final String NFO = "NFO";
+	
+	//Alert
+	public static final String TENANT_ID = "1404";
+	public static final String PRICE = "PRICE";
 
 }

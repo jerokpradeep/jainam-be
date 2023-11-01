@@ -73,8 +73,8 @@ public class OrderExecutionService implements OrderExecutionServiceSpec {
 		try {
 			/** Verify session **/
 			Log.info("Orders  userId - " + info.getUserId());
-			String userSession = AppUtil.getUserSession(info.getUserId());
-//			String userSession = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6NzA3MDcwLCJ1c2VyaWQiOjcwNzA3MCwidGVuYW50aWQiOjcwNzA3MCwibWVtYmVySW5mbyI6eyJ0ZW5hbnRJZCI6IjIxNCIsImdyb3VwSWQiOiJITyIsInVzZXJJZCI6IkMwMDAwOCIsInRlbXBsYXRlSWQiOiJETlMiLCJ1ZElkIjoiOTc2ODY0MTlmOWNlMzc0MSIsIm9jVG9rZW4iOiIweDAxN0M2NTlCQzM3MzYzMkQwMkI3NUVEMDg0NjkyNCIsInVzZXJDb2RlIjoiQUNKWVUiLCJncm91cENvZGUiOiJBQUFBQSIsImFwaWtleURhdGEiOnsiQ3VzdG9tZXJJZCI6IjIxNCIsImV4cCI6MTc3NjE1OTcyMCwiaWF0IjoxNjg5NzU5NzY3fSwic291cmNlIjoiTU9CSUxFQVBJIn0sImV4cCI6MTY5NDE5Nzc5OSwiaWF0IjoxNjk0MTQ5Nzk4fQ.r9E8BX28E2_mvB9rsA2q4_-xQd106bpHd6pteqvZOc8";
+//			String userSession = AppUtil.getUserSession(info.getUserId());
+			String userSession = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6NzA3MDcwLCJ1c2VyaWQiOjcwNzA3MCwidGVuYW50aWQiOjcwNzA3MCwibWVtYmVySW5mbyI6eyJ0ZW5hbnRJZCI6IjQxOSIsImdyb3VwSWQiOiJITyIsInVzZXJJZCI6IkozMyIsInRlbXBsYXRlSWQiOiJVQVQiLCJ1ZElkIjoiIiwib2NUb2tlbiI6IjB4MDE3ODA0Mjg2MDZFOUQxQjMzNTE0MDBFNTE2NkExIiwidXNlckNvZGUiOiJOWlNQSSIsImdyb3VwQ29kZSI6IkFBQUFBIiwiYXBpa2V5RGF0YSI6eyJDdXN0b21lcklkIjoiNDE5IiwiU3ViVGVuYW50SWQiOiIiLCJQcm9kdWN0U291cmNlIjoiV0FWRUFQSSIsImV4cCI6MTgyMDgzMTI4MCwiaWF0IjoxNjkxMjMxMjkzfSwic291cmNlIjoiTU9CSUxFQVBJIn0sImV4cCI6MTY5ODg2MzM5OSwiaWF0IjoxNjk4ODQ2OTg3fQ.b4h-TQEYuXDr7_ay7D081e0DpCM-rfB_wz2z0dacNqo";
 			Log.info("Orders  userSession - " + userSession);
 			if (StringUtil.isNullOrEmpty(userSession))
 				return prepareResponse.prepareUnauthorizedResponseForList();
@@ -247,13 +247,14 @@ public class OrderExecutionService implements OrderExecutionServiceSpec {
 
 			coverOrderReqModel.setTransactionType(orderDetails.getTransType());
 
-			coverOrderReqModel.getMainLeg().setOrderType(AppConstants.COVER_MARGINPLUS);
+			coverOrderReqModel.getMainLeg().setOrderType(AppConstants.RL_MKT);
 			coverOrderReqModel.getMainLeg().setQuantity(Integer.parseInt(orderDetails.getQty()));
 			coverOrderReqModel.getMainLeg().setPrice(0);
 
 			List<Leg> legs = new ArrayList<>();
 			Leg leg = new Leg();
-			leg.setPrice(Float.parseFloat(orderDetails.getPrice()));
+//			leg.setPrice(Float.parseFloat(orderDetails.getPrice()));
+			leg.setPrice(Float.parseFloat(orderDetails.getTriggerPrice()));
 			leg.setQuantity(0);
 			leg.setTriggerPrice(Float.parseFloat(orderDetails.getTriggerPrice()));
 			legs.add(leg);
@@ -1231,13 +1232,20 @@ public class OrderExecutionService implements OrderExecutionServiceSpec {
 			legDetail.setMarketSegmentId(AppConstants.PAYMENT_PRIORITY);// TODO
 			legDetail.setToken(Integer.parseInt(marginReqModel.getToken()));
 			legDetail.setQuantity(Integer.parseInt(marginReqModel.getQty()));
-			String price = "";
-			if (marginReqModel.getPrice().contains(".")) {
-				price = marginReqModel.getPrice().replace(".", "");
-				legDetail.setPrice(Float.parseFloat(price));
-			} else {
-				legDetail.setPrice(Float.parseFloat(marginReqModel.getPrice()));
-			}
+			
+//			String price = "";
+//			if (marginReqModel.getPrice().contains(".")) {
+//				price = marginReqModel.getPrice().replace(".", "");
+//				legDetail.setPrice(Float.parseFloat(price));
+//			} else {
+//				legDetail.setPrice(Float.parseFloat(marginReqModel.getPrice()));
+//			}
+			
+			String price = marginReqModel.getPrice();
+			float floatValue = Float.parseFloat(price);
+			float priceValue = floatValue *= 100;
+			legDetail.setPrice(priceValue);
+			
 			legDetail.setMktFlag(AppConstants.PAYMENT_PRIORITY);// TODO
 
 			if (marginReqModel.getProduct().equalsIgnoreCase(AppConstants.PRODUCT_MIS)) {

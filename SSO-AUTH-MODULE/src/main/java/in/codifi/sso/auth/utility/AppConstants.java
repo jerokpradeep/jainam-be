@@ -134,4 +134,6 @@ public class AppConstants {
 
 	public static final String OMS_TR = "OMT";
 	public static final String INVALID_AUTH_CODE = "Invalid auth code";
+	
+	public static final String SOURCE_SSO = "SSO";
 }

@@ -31,5 +31,13 @@ public interface OrderInfoServiceSpec {
 	 * @return
 	 */
 	RestResponse<GenericResponse> getOrderHistory(OrderReqModel req, ClinetInfoModel info);
+	
+	/**
+	 * Method to get Gtd order book details
+	 * 
+	 * @author Gowthaman M
+	 * @return
+	 */
+	RestResponse<GenericResponse> getGtdOrderBookInfo(ClinetInfoModel info);
 
 }

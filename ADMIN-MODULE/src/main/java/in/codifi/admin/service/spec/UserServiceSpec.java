@@ -21,4 +21,5 @@ public interface UserServiceSpec {
 	 * @return
 	 */
 	RestResponse<GenericResponse> truncateUserLoggedInDetails();
+
 }

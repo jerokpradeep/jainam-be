@@ -22,7 +22,6 @@ import in.codifi.holdings.config.HazelcastConfig;
 import in.codifi.holdings.config.RestServiceProperties;
 import in.codifi.holdings.entity.logs.RestAccessLogModel;
 import in.codifi.holdings.model.request.EdisHoldModel;
-import in.codifi.holdings.model.request.EdisSummaryRequest;
 import in.codifi.holdings.model.response.GenericResponse;
 import in.codifi.holdings.repository.AccessLogManager;
 import in.codifi.holdings.service.spec.EdisServiceSpec;
@@ -209,14 +208,16 @@ public class EdisService implements EdisServiceSpec {
 //					+ "%5B%7B%22ISIN%22%3A%22INE012A01025%22%2C%22Quantity%22%3A0%2C%22ISINName%22%3A%22ACC+LIMITED%22%2C%22SettlmtCycle%22%3A%22T1%22%7D%5D"
 //					+ AppConstants.SYMBOL_AND;
 
-				toAppend = AppConstants.USER_ID + clientId + AppConstants.SYMBOL_AND;
+//				toAppend = AppConstants.USER_ID + clientId + AppConstants.SYMBOL_AND;
+//				sb.append(toAppend);
+				toAppend = AppConstants.USER_ID + userId + AppConstants.SYMBOL_AND;
 				sb.append(toAppend);
 				toAppend = AppConstants.GROUP_ID + groupId + AppConstants.SYMBOL_AND;
 				sb.append(toAppend);
 				toAppend = AppConstants.PRODUCT_TYPE + productType + AppConstants.SYMBOL_AND;
 				sb.append(toAppend);
 
-				toAppend = AppConstants.AMO.toLowerCase() + AppConstants.SYMBOL_EQUAL + AppConstants.CHAR_Y.toString()
+				toAppend = AppConstants.AMO.toLowerCase() + AppConstants.SYMBOL_EQUAL + AppConstants.CHAR_N.toString()
 						+ AppConstants.SYMBOL_AND;
 //			toAppend = AppConstants.AMO.toLowerCase() + AppConstants.SYMBOL_EQUAL
 //					+ (model.getOrderType() == "AMO" ? AppConstants.CHAR_Y.toString() : AppConstants.CHAR_N.toString())
@@ -257,24 +258,29 @@ public class EdisService implements EdisServiceSpec {
 	 * @author Gowthaman
 	 * @return
 	 */
-	public RestResponse<GenericResponse> getEdisSummary(EdisSummaryRequest req, ClinetInfoModel info) {
-		if (StringUtil.isNotNullOrEmpty(req.getProductType()) && StringUtil.isNotNullOrEmpty(req.getSegId())
-				&& StringUtil.isNotNullOrEmpty(req.getSellQty())
-				&& StringUtil.isNotNullOrEmpty(req.getSummaryMktSegId())
-				&& StringUtil.isNotNullOrEmpty(req.getToken())) {
+	public RestResponse<GenericResponse> getEdisSummary(ClinetInfoModel info) {
+//		if (StringUtil.isNotNullOrEmpty(req.getProductType()) && StringUtil.isNotNullOrEmpty(req.getSegId())
+//				&& StringUtil.isNotNullOrEmpty(req.getSellQty())
+//				&& StringUtil.isNotNullOrEmpty(req.getSummaryMktSegId())
+//				&& StringUtil.isNotNullOrEmpty(req.getToken())) {
+//
+//			String userSession = AppUtil.getUserSession(info.getUserId());
+////			String userSession = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6OTA5MDkwLCJ1c2VyaWQiOjkwOTA5MCwidGVuYW50aWQiOjkwOTA5MCwibWVtYmVySW5mbyI6eyJ0ZW5hbnRJZCI6IjIxNCIsImdyb3VwSWQiOiJITyIsInVzZXJJZCI6IjExNzk5NSIsInRlbXBsYXRlSWQiOiJETlMiLCJ1ZElkIjoiYjcwZDZmMTM4MWVjNzUyMSIsIm9jVG9rZW4iOiIweDAxODFDQTYzRTNGRjUwRDdFNDc4RUJFMzgzQUY4QSIsInVzZXJDb2RlIjoiQUZET0IiLCJncm91cENvZGUiOiJBQUFBQSIsImFwaWtleURhdGEiOnsiQ3VzdG9tZXJJZCI6IjIxNCIsImV4cCI6MTc3NjE1OTcyMCwiaWF0IjoxNjg5NzU5NzY3fSwic291cmNlIjoiTU9CSUxFQVBJIn0sImV4cCI6MTY5NTc1Mjk5OSwiaWF0IjoxNjk1NzQzOTY4fQ.0LUvc_JBZJaMpkC5_EyXwY-_GaeMMSuwBa8sf6KlIbs";
+//			if (StringUtil.isNullOrEmpty(userSession))
+//				return prepareResponse.prepareUnauthorizedResponse();
+//
+//			return holdingsRestService.getEdisSummary(req, info, userSession);
+//
+//		} else {
+//			prepareResponse.prepareFailedResponse(AppConstants.INVALID_PARAMETER);
+//		}
 
-			String userSession = AppUtil.getUserSession(info.getUserId());
-//			String userSession = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6NzA3MDcwLCJ1c2VyaWQiOjcwNzA3MCwidGVuYW50aWQiOjcwNzA3MCwibWVtYmVySW5mbyI6eyJ0ZW5hbnRJZCI6IjIxNCIsImdyb3VwSWQiOiJITyIsInVzZXJJZCI6IkMwMDAwOCIsInRlbXBsYXRlSWQiOiJETlMiLCJ1ZElkIjoiOTc2ODY0MTlmOWNlMzc0MSIsIm9jVG9rZW4iOiIweDAxN0M2NTNCMjI2NjY4NTIyMTkyODEzNTFCRDg0NSIsInVzZXJDb2RlIjoiQUNKWVUiLCJncm91cENvZGUiOiJBQUFBQSIsImFwaWtleURhdGEiOnsiQ3VzdG9tZXJJZCI6IjIxNCIsImV4cCI6MTc3NjE1OTcyMCwiaWF0IjoxNjg5NzU5NzY3fSwic291cmNlIjoiTU9CSUxFQVBJIn0sImV4cCI6MTY5MzY3OTM5OSwiaWF0IjoxNjkzNjQ4MDU4fQ.cCYUEc11tFz_wGFptdPhU0bK85j5tUly6reIxCj3T2I";
-			if (StringUtil.isNullOrEmpty(userSession))
-				return prepareResponse.prepareUnauthorizedResponse();
+		String userSession = AppUtil.getUserSession(info.getUserId());
+//		String userSession = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6OTA5MDkwLCJ1c2VyaWQiOjkwOTA5MCwidGVuYW50aWQiOjkwOTA5MCwibWVtYmVySW5mbyI6eyJ0ZW5hbnRJZCI6IjIxNCIsImdyb3VwSWQiOiJITyIsInVzZXJJZCI6IjExNzk5NSIsInRlbXBsYXRlSWQiOiJETlMiLCJ1ZElkIjoiYjcwZDZmMTM4MWVjNzUyMSIsIm9jVG9rZW4iOiIweDAxODFDQTYzRTNGRjUwRDdFNDc4RUJFMzgzQUY4QSIsInVzZXJDb2RlIjoiQUZET0IiLCJncm91cENvZGUiOiJBQUFBQSIsImFwaWtleURhdGEiOnsiQ3VzdG9tZXJJZCI6IjIxNCIsImV4cCI6MTc3NjE1OTcyMCwiaWF0IjoxNjg5NzU5NzY3fSwic291cmNlIjoiTU9CSUxFQVBJIn0sImV4cCI6MTY5NTc1Mjk5OSwiaWF0IjoxNjk1NzQzOTY4fQ.0LUvc_JBZJaMpkC5_EyXwY-_GaeMMSuwBa8sf6KlIbs";
+		if (StringUtil.isNullOrEmpty(userSession))
+			return prepareResponse.prepareUnauthorizedResponse();
+		return holdingsRestService.getEdisSummarys(info, userSession);
 
-			return holdingsRestService.getEdisSummary(req, info, userSession);
-
-		} else {
-			prepareResponse.prepareFailedResponse(AppConstants.INVALID_PARAMETER);
-		}
-
-		return null;
 	}
 
 	/**
