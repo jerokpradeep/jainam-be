@@ -10,7 +10,6 @@ import org.jboss.resteasy.reactive.RestResponse;
 import in.codifi.cache.model.ClinetInfoModel;
 import in.codifi.holdings.controller.spec.EdisControllerSpec;
 import in.codifi.holdings.model.request.EdisHoldModel;
-import in.codifi.holdings.model.request.EdisSummaryRequest;
 import in.codifi.holdings.model.response.GenericResponse;
 import in.codifi.holdings.service.spec.EdisServiceSpec;
 import in.codifi.holdings.utility.AppConstants;
@@ -52,7 +51,7 @@ public class EdisController implements EdisControllerSpec {
 		return service.getRedirectUrl(model, info.getUserId());
 
 	}
-	
+
 	/**
 	 * Method to Get EdisSummary
 	 * 
@@ -60,17 +59,17 @@ public class EdisController implements EdisControllerSpec {
 	 * @return
 	 */
 	@Override
-	public RestResponse<GenericResponse> getEdisSummary(EdisSummaryRequest req) {
+	public RestResponse<GenericResponse> getEdisSummary() {
 		ClinetInfoModel info = appUtil.getClientInfo();
-//		ClinetInfoModel info = new ClinetInfoModel();
-//		info.setUserId("C00008");
 		if (info == null || StringUtil.isNullOrEmpty(info.getUserId())) {
 			Log.error("Client info is null");
 			return prepareResponse.prepareFailedResponse(AppConstants.FAILED_STATUS);
 		} else if (StringUtil.isNullOrEmpty(info.getUcc())) {
 			return prepareResponse.prepareFailedResponse(AppConstants.GUEST_USER_ERROR);
 		}
-		return service.getEdisSummary(req, info);
+//		ClinetInfoModel info = new ClinetInfoModel();
+//		info.setUserId("117995");
+		return service.getEdisSummary(info);
 
 	}
 

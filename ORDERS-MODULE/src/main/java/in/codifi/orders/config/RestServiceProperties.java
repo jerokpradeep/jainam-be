@@ -29,6 +29,9 @@ public class RestServiceProperties {
 
 	@ConfigProperty(name = "appconfig.odin.url.orderbook")
 	private String orderBookUrl;
+	
+	@ConfigProperty(name = "appconfig.odin.url.gtdOrderbook")
+	private String gtdOrderbookUrl;
 
 	@ConfigProperty(name = "appconfig.odin.url.tradebook")
 	private String tradeBookUrl;

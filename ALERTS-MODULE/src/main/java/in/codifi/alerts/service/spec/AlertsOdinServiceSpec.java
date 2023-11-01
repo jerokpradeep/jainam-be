@@ -2,9 +2,8 @@ package in.codifi.alerts.service.spec;
 
 import org.jboss.resteasy.reactive.RestResponse;
 
+import in.codifi.alerts.model.request.RequestModel;
 import in.codifi.alerts.model.response.GenericResponse;
-import in.codifi.alerts.ws.model.AlertsReqModel;
-import in.codifi.alerts.ws.model.ModifyAlertsReqModel;
 import in.codifi.cache.model.ClientInfoModel;
 
 public interface AlertsOdinServiceSpec {
@@ -25,7 +24,7 @@ public interface AlertsOdinServiceSpec {
 	 * @param req
 	 * @return
 	 */
-	RestResponse<GenericResponse> createAlerts(AlertsReqModel req, ClientInfoModel info);
+	RestResponse<GenericResponse> createAlerts(RequestModel req, ClientInfoModel info);
 
 	/**
 	 * Method to update Alerts
@@ -36,7 +35,7 @@ public interface AlertsOdinServiceSpec {
 	 * @param info
 	 * @return
 	 */
-	RestResponse<GenericResponse> updateAlerts(ModifyAlertsReqModel req, ClientInfoModel info);
+	RestResponse<GenericResponse> updateAlerts(RequestModel req, ClientInfoModel info);
 
 	/**
 	 * Method to delete alert

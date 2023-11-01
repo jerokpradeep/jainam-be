@@ -34,4 +34,5 @@ public class UserController implements UserControllerSpec {
 	public RestResponse<GenericResponse> truncateUserLoggedInDetails() {
 		return service.truncateUserLoggedInDetails();
 	}
+
 }

@@ -6,6 +6,7 @@ import javax.ws.rs.Path;
 import org.jboss.resteasy.reactive.RestResponse;
 
 import in.codifi.admin.controller.spec.CommonControllerSpec;
+import in.codifi.admin.model.request.PasswordForceUpdateReq;
 import in.codifi.admin.model.request.SendNoficationReqModel;
 import in.codifi.admin.model.request.UserReqModel;
 import in.codifi.admin.model.response.GenericResponse;
@@ -162,6 +163,28 @@ public class CommonController implements CommonControllerSpec {
 	 */
 	public RestResponse<GenericResponse> getUserNotificationList(UserReqModel reqModel) {
 		return service.getUserNotificationList(reqModel);
+	}
+	
+	/**
+	 * Method to password Force Update
+	 * 
+	 * @author Gowthaman
+	 * @return
+	 */
+	public RestResponse<GenericResponse> passwordForceUpdate(PasswordForceUpdateReq reqModel) {
+		return service.passwordForceUpdate(reqModel);
+	}
+	
+	/**
+	 * Method to add New Employee User in keyclock
+	 * 
+	 * @author Gowthaman
+	 * @param req
+	 * @return
+	 */
+	@Override
+	public RestResponse<GenericResponse> addNewEmpUser(CreateUserRequestModel req) {
+		return service.addNewEmpUser(req);
 	}
 
 	

@@ -72,9 +72,9 @@ public class ContractController implements ContractControllerSpec {
 	public RestResponse<GenericResponse> reloadContractMasterFile() {
 		return service.reloadContractMasterFile();
 	}
-	
+
 	/**
-	 * Method to Load fiftytwoWeekData 
+	 * Method to Load fiftytwoWeekData
 	 * 
 	 * @author Gowthaman
 	 * @return
@@ -82,5 +82,26 @@ public class ContractController implements ContractControllerSpec {
 	@Override
 	public RestResponse<GenericResponse> loadFiftytwoWeekData() {
 		return service.loadFiftytwoWeekData();
+	}
+
+	/**
+	 * method to add index value
+	 * 
+	 * @author LOKESH
+	 */
+	@Override
+	public RestResponse<GenericResponse> addIndexValue() {
+		return service.addIndexValue();
+	}
+
+	/**
+	 * Method to create Archive Table For Contract Master
+	 * 
+	 * @author LOKESH
+	 * @return
+	 */
+	@Override
+	public RestResponse<GenericResponse> createArchiveTableForContractMaster() {
+		return service.createArchiveTableForContractMaster();
 	}
 }

@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import in.codifi.sso.auth.entity.logs.AccessLogModel;
 import in.codifi.sso.auth.repository.AccessLogManager;
 import in.codifi.sso.auth.utility.AppConstants;
+import in.codifi.sso.auth.utility.StringUtil;
 import io.quarkus.arc.Priority;
 import io.quarkus.logging.Log;
 
@@ -87,7 +88,15 @@ public class AccessLogFilter implements ContainerRequestFilter, ContainerRespons
 					accLogModel.setOutTime(new Timestamp(System.currentTimeMillis()));
 					accLogModel.setMethod(requestContext.getMethod());
 					accLogModel.setModule(AppConstants.MODULE_SSO_AUTH);
-					accLogModel.setReqBody(objectMapper.writeValueAsString(requestContext.getProperty("reqBody")));
+
+					String queryParams = uriInfo.getRequestUri().getQuery();
+					if (StringUtil.isNotNullOrEmpty(queryParams)) {
+						accLogModel.setReqBody(queryParams);
+					} else {
+						accLogModel.setReqBody(objectMapper.writeValueAsString(requestContext.getProperty("reqBody")));
+					}
+
+//					accLogModel.setReqBody(objectMapper.writeValueAsString(requestContext.getProperty("reqBody")));
 					Object reponseObj = responseContext.getEntity();
 					accLogModel.setResBody(objectMapper.writeValueAsString(reponseObj));
 					accLogModel.setSource("");// TODO
@@ -126,6 +135,7 @@ public class AccessLogFilter implements ContainerRequestFilter, ContainerRespons
 			InputStream stream = new ByteArrayInputStream(body);
 			requestContext.setEntityStream(stream);
 			String formedReq = new String(body);
+			System.out.println("formedReq" + formedReq);
 			requestContext.setProperty("reqBody", formedReq);
 		} catch (Exception e) {
 			Log.error(e);

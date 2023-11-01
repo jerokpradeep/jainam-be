@@ -19,4 +19,10 @@ public class Attributes implements Serializable {
 	private List<String> mobile;
 	@JsonProperty("pan")
 	private List<String> pan;
+	@JsonProperty("ucc")
+	private List<String> ucc;
+	@JsonProperty("gender")
+	private List<String> gender;
+	@JsonProperty("maritalStatus")
+	private List<String> maritalStatus;
 }

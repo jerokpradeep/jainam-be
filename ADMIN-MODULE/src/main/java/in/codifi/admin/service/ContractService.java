@@ -9,16 +9,21 @@ import javax.inject.Inject;
 import org.jboss.resteasy.reactive.RestResponse;
 import org.json.simple.JSONObject;
 
+import in.codifi.admin.config.HazelcastConfig;
+import in.codifi.admin.entity.ContractEntity;
 import in.codifi.admin.model.response.ContractMasterRespModel;
 import in.codifi.admin.model.response.ContractSymbolRespModel;
 import in.codifi.admin.model.response.ExchangeResponseModel;
 import in.codifi.admin.model.response.GenericResponse;
 import in.codifi.admin.repository.ContractEntityManager;
+import in.codifi.admin.repository.ContractRepository;
 import in.codifi.admin.req.model.ContractMasterReqModel;
 import in.codifi.admin.service.spec.ContractServiceSpec;
 import in.codifi.admin.utility.AppConstants;
 import in.codifi.admin.utility.PrepareResponse;
 import in.codifi.admin.utility.StringUtil;
+import in.codifi.cache.model.ContractMasterModel;
+import io.quarkus.logging.Log;
 
 @ApplicationScoped
 public class ContractService implements ContractServiceSpec {
@@ -27,6 +32,8 @@ public class ContractService implements ContractServiceSpec {
 	PrepareResponse prepareResponse;
 	@Inject
 	ContractEntityManager contractEntityManager;
+	@Inject
+	ContractRepository contractRepository;
 
 	/**
 	 * method to get contract master list
@@ -217,17 +224,39 @@ public class ContractService implements ContractServiceSpec {
 	 */
 	@Override
 	public RestResponse<GenericResponse> addContractMaster(ExchangeResponseModel exchangeModel) {
-		if (exchangeModel != null && exchangeModel.getExch() != null && exchangeModel.getExchange_segment() != null
-				&& exchangeModel.getToken() != null && exchangeModel.getSymbol() != null) {
-			boolean isInserted = contractEntityManager.addNewContractInMaster(exchangeModel,
-					exchangeModel.getSort_order_1(), exchangeModel.getSort_order_2(), exchangeModel.getSort_order_3());
-			if (!isInserted) {
-				return prepareResponse.prepareSuccessResponseObject(AppConstants.INSERTED);
-			}
-		} else {
-			return prepareResponse.prepareFailedResponse(AppConstants.INVALID_REQUEST_ADMIN);
+		if (!validateContractMasterParam(exchangeModel))
+			return prepareResponse.prepareFailedResponse(AppConstants.INVALID_PARAMETERS);
+
+		boolean isInserted = contractEntityManager.addNewContractInMaster(exchangeModel);
+		if (!isInserted) {
+			return prepareResponse.prepareSuccessResponseObject(AppConstants.INSERTED);
 		}
 		return prepareResponse.prepareFailedResponse(AppConstants.FAILED_STATUS);
+	}
+
+	private boolean validateContractMasterParam(ExchangeResponseModel exchangeModel) {
+		if (StringUtil.isNotNullOrEmpty(exchangeModel.getExch())
+				&& StringUtil.isNotNullOrEmpty(exchangeModel.getExchange_segment())
+				&& StringUtil.isNotNullOrEmpty(exchangeModel.getSymbol())
+				&& StringUtil.isNotNullOrEmpty(exchangeModel.getToken())
+				&& StringUtil.isNotNullOrEmpty(exchangeModel.getInstrument_type())
+				&& StringUtil.isNotNullOrEmpty(exchangeModel.getExchange_segment())
+				&& StringUtil.isNotNullOrEmpty(exchangeModel.getStrike_price())
+				&& StringUtil.isNotNullOrEmpty(exchangeModel.getFormatted_ins_name())
+				&& StringUtil.isNotNullOrEmpty(exchangeModel.getTrading_symbol())
+				&& StringUtil.isNotNullOrEmpty(exchangeModel.getCompany_name())
+				&& StringUtil.isNotNullOrEmpty(exchangeModel.getExpiry_date())
+				&& StringUtil.isNotNullOrEmpty(exchangeModel.getLot_size())
+				&& StringUtil.isNotNullOrEmpty(exchangeModel.getTick_size())
+				&& StringUtil.isNotNullOrEmpty(exchangeModel.getPdc())
+				&& StringUtil.isNotNullOrEmpty(exchangeModel.getAlter_token())
+				&& StringUtil.isNotNullOrEmpty(exchangeModel.getFreeze_qty())
+				&& StringUtil.isNotNullOrEmpty(exchangeModel.getIsin())
+				&& StringUtil.isNotNullOrEmpty(exchangeModel.getWeek_tag())
+				&& StringUtil.isNotNullOrEmpty(exchangeModel.getInstrument_name())) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -263,5 +292,55 @@ public class ContractService implements ContractServiceSpec {
 		} else {
 			return prepareResponse.prepareFailedResponse(AppConstants.NO_RECORDS_FOUND);
 		}
+	}
+
+	/**
+	 * Method To load contract master into cache
+	 * 
+	 * @author Dinesh Kumar
+	 *
+	 * @return
+	 */
+	@Override
+	public RestResponse<GenericResponse> loadContractMaster() {
+		try {
+			List<ContractEntity> contractList = new ArrayList<>();
+			contractList = contractRepository.findAll();
+			if (contractList.size() > 0)
+				HazelcastConfig.getInstance().getContractMaster().clear();
+			for (ContractEntity contractEntity : contractList) {
+				ContractMasterModel result = new ContractMasterModel();
+
+				result.setExch(contractEntity.getExch());
+				result.setSegment(contractEntity.getSegment());
+				result.setSymbol(contractEntity.getSymbol());
+				result.setIsin(contractEntity.getIsin());
+				result.setFormattedInsName(contractEntity.getFormattedInsName());
+				result.setToken(contractEntity.getToken());
+				result.setTradingSymbol(contractEntity.getTradingSymbol());
+				result.setGroupName(contractEntity.getGroupName());
+				result.setInsType(contractEntity.getInsType());
+				result.setOptionType(contractEntity.getOptionType());
+				result.setStrikePrice(contractEntity.getStrikePrice());
+				result.setExpiry(contractEntity.getExpiryDate());
+				result.setLotSize(contractEntity.getLotSize());
+				result.setTickSize(contractEntity.getTickSize());
+				result.setPdc(contractEntity.getPdc());
+				result.setWeekTag(contractEntity.getWeekTag());
+				result.setFreezQty(contractEntity.getFreezeQty());
+				result.setAlterToken(contractEntity.getAlterToken());
+				result.setCompanyName(contractEntity.getCompanyName());
+				String key = contractEntity.getExch() + "_" + contractEntity.getToken();
+				HazelcastConfig.getInstance().getContractMaster().put(key, result);
+				System.out.println("Key -- " + key + " -- Result -- " + result);
+			}
+			System.out.println("Loaded SucessFully");
+			System.out.println("Full Size " + HazelcastConfig.getInstance().getContractMaster().size());
+		} catch (Exception e) {
+			e.printStackTrace();
+			Log.error(e);
+			return prepareResponse.prepareFailedResponse(AppConstants.CONTRACT_LOAD_FAILED);
+		}
+		return prepareResponse.prepareSuccessMessage(AppConstants.CONTRACT_LOAD_SUCESS);
 	}
 }

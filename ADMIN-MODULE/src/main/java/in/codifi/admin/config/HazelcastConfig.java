@@ -3,15 +3,20 @@ package in.codifi.admin.config;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.microprofile.config.ConfigProvider;
-
 import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.core.HazelcastInstance;
 
+import org.eclipse.microprofile.config.ConfigProvider;
+
+import in.codifi.admin.entity.AdminPreferenceEntity;
 import in.codifi.admin.entity.HoldingsJSONEntity;
 import in.codifi.admin.entity.PositionAvgPriceEntity;
+import in.codifi.admin.model.response.UserPerferencePreDefModel;
 import in.codifi.admin.ws.model.kc.GetUserInfoResp;
+import in.codifi.cache.model.AdminIndexModel;
+import in.codifi.cache.model.AdminPreferenceModel;
+import in.codifi.cache.model.ContractMasterModel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -46,7 +51,14 @@ public class HazelcastConfig {
 	private Map<String, List<PositionAvgPriceEntity>> positionsAvgPrice = getHz().getMap("positionsAvgPrice");
 	private Map<String, String> keycloakAdminSession = getHz().getMap("keycloakAdminSession");
 	private Map<String, HoldingsJSONEntity> holdingsData = getHz().getMap("holdingsData");
+	private Map<String, ContractMasterModel> contractMaster = getHz().getMap("contractMaster");
+
+	private Map<String, AdminPreferenceModel> adminPreferenceModel = getHz().getMap("adminPreferenceModel");
+	private Map<String, UserPerferencePreDefModel> userPerferenceModel = getHz().getMap("userPerferenceModel");
 	
+	private Map<String, List<AdminPreferenceEntity>> adminPreferenceEntity = getHz().getMap("adminPreferenceEntity");
+
 	private Map<String, List<GetUserInfoResp>> keycloakUserDetails = getHz().getMap("keycloakUserDetails");
 
+	private Map<String, List<AdminIndexModel>> indexValue = getHz().getMap("indexValue");
 }

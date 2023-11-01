@@ -50,7 +50,6 @@ public class ReportController implements ReportControllerSpec {
 	 */
 	@Override
 	public RestResponse<GenericResponse> getUserBankDetails(BankDetailsResponseModel bankRespModel) {
-
 		return service.getUserBankDetails(bankRespModel);
 	}
 
@@ -98,7 +97,7 @@ public class ReportController implements ReportControllerSpec {
 	public RestResponse<GenericResponse> getMarketWatchdata(MarketWatchReqModel mwReqModel) {
 		return service.getMarketWatchdata(mwReqModel);
 	}
-	
+
 	/**
 	 * Method to get the Holdings Count
 	 * 

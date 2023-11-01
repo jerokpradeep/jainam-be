@@ -67,4 +67,16 @@ public class ContractController implements ContractControllerSpec {
 	public RestResponse<GenericResponse> getDuplicateList() {
 		return service.getDuplicateList();
 	}
+
+	/**
+	 * Method to load contract master into cache
+	 * 
+	 * @author Dinesh Kumar
+	 *
+	 * @return
+	 */
+	@Override
+	public RestResponse<GenericResponse> loadContractMaster() {
+		return service.loadContractMaster();
+	}
 }

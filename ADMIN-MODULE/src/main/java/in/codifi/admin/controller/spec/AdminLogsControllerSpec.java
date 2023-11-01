@@ -9,6 +9,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.jboss.resteasy.reactive.RestResponse;
 
+import in.codifi.admin.model.request.UrlRequestModel;
 import in.codifi.admin.model.response.AccesslogResponseModel;
 import in.codifi.admin.model.response.GenericResponse;
 
@@ -22,7 +23,7 @@ public interface AdminLogsControllerSpec {
 	 * @return
 	 */
 	@Path("/userLogDetails")
-	@POST
+	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public RestResponse<GenericResponse> userLogDetails();
@@ -31,7 +32,6 @@ public interface AdminLogsControllerSpec {
 	 * method to get the user based records from the data base (TOP 10 USER)
 	 * 
 	 * @author LOKESH
-	 * @param accesslogDTO
 	 * @return
 	 */
 	@Path("/getUserbasedRecords")
@@ -41,10 +41,9 @@ public interface AdminLogsControllerSpec {
 	public RestResponse<GenericResponse> getUserbasedRecords(AccesslogResponseModel accessModel);
 
 	/**
-	 * method to get the user based records from the data base (TOP 10 USER)
+	 * method to get the url based records
 	 * 
 	 * @author LOKESH
-	 * @param accesslogDTO
 	 * @return
 	 */
 	@Path("/getUrlBasedRecords")
@@ -53,17 +52,17 @@ public interface AdminLogsControllerSpec {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public RestResponse<GenericResponse> getUrlBasedRecords();
 
-	/**
-	 * Method to get last 12 hour login count
-	 * 
-	 * @author LOKESH
-	 * @return
-	 */
-	@Path("/getLast12hourLoginCount")
-	@POST
-	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.APPLICATION_JSON)
-	public RestResponse<GenericResponse> getLast12hourLoginCount();
+//	/**
+//	 * Method to get last 12 hour login count
+//	 * 
+//	 * @author LOKESH
+//	 * @return
+//	 */
+//	@Path("/getLast12hourLoginCount")
+//	@POST
+//	@Produces(MediaType.APPLICATION_JSON)
+//	@Consumes(MediaType.APPLICATION_JSON)
+//	public RestResponse<GenericResponse> getLast12hourLoginCount();
 
 	/**
 	 * Method to get distinct url for drop down
@@ -76,5 +75,89 @@ public interface AdminLogsControllerSpec {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public RestResponse<GenericResponse> getDistinctUrl();
+
+	/**
+	 * method to get the url based records 1
+	 * 
+	 * @author LOKESH
+	 * @return
+	 */
+	@Path("/getUrlBasedRecords1")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public RestResponse<GenericResponse> getUrlBasedRecords1();
+
+	/**
+	 * method to get the url record
+	 * 
+	 * @author LOKESH
+	 * @return
+	 */
+	@Path("/getUrlRecord")
+	@POST
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public RestResponse<GenericResponse> getUrlRecord(UrlRequestModel model);
+
+	/**
+	 * method to Insert the Login record per day
+	 * 
+	 * @author LOKESH
+	 * @return
+	 */
+	@Path("/insert/loginRecord")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public RestResponse<GenericResponse> getLoginRecord();
+
+	/**
+	 * method to get user record mob
+	 * 
+	 * @author LOKESH
+	 * @return
+	 */
+	@Path("/userecord/mob")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public RestResponse<GenericResponse> getUserRecordMOb();
+
+	/**
+	 * method to get user record Web
+	 * 
+	 * @author LOKESH
+	 * @return
+	 */
+	@Path("/userecord/web")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public RestResponse<GenericResponse> getUserRecordWeb();
+
+	/**
+	 * method to get user record API
+	 * 
+	 * @author LOKESH
+	 * @return
+	 */
+	@Path("/userecord/api")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public RestResponse<GenericResponse> getUserRecordApi();
+
+	/**
+	 * method to get Unique UserId
+	 * 
+	 * @author LOKESH
+	 * @return
+	 */
+	@Path("/userecord/UniqueUser")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public RestResponse<GenericResponse> getUniqueUserId();
 
 }

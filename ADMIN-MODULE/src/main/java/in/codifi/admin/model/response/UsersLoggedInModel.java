@@ -14,4 +14,5 @@ public class UsersLoggedInModel {
 	private long mob;
 	private long api;
 	private List<JSONObject> sso;
+	private long totalCount;
 }

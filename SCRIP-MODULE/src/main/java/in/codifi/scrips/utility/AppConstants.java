@@ -80,8 +80,8 @@ public class AppConstants {
 	public static final String X_API_KEY_NAME = "x-api-key";
 	public static final String MTF_LOAD_FAILED = "Failed to Load MTF Approved File";
 	public static final String MTF_LOAD_SUCCESS = "MTF Approved File loaded Successfully";
-	
-	//exch
+
+	// exch
 	public static final String NSE = "NSE";
 	public static final String BSE = "BSE";
 	public static final String NFO = "NFO";
@@ -89,5 +89,6 @@ public class AppConstants {
 	public static final String BSE_EQ = "BSE_EQ";
 	public static final String NSE_FO = "NSE_FO";
 	public static final String INVALID_EXCH = "Invalid exchange";
+	public static final String INSERTED = "Inserted Successfully";
 
 }

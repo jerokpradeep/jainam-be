@@ -36,6 +36,7 @@ import in.codifi.orders.model.transformation.GenericOrderMariginRespModel;
 import in.codifi.orders.model.transformation.GenericOrderResp;
 import in.codifi.orders.model.transformation.GenericPositionSqrOffResp;
 import in.codifi.orders.model.transformation.GenericTradeBookResp;
+import in.codifi.orders.model.transformation.GtdOrderBookResp;
 import in.codifi.orders.model.transformation.OrderHisRespModel;
 import in.codifi.orders.model.transformation.PositionsRemodeling;
 import in.codifi.orders.reposirory.AccessLogManager;
@@ -44,6 +45,8 @@ import in.codifi.orders.utility.AppConstants;
 import in.codifi.orders.utility.CodifiUtil;
 import in.codifi.orders.utility.PrepareResponse;
 import in.codifi.orders.utility.StringUtil;
+import in.codifi.orders.ws.model.GtdOrderBookRespData;
+import in.codifi.orders.ws.model.GtdOrderBookResponse;
 import in.codifi.orders.ws.model.OrderBookSuccess;
 import in.codifi.orders.ws.model.OrderHistoryRespData;
 import in.codifi.orders.ws.model.OrderHistoryRespModel;
@@ -470,7 +473,8 @@ public class OrdersRestService {
 			}
 
 		} catch (Exception e) {
-			Log.error(e);
+			e.printStackTrace();
+			Log.error("OrderBook -- " + e.getMessage());
 		}
 		accessLogModel.setResBody(AppConstants.FAILED_STATUS);
 		insertRestAccessLogs(accessLogModel);
@@ -1224,10 +1228,9 @@ public class OrdersRestService {
 	 */
 	public List<OrderHisRespModel> bindOrderHistoryData(OrderHistoryRespModel orderHistoryResp, String userId) {
 		List<OrderHisRespModel> response = new ArrayList<>();
-		OrderHisRespModel result = new OrderHisRespModel();
 
 		for (OrderHistoryRespData rSet : orderHistoryResp.getData()) {
-
+			OrderHisRespModel result = new OrderHisRespModel();
 			String token = rSet.getScripToken();
 			String exch = "";
 			String restExch = rSet.getExchange();
@@ -1254,7 +1257,7 @@ public class OrdersRestService {
 			result.setExchange(exch);
 			result.setExchOrderNo(rSet.getExcOrderNo());
 			result.setExchTime(rSet.getExchangeTimestamp());
-			result.setFillshares("");
+			result.setFillshares(rSet.getPendingQty());
 			result.setLotSize("");
 			result.setOrderNo(rSet.getOrderId());
 			result.setOrderType(rSet.getOrderType());
@@ -1268,7 +1271,7 @@ public class OrdersRestService {
 			result.setRet("");
 			result.setStatus(rSet.getStatus());
 			result.setTickSize("");
-			result.setTime(rSet.getExchangeTimestamp());
+			result.setTime(rSet.getOrderTimestamp());
 			result.setToken("");
 			result.setTradingSymbol(rSet.getSymbol());
 			result.setTransType(rSet.getTransType());
@@ -1845,6 +1848,182 @@ public class OrdersRestService {
 		accessLogModel.setResBody("Failed");
 		insertRestAccessLogs(accessLogModel);
 		return prepareResponse.prepareFailedResponse(AppConstants.FAILED_STATUS);
+	}
+
+	/**
+	 * Method to get Gtd order book details
+	 * 
+	 * @author Gowthaman M
+	 * @return
+	 */
+	@SuppressWarnings("unlikely-arg-type")
+	public RestResponse<GenericResponse> getGtdOrderBookInfo(String pUserSession, ClinetInfoModel pInfo) {
+		GtdOrderBookResponse gtdOrderBookRespModel = new GtdOrderBookResponse();
+		ObjectMapper mapper = new ObjectMapper();
+		RestAccessLogModel accessLogModel = new RestAccessLogModel();
+		String output = null;
+		try {
+			accessLogModel.setMethod("getGtdOrderBookInfo");
+			accessLogModel.setModule(AppConstants.MODULE_ORDER);
+			accessLogModel.setUserId(pInfo.getUserId());
+			accessLogModel.setInTime(new Timestamp(new Date().getTime()));
+
+			CodifiUtil.trustedManagement();
+			String urlRequest = AppConstants.QUESTION_MARK + AppConstants.OFFSET + AppConstants.SYMBOL_EQUAL
+					+ AppConstants.ONE + AppConstants.SYMBOL_AND + AppConstants.LIMIT + AppConstants.SYMBOL_EQUAL
+					+ AppConstants.LIMIT_1000 + AppConstants.SYMBOL_AND + AppConstants.ORDER_STATUS
+					+ AppConstants.SYMBOL_EQUAL + AppConstants.NEGATIVE_ONE;
+			URL url = new URL(props.getGtdOrderbookUrl() + urlRequest);
+			accessLogModel.setUrl(url.toString());
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.setRequestMethod(AppConstants.GET_METHOD);
+			conn.setRequestProperty(AppConstants.ACCEPT, AppConstants.APPLICATION_JSON);
+			conn.setRequestProperty(AppConstants.AUTHORIZATION, AppConstants.BEARER_WITH_SPACE + pUserSession);
+			conn.setRequestProperty(AppConstants.X_API_KEY_NAME, props.getXApiKey());
+			conn.setDoOutput(true);
+			int responseCode = conn.getResponseCode();
+			System.out.println("get Gtd Order Book Info responseCode -- " + responseCode);
+			BufferedReader bufferedReader;
+			if (responseCode == 401) {
+				accessLogModel.setOutTime(new Timestamp(new Date().getTime()));
+				accessLogModel.setResBody(AppConstants.UNAUTHORIZED);
+				insertRestAccessLogs(accessLogModel);
+				return prepareResponse.prepareUnauthorizedResponse();
+
+			} else if (responseCode == 200) {
+				bufferedReader = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+				output = bufferedReader.readLine();
+				System.out.println("output -- " + output);
+				accessLogModel.setOutTime(new Timestamp(new Date().getTime()));
+				accessLogModel.setResBody(output);
+				insertRestAccessLogs(accessLogModel);
+				if (StringUtil.isNotNullOrEmpty(output)) {
+					gtdOrderBookRespModel = mapper.readValue(output, GtdOrderBookResponse.class);
+					/** Bind the response to generic response **/
+					if (gtdOrderBookRespModel.getData().contains("[]")
+							&& gtdOrderBookRespModel.getMessage().equalsIgnoreCase("Orders fetched successfully")) {
+						return prepareResponse.prepareFailedResponse(AppConstants.NO_RECORD_FOUND);
+					} else if (gtdOrderBookRespModel.getStatus().equalsIgnoreCase(AppConstants.REST_STATUS_SUCCESS)) {
+						List<GtdOrderBookResp> extract = bindGtdOrderBookData(gtdOrderBookRespModel.getData(),
+								pInfo.getUserId());
+						return prepareResponse.prepareSuccessResponseObject(extract);
+//						return prepareResponse.prepareSuccessMessage(AppConstants.SUCCESS_STATUS);
+					} else if (gtdOrderBookRespModel.getStatus().equalsIgnoreCase(AppConstants.REST_STATUS_ERROR)) {
+						return prepareResponse.prepareFailedResponseForRestService(gtdOrderBookRespModel.getMessage());
+					} else {
+						return prepareResponse.prepareFailedResponseForRestService(
+								StringUtil.isNotNullOrEmpty(gtdOrderBookRespModel.getMessage())
+										? gtdOrderBookRespModel.getMessage()
+										: AppConstants.FAILED_STATUS);
+					}
+				}
+			} else {
+				System.out.println("Error Connection in GTD Order Book api. Rsponse code - " + responseCode);
+				accessLogModel.setResBody(output);
+				insertRestAccessLogs(accessLogModel);
+				bufferedReader = new BufferedReader(new InputStreamReader((conn.getErrorStream())));
+				output = bufferedReader.readLine();
+				accessLogModel.setOutTime(new Timestamp(new Date().getTime()));
+				accessLogModel.setOutTime(new Timestamp(new Date().getTime()));
+				if (StringUtil.isNotNullOrEmpty(output)) {
+					gtdOrderBookRespModel = mapper.readValue(output, GtdOrderBookResponse.class);
+					if (StringUtil.isNotNullOrEmpty(gtdOrderBookRespModel.getMessage()))
+						return prepareResponse.prepareFailedResponseForRestService(gtdOrderBookRespModel.getMessage());
+				} else {
+					return prepareResponse.prepareFailedResponseForRestService(AppConstants.FAILED_STATUS);
+				}
+
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			Log.error("get GTD Order Book Info -- " + e.getMessage());
+		}
+		return prepareResponse.prepareFailedResponseForRestService(AppConstants.FAILED_STATUS);
+	}
+
+	/**
+	 * Method to Bind Gtd Order Book Data
+	 * 
+	 * @author Gowthaman
+	 * @param data
+	 * @param userId
+	 * @return
+	 */
+	public List<GtdOrderBookResp> bindGtdOrderBookData(List<GtdOrderBookRespData> data, String userId) {
+		List<GtdOrderBookResp> responseList = new ArrayList<>();
+		try {
+			for (GtdOrderBookRespData model : data) {
+				GtdOrderBookResp extract = new GtdOrderBookResp();
+				String restExch = model.getExchange();
+				String exch = "";
+
+				if (restExch.equalsIgnoreCase(AppConstants.NSE_EQ)) {
+					exch = AppConstants.NSE;
+				} else if (restExch.equalsIgnoreCase(AppConstants.BSE_EQ)) {
+					exch = AppConstants.BSE;
+				} else if (restExch.equalsIgnoreCase(AppConstants.NSE_FO)) {
+					exch = AppConstants.NFO;
+				} else if (restExch.equalsIgnoreCase(AppConstants.NSE_CUR)) {
+					exch = AppConstants.CDS;
+				}
+
+				String token = model.getScripToken().toString();
+				ContractMasterModel coModel = HazelcastConfig.getInstance().getContractMaster().get(exch + "_" + token);
+				if (coModel != null) {
+					String scripName = StringUtil.isNotNullOrEmpty(coModel.getFormattedInsName())
+							? coModel.getFormattedInsName()
+							: "";
+					extract.setFormattedInsName(scripName);
+				}
+
+				extract.setOrderNo(model.getOrderId());
+				extract.setUserId(userId);
+				extract.setActId(userId);
+				extract.setExchange(exch);
+				extract.setCompanyName(coModel.getCompanyName());
+				extract.setTradingSymbol(model.getSymbol());
+				extract.setQty(model.getTotalQty().toString());
+				extract.setTransType(model.getTranType());
+				extract.setRet(model.getValidity());
+				extract.setToken(model.getScripToken().toString());
+				extract.setLotSize(model.getMktLot().toString());
+//				extract.setTickSize(model.getTi()); //TODO
+				extract.setPrice(model.getOrderPrice());
+//				extract.setRPrice(model.getRprc()); //TODO
+//				extract.setAvgTradePrice(model.getAvgprc()); //TODO
+				extract.setDisclosedQty(model.getDisclosedQty().toString());
+				extract.setOrderStatus(model.getStatus());
+				extract.setFillShares(model.getTradedQty().toString());
+				extract.setExchUpdateTime("");
+				extract.setExchOrderId(model.getExchOrderNo()); // TODO
+//				extract.setRQty(model.getRqty()); //TODO
+				extract.setRejectedReason(model.getErrorReason());
+				extract.setTriggerPrice(model.getTriggerPrice());
+//				extract.setMktProtection(model.getMktProtection()); //TODO
+//				extract.setTarget(model.getBlPrc()); //TODO
+//				extract.setStopLoss(model.getBpPrc()); //TODO
+//				extract.setTrailingPrice(model.getTrailPrc()); //TODO
+				extract.setOrderTime(model.getOrder_timestamp());
+				boolean isAmo = model.getIsAmoOrder();
+				if (StringUtil.isNotNullOrEmpty(model.getProductType())) {
+					extract.setProduct(HazelcastConfig.getInstance().getProductTypes().get(model.getProductType()));
+				}
+				if (StringUtil.isNotNullOrEmpty(model.getOrderType())) {
+					extract.setPriceType(HazelcastConfig.getInstance().getPriceTypes().get(model.getOrderType()));
+				}
+				if (isAmo) {
+					extract.setOrderType(AppConstants.AMO);
+				} else {
+					extract.setOrderType(model.getProductType());
+				}
+				responseList.add(extract);
+			}
+		} catch (Exception e) {
+			Log.error(e);
+			throw new RuntimeException();
+		}
+		return responseList;
 	}
 
 }

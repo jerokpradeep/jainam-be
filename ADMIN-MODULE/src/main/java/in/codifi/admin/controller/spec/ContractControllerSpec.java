@@ -72,4 +72,15 @@ public interface ContractControllerSpec {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public RestResponse<GenericResponse> getDuplicateList();
+
+	/**
+	 * Method to load contract master into cache
+	 * 
+	 * @author Dinesh Kumar
+	 *
+	 * @return
+	 */
+	@Path("/reloadcache")
+	@POST
+	RestResponse<GenericResponse> loadContractMaster();
 }

@@ -193,7 +193,7 @@ public class ContractEntityManager {
 					.createNativeQuery("select exchange_segment, group_name, symbol, instrument_name ,token"
 							+ " FROM tbl_global_contract_master_details"
 							+ " where exchange_segment = :exchSeg AND token NOT IN "
-							+ " (SELECT token FROM tbl_global_contract_master_details where exchange_segment = :exchSeg)");
+							+ " (SELECT token FROM tbl_global_contract_master_details_archive where exchange_segment = :exchSeg)");
 			query.setParameter("exchSeg", exchangeSeg);
 			@SuppressWarnings("unchecked")
 			List<Object[]> result = query.getResultList();
@@ -231,7 +231,7 @@ public class ContractEntityManager {
 					.createNativeQuery("select exchange_segment, group_name, symbol, instrument_name ,token"
 							+ " FROM tbl_global_contract_master_details"
 							+ " where exchange_segment = :exchSeg AND token NOT IN "
-							+ " (SELECT token FROM tbl_global_contract_master_details where exchange_segment = :exchSeg)");
+							+ " (SELECT token FROM tbl_global_contract_master_details_archive where exchange_segment = :exchSeg)");
 			query.setParameter("exchSeg", exchangeSeg);
 			@SuppressWarnings("unchecked")
 			List<Object[]> result = query.getResultList();
@@ -254,8 +254,13 @@ public class ContractEntityManager {
 		return deactivatedList;
 	}
 
-	public boolean addNewContractInMaster(ExchangeResponseModel exchangeModel, int sortOrder1, int sortOrder2,
-			int sortOrder3) {
+	/**
+	 * Method to add the contract into the master details
+	 * 
+	 * @author LOKESH
+	 * @return
+	 */
+	public boolean addNewContractInMaster(ExchangeResponseModel exchangeModel) {
 		Connection conn = null;
 		boolean isSuccessful = false;
 		PreparedStatement pStmt = null;
@@ -287,12 +292,415 @@ public class ContractEntityManager {
 			pStmt.setString(paramPos++, exchangeModel.getFreeze_qty());
 			pStmt.setString(paramPos++, exchangeModel.getIsin());
 			pStmt.setString(paramPos++, exchangeModel.getWeek_tag());
-			pStmt.setInt(paramPos++, sortOrder1);
-			pStmt.setInt(paramPos++, sortOrder2);
-			pStmt.setInt(paramPos++, sortOrder3);
+			if (exchangeModel.getExch().equalsIgnoreCase("NFO")
+					&& exchangeModel.getInstrument_type().equalsIgnoreCase("FUTIDX")
+					&& exchangeModel.getSymbol().equalsIgnoreCase("NIFTY")) {
+
+				Connection connec = null;
+				PreparedStatement pStmt1 = null;
+				ResultSet rset = null;
+				try {
+					connec = dataSource.getConnection();
+					pStmt1 = conn.prepareStatement(
+							"SELECT max((sort_order_2)) as count , max((sort_order_3)) as count1 FROM chola_db.tbl_global_contract_master_details where exch = 'nfo' and instrument_type = 'futidx' and symbol = 'nifty'");
+					rset = pStmt1.executeQuery();
+					if (rset != null) {
+						while (rset.next()) {
+							int value = rset.getInt("count") + 1;
+							int value1 = rset.getInt("count1") + 1;
+
+							pStmt.setInt(paramPos++, 3);
+							pStmt.setInt(paramPos++, value);
+							pStmt.setInt(paramPos++, value1);//
+							connec.close();
+						}
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else if (exchangeModel.getExch().equalsIgnoreCase("NFO")
+					&& exchangeModel.getInstrument_type().equalsIgnoreCase("FUTIDX")
+					&& exchangeModel.getSymbol().equalsIgnoreCase("BANKNIFTY")) {
+
+				Connection connec = null;
+				PreparedStatement pStmt1 = null;
+				ResultSet rset = null;
+				try {
+					connec = dataSource.getConnection();
+					pStmt1 = conn.prepareStatement(
+							"SELECT max((sort_order_2)) as count , max((sort_order_3)) as count1 FROM chola_db.tbl_global_contract_master_details where exch = 'nfo' and instrument_type = 'futidx' and symbol = 'banknifty'");
+					rset = pStmt1.executeQuery();
+					if (rset != null) {
+						while (rset.next()) {
+							int value = rset.getInt("count") + 1;
+							int value1 = rset.getInt("count1") + 1;
+
+							pStmt.setInt(paramPos++, 4);
+							pStmt.setInt(paramPos++, value);
+							pStmt.setInt(paramPos++, value1);//
+							connec.close();
+						}
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+//				pStmt.setInt(paramPos++, 4);
+//				pStmt.setInt(paramPos++, 1);//
+//				pStmt.setInt(paramPos++, 1);//
+			} else if (exchangeModel.getExch().equalsIgnoreCase("NFO")
+					&& exchangeModel.getInstrument_type().equalsIgnoreCase("FUTIDX")
+					&& !exchangeModel.getSymbol().equalsIgnoreCase("BANKNIFTY")
+					&& !exchangeModel.getSymbol().equalsIgnoreCase("NIFTY")) {
+
+				Connection connec = null;
+				PreparedStatement pStmt1 = null;
+				ResultSet rset = null;
+				try {
+					connec = dataSource.getConnection();
+					pStmt1 = conn.prepareStatement(
+							"SELECT max((sort_order_2)) as count , max((sort_order_3)) as count1 FROM chola_db.tbl_global_contract_master_details where exch = 'nfo' and instrument_type = 'futidx' and symbol != 'nifty' and symbol != 'banknifty'");
+					rset = pStmt1.executeQuery();
+					if (rset != null) {
+						while (rset.next()) {
+							int value = rset.getInt("count") + 1;
+							int value1 = rset.getInt("count1") + 1;
+
+							pStmt.setInt(paramPos++, 5);
+							pStmt.setInt(paramPos++, value);
+							pStmt.setInt(paramPos++, value1);//
+							connec.close();
+						}
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+//				pStmt.setInt(paramPos++, 5);
+//				pStmt.setInt(paramPos++, 1);//
+//				pStmt.setInt(paramPos++, 1);//
+			} else if (exchangeModel.getExch().equalsIgnoreCase("NFO")
+					&& exchangeModel.getInstrument_type().equalsIgnoreCase("FUTSTK")) {
+
+				Connection connec = null;
+				PreparedStatement pStmt1 = null;
+				ResultSet rset = null;
+				try {
+					connec = dataSource.getConnection();
+					pStmt1 = conn.prepareStatement(
+							"SELECT max((sort_order_2)) as count , max((sort_order_3)) as count1 FROM chola_db.tbl_global_contract_master_details where exch = 'nfo' and instrument_type = 'futstk'");
+					rset = pStmt1.executeQuery();
+					if (rset != null) {
+						while (rset.next()) {
+							int value = rset.getInt("count") + 1;
+							int value1 = rset.getInt("count1") + 1;
+
+							pStmt.setInt(paramPos++, 9);
+							pStmt.setInt(paramPos++, value);
+							pStmt.setInt(paramPos++, value1);//
+							connec.close();
+						}
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+//				pStmt.setInt(paramPos++, 9);
+//				pStmt.setInt(paramPos++, 1);//
+//				pStmt.setInt(paramPos++, 1);//
+			} else if (exchangeModel.getExch().equalsIgnoreCase("NFO")
+					&& exchangeModel.getInstrument_type().equalsIgnoreCase("OPTIDX")
+					&& exchangeModel.getSymbol().equalsIgnoreCase("NIFTY")
+					&& exchangeModel.getOption_type().equalsIgnoreCase("CE")) {
+				Connection connec = null;
+				PreparedStatement pStmt1 = null;
+				ResultSet rset = null;
+				try {
+					connec = dataSource.getConnection();
+					pStmt1 = conn.prepareStatement(
+							"SELECT max(sort_order_3) as count FROM TBL_GLOBAL_CONTRACT_MASTER_DETAILS where exch = 'nfo' and instrument_type = 'optidx' and symbol = 'nifty'");
+					rset = pStmt1.executeQuery();
+					if (rset != null) {
+						while (rset.next()) {
+							int value = rset.getInt("count") + 1;
+
+							pStmt.setInt(paramPos++, 6);
+							pStmt.setInt(paramPos++, 1);
+							pStmt.setInt(paramPos++, value);//
+							connec.close();
+						}
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+			} else if (exchangeModel.getExch().equalsIgnoreCase("NFO")
+					&& exchangeModel.getInstrument_type().equalsIgnoreCase("OPTIDX")
+					&& exchangeModel.getSymbol().equalsIgnoreCase("NIFTY")
+					&& exchangeModel.getOption_type().equalsIgnoreCase("PE")) {
+				Connection connec = null;
+				PreparedStatement pStmt1 = null;
+				ResultSet rset = null;
+				try {
+					connec = dataSource.getConnection();
+					pStmt1 = conn.prepareStatement(
+							"SELECT max(sort_order_3) as count FROM TBL_GLOBAL_CONTRACT_MASTER_DETAILS where exch = 'nfo' and instrument_type = 'optidx' and symbol = 'nifty'");
+					rset = pStmt1.executeQuery();
+					if (rset != null) {
+						while (rset.next()) {
+							int value = rset.getInt("count") + 1;
+
+							pStmt.setInt(paramPos++, 6);
+							pStmt.setInt(paramPos++, 2);
+							pStmt.setInt(paramPos++, value);//
+							connec.close();
+						}
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else if (exchangeModel.getExch().equalsIgnoreCase("NFO")
+					&& exchangeModel.getInstrument_type().equalsIgnoreCase("OPTIDX")
+					&& exchangeModel.getSymbol().equalsIgnoreCase("BANKNIFTY")
+					&& exchangeModel.getOption_type().equalsIgnoreCase("CE")) {
+				Connection connec = null;
+				PreparedStatement pStmt1 = null;
+				ResultSet rset = null;
+				try {
+					connec = dataSource.getConnection();
+					pStmt1 = conn.prepareStatement(
+							"SELECT max(sort_order_3) as count FROM TBL_GLOBAL_CONTRACT_MASTER_DETAILS where exch = 'nfo' and instrument_type = 'optidx' and symbol = 'banknifty'");
+					rset = pStmt1.executeQuery();
+					if (rset != null) {
+						while (rset.next()) {
+							int value = rset.getInt("count") + 1;
+
+							pStmt.setInt(paramPos++, 7);
+							pStmt.setInt(paramPos++, 1);
+							pStmt.setInt(paramPos++, value);//
+							connec.close();
+						}
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else if (exchangeModel.getExch().equalsIgnoreCase("NFO")
+					&& exchangeModel.getInstrument_type().equalsIgnoreCase("OPTIDX")
+					&& exchangeModel.getSymbol().equalsIgnoreCase("BANKNIFTY")
+					&& exchangeModel.getOption_type().equalsIgnoreCase("PE")) {
+				Connection connec = null;
+				PreparedStatement pStmt1 = null;
+				ResultSet rset = null;
+				try {
+					connec = dataSource.getConnection();
+					pStmt1 = conn.prepareStatement(
+							"SELECT max(sort_order_3) as count FROM TBL_GLOBAL_CONTRACT_MASTER_DETAILS where exch = 'nfo' and instrument_type = 'optidx' and symbol = 'banknifty'");
+					rset = pStmt1.executeQuery();
+					if (rset != null) {
+						while (rset.next()) {
+							int value = rset.getInt("count") + 1;
+
+							pStmt.setInt(paramPos++, 7);
+							pStmt.setInt(paramPos++, 2);
+							pStmt.setInt(paramPos++, value);//
+							connec.close();
+						}
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else if (exchangeModel.getExch().equalsIgnoreCase("NFO")
+					&& exchangeModel.getInstrument_type().equalsIgnoreCase("OPTIDX")
+					&& !exchangeModel.getSymbol().equalsIgnoreCase("BANKNIFTY")
+					&& !exchangeModel.getSymbol().equalsIgnoreCase("NIFTY")
+					&& exchangeModel.getOption_type().equalsIgnoreCase("CE")) {
+
+				Connection connec = null;
+				PreparedStatement pStmt1 = null;
+				ResultSet rset = null;
+				try {
+					connec = dataSource.getConnection();
+					pStmt1 = conn.prepareStatement(
+							"SELECT max((sort_order_3)) as count FROM chola_db.tbl_global_contract_master_details where exch = 'nfo' and instrument_type = 'optidx' and symbol != 'nifty' and symbol != 'banknifty'");
+					rset = pStmt1.executeQuery();
+					if (rset != null) {
+						while (rset.next()) {
+							int value = rset.getInt("count") + 1;
+
+							pStmt.setInt(paramPos++, 8);
+							pStmt.setInt(paramPos++, 1);
+							pStmt.setInt(paramPos++, value);//
+							connec.close();
+						}
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else if (exchangeModel.getExch().equalsIgnoreCase("NFO")
+					&& exchangeModel.getInstrument_type().equalsIgnoreCase("OPTIDX")
+					&& !exchangeModel.getSymbol().equalsIgnoreCase("BANKNIFTY")
+					&& !exchangeModel.getSymbol().equalsIgnoreCase("NIFTY")
+					&& exchangeModel.getOption_type().equalsIgnoreCase("PE")) {
+
+				Connection connec = null;
+				PreparedStatement pStmt1 = null;
+				ResultSet rset = null;
+				try {
+					connec = dataSource.getConnection();
+					pStmt1 = conn.prepareStatement(
+							"SELECT max((sort_order_3)) as count FROM chola_db.tbl_global_contract_master_details where exch = 'nfo' and instrument_type = 'optidx' and symbol != 'nifty' and symbol != 'banknifty'");
+					rset = pStmt1.executeQuery();
+					if (rset != null) {
+						while (rset.next()) {
+							int value = rset.getInt("count") + 1;
+
+							pStmt.setInt(paramPos++, 8);
+							pStmt.setInt(paramPos++, 2);
+							pStmt.setInt(paramPos++, value);//
+							connec.close();
+						}
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else if (exchangeModel.getExch().equalsIgnoreCase("NFO")
+					&& exchangeModel.getInstrument_type().equalsIgnoreCase("OPTSTK")
+					&& exchangeModel.getOption_type().equalsIgnoreCase("CE")) {
+
+				Connection connec = null;
+				PreparedStatement pStmt1 = null;
+				ResultSet rset = null;
+				try {
+					connec = dataSource.getConnection();
+					pStmt1 = conn.prepareStatement(
+							"SELECT max((sort_order_3)) as count FROM chola_db.tbl_global_contract_master_details where exch = 'nfo' and instrument_type = 'optstk'");
+					rset = pStmt1.executeQuery();
+					if (rset != null) {
+						while (rset.next()) {
+							int value = rset.getInt("count") + 1;
+
+							pStmt.setInt(paramPos++, 10);
+							pStmt.setInt(paramPos++, 1);
+							pStmt.setInt(paramPos++, value);//
+							connec.close();
+						}
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else if (exchangeModel.getExch().equalsIgnoreCase("NFO")
+					&& exchangeModel.getInstrument_type().equalsIgnoreCase("OPTSTK")
+					&& exchangeModel.getOption_type().equalsIgnoreCase("PE")) {
+
+				Connection connec = null;
+				PreparedStatement pStmt1 = null;
+				ResultSet rset = null;
+				try {
+					connec = dataSource.getConnection();
+					pStmt1 = conn.prepareStatement(
+							"SELECT max((sort_order_3)) as count FROM chola_db.tbl_global_contract_master_details where exch = 'nfo' and instrument_type = 'optstk'");
+					rset = pStmt1.executeQuery();
+					if (rset != null) {
+						while (rset.next()) {
+							int value = rset.getInt("count") + 1;
+
+							pStmt.setInt(paramPos++, 10);
+							pStmt.setInt(paramPos++, 2);
+							pStmt.setInt(paramPos++, value);//
+							connec.close();
+						}
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else if (exchangeModel.getExch().equalsIgnoreCase("NSE")) {
+				pStmt.setInt(paramPos++, 1);
+				pStmt.setInt(paramPos++, 1);
+				pStmt.setInt(paramPos++, 1);
+			} else if (exchangeModel.getExch().equalsIgnoreCase("BSE")) {
+				pStmt.setInt(paramPos++, 2);
+				pStmt.setInt(paramPos++, 1);
+				pStmt.setInt(paramPos++, 1);
+			} else if (exchangeModel.getExch().equalsIgnoreCase("CDS")
+					&& exchangeModel.getInstrument_type().equalsIgnoreCase("FUTCUR")) {
+				Connection connec = null;
+				PreparedStatement pStmt1 = null;
+				ResultSet rset = null;
+				try {
+					connec = dataSource.getConnection();
+					pStmt1 = conn.prepareStatement(
+							"SELECT max((sort_order_2)) as count , max((sort_order_3)) as count1 FROM chola_db.tbl_global_contract_master_details where exch = 'cds' and instrument_type = 'futcur'");
+					rset = pStmt1.executeQuery();
+					if (rset != null) {
+						while (rset.next()) {
+							int value = rset.getInt("count") + 1;
+							int value1 = rset.getInt("count1") + 1;
+
+							pStmt.setInt(paramPos++, 11);
+							pStmt.setInt(paramPos++, value);
+							pStmt.setInt(paramPos++, value1);//
+							connec.close();
+						}
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+//				pStmt.setInt(paramPos++, 11);
+//				pStmt.setInt(paramPos++, 1);//
+//				pStmt.setInt(paramPos++, 1);//
+			} else if (exchangeModel.getExch().equalsIgnoreCase("CDS")
+					&& exchangeModel.getInstrument_type().equalsIgnoreCase("OPTCUR")
+					&& exchangeModel.getOption_type().equalsIgnoreCase("CE")) {
+
+				Connection connec = null;
+				PreparedStatement pStmt1 = null;
+				ResultSet rset = null;
+				try {
+					connec = dataSource.getConnection();
+					pStmt1 = conn.prepareStatement(
+							"SELECT max((sort_order_3)) as count FROM chola_db.tbl_global_contract_master_details where exch = 'cds' and instrument_type = 'optcur'");
+					rset = pStmt1.executeQuery();
+					if (rset != null) {
+						while (rset.next()) {
+							int value = rset.getInt("count") + 1;
+
+							pStmt.setInt(paramPos++, 13);
+							pStmt.setInt(paramPos++, 1);
+							pStmt.setInt(paramPos++, value);//
+							connec.close();
+						}
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else if (exchangeModel.getExch().equalsIgnoreCase("CDS")
+					&& exchangeModel.getInstrument_type().equalsIgnoreCase("OPTCUR")
+					&& exchangeModel.getOption_type().equalsIgnoreCase("PE")) {
+
+				Connection connec = null;
+				PreparedStatement pStmt1 = null;
+				ResultSet rset = null;
+				try {
+					connec = dataSource.getConnection();
+					pStmt1 = conn.prepareStatement(
+							"SELECT max((sort_order_3)) as count FROM chola_db.tbl_global_contract_master_details where exch = 'cds' and instrument_type = 'optcur'");
+					rset = pStmt1.executeQuery();
+					if (rset != null) {
+						while (rset.next()) {
+							int value = rset.getInt("count") + 1;
+
+							pStmt.setInt(paramPos++, 13);
+							pStmt.setInt(paramPos++, 2);
+							pStmt.setInt(paramPos++, value);//
+							connec.close();
+						}
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
 			pStmt.setString(paramPos++, exchangeModel.getInstrument_name());
 //			pStmt.setInt(paramPos++, sortOrder);
 			isSuccessful = pStmt.execute();
+
+			conn.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -340,6 +748,7 @@ public class ContractEntityManager {
 					}
 				}
 			}
+			conn1.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

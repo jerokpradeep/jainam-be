@@ -21,6 +21,7 @@ public class ContractInfoDetails {
 	private String pdc;
 	private String fiftyWeekHigh;
 	private String fiftyWeeklow;
+	private boolean mtf;
 	private String insType;
 	private Date expiry;
 	private List<PromptModel> prompt;

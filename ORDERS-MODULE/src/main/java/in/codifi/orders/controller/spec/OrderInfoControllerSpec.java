@@ -49,5 +49,17 @@ public interface OrderInfoControllerSpec {
 	@Produces(MediaType.APPLICATION_JSON)
 	@APIResponse(description = "Get order history")
 	public RestResponse<GenericResponse> getOrderHistory(OrderReqModel req);
+	
+	/**
+	 * Method to get Gtd order book
+	 * 
+	 * @author Gowthaman M
+	 * @return
+	 */
+	@Path("/gtdOrderbook")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@APIResponse(description = "Get order book ")
+	public RestResponse<GenericResponse> getGtdOrderBookInfo();
 
 }

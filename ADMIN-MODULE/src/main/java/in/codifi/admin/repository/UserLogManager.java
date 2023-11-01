@@ -19,7 +19,7 @@ import in.codifi.admin.model.response.UsersLoggedInModel;
 import io.quarkus.logging.Log;
 
 @ApplicationScoped
-public class AccessLogManager {
+public class UserLogManager {
 
 	@Named("logs")
 	@Inject
@@ -56,6 +56,7 @@ public class AccessLogManager {
 					}
 				}
 			}
+			connection.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 			Log.error("getCountBySource", e);
@@ -160,7 +161,84 @@ public class AccessLogManager {
 					vendorList.add(vendor);
 				}
 			}
+			connection.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+			Log.error("getCountBySource", e);
+		} finally {
+			try {
+				if (resultSet != null) {
+					resultSet.close();
+				}
+				if (statement != null) {
+					statement.close();
+				}
+				if (connection != null) {
+					connection.close();
+				}
+			} catch (Exception e) {
+				Log.error("getCountBySource -" + e);
+			}
+		}
+		return vendorList;
+	}
 
+	/**
+	 * Method to Truncate user logged in details
+	 * 
+	 * @author LOKESH
+	 * @return
+	 */
+	@SuppressWarnings("unused")
+	public RestResponse<GenericResponse> truncateUserLoggedInDetails() {
+		Connection connection = null;
+		PreparedStatement statement = null;
+
+		try {
+			connection = dataSource.getConnection();
+			String truncateQuery = "TRUNCATE TABLE tbl_user_loggedin_report";
+			statement = connection.prepareStatement(truncateQuery);
+			int rowsAffected = statement.executeUpdate();
+			connection.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+			Log.error("getCountBySource", e);
+		} finally {
+			try {
+				if (statement != null) {
+					statement.close();
+				}
+				if (connection != null) {
+					connection.close();
+				}
+			} catch (Exception e) {
+				Log.error("getCountBySource -" + e);
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * method to get Total users logged in details
+	 * 
+	 * @author LOKESH
+	 */
+	public int getTotalUserLoggedInDetails() {
+		Connection connection = null;
+		PreparedStatement statement = null;
+		ResultSet resultSet = null;
+		int userCount = 0;
+		try {
+			connection = dataSource.getConnection();
+			String selectQuery = "select count(DISTINCT(user_id)) as userCount from tbl_user_loggedin_report";
+			statement = connection.prepareStatement(selectQuery);
+			resultSet = statement.executeQuery();
+			if (resultSet != null) {
+				while (resultSet.next()) {
+					userCount = resultSet.getInt("userCount");
+				}
+			}
+			connection.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 			Log.error("getCountBySource", e);
@@ -180,23 +258,6 @@ public class AccessLogManager {
 				Log.error("getCountBySource -" + e);
 			}
 		}
-		return vendorList;
-	}
-
-	@SuppressWarnings("unused")
-	public RestResponse<GenericResponse> truncateUserLoggedInDetails() {
-		Connection connection = null;
-		PreparedStatement statement = null;
-
-		try {
-			connection = dataSource.getConnection();
-			String truncateQuery = "TRUNCATE TABLE tbl_user_loggedin_report";
-			statement = connection.prepareStatement(truncateQuery);
-			int rowsAffected = statement.executeUpdate();
-		} catch (Exception e) {
-			e.printStackTrace();
-			Log.error("getCountBySource", e);
-		}
-		return null;
+		return userCount;
 	}
 }

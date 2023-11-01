@@ -15,11 +15,13 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.jboss.resteasy.reactive.RestResponse;
+import org.json.simple.JSONValue;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import in.codifi.alerts.config.ApplicationProperties;
 import in.codifi.alerts.entity.logs.RestAccessLogModel;
+import in.codifi.alerts.entity.primary.AlertsEntity;
 import in.codifi.alerts.model.response.GenericResponse;
 import in.codifi.alerts.repository.AccessLogManager;
 import in.codifi.alerts.utility.AppConstants;
@@ -33,7 +35,6 @@ import in.codifi.alerts.ws.model.PushNotifyAndroid;
 import in.codifi.alerts.ws.model.PushNotifyData;
 import in.codifi.alerts.ws.model.PushNotifyNotification;
 import in.codifi.alerts.ws.model.PushNotifyReq;
-import in.codifi.cache.model.ClientInfoModel;
 import io.quarkus.logging.Log;
 
 @ApplicationScoped
@@ -135,64 +136,65 @@ public class AlertsRestService {
 	 * @return
 	 */
 
-	public RestResponse<GenericResponse> setAlert(String request, ClientInfoModel info) {
-		AlertRespModel respModel = new AlertRespModel();
-		ObjectMapper mapper = new ObjectMapper();
+	public Object setAlert(AlertsEntity alertEntity, String userId) {
+		long triggerId = alertEntity.getId();
+		Object object = new Object();
+		URL url = null;
 		try {
-			Log.info("login request" + request);
 			RestAccessLogModel accessLogModel = new RestAccessLogModel();
 			accessLogModel.setMethod("setAlert");
 			accessLogModel.setModule(AppConstants.MODULE_ALERTS);
-			accessLogModel.setReqBody(request);
-			accessLogModel.setUserId(info.getUserId());
+			accessLogModel.setUserId(userId);
 			accessLogModel.setInTime(new Timestamp(new Date().getTime()));
 
-			CodifiUtil.trustedManagement();
-			URL url = new URL(props.getSetAlertUrl());
-			accessLogModel.setUrl(url.toString());
-			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-			conn.setRequestMethod(AppConstants.POST_METHOD);
-			conn.setRequestProperty(AppConstants.CONTENT_TYPE, AppConstants.APPLICATION_JSON);
-			conn.setRequestProperty(AppConstants.X_API_KEY_NAME, props.getXApiKey());
-			conn.setDoOutput(true);
-			try (OutputStream os = conn.getOutputStream()) {
-				byte[] input = request.getBytes(AppConstants.UTF_8);
-				os.write(input, 0, input.length);
+			String exch = "";
+			if (alertEntity.getExch().equalsIgnoreCase("NSE")) {
+				exch = "NSEEQ";
+			} else if (alertEntity.getExch().equalsIgnoreCase("NFO")) {
+				exch = "NSEFO";
+			} else if (alertEntity.getExch().equalsIgnoreCase("CDS")) {
+				exch = "NSECD";
+			} else if (alertEntity.getExch().equalsIgnoreCase("MCX")) {
+				exch = "MCX";
+			} else if (alertEntity.getExch().equalsIgnoreCase("BSE")) {
+				exch = "BSEEQ";
+			} else if (alertEntity.getExch().equalsIgnoreCase("BFO")) {
+				exch = "BSEFO";
+			} else if (alertEntity.getExch().equalsIgnoreCase("BCD")) {
+				exch = "BSECD";
 			}
+			String urls = props.getAlertBaseUrl() + "alertId=" + triggerId + "&param=LTP&operator="
+					+ alertEntity.getOperator() + "&token=" + alertEntity.getToken() + "&value="
+					+ alertEntity.getValue() + "&exch=" + exch + "&vendorname=" + props.getAlertVendorName();
+			url = new URL(urls);
+
+			Log.info("Alerts set-"+urls);
+			accessLogModel.setUrl(props.getAlertBaseUrl());
+			accessLogModel.setReqBody(urls);
+
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.setRequestMethod(AppConstants.GET);
+			conn.setDoOutput(true);
 			accessLogModel.setOutTime(new Timestamp(new Date().getTime()));
-			int responseCode = conn.getResponseCode();
-			BufferedReader bufferedReader;
-			String output = null;
-			if (responseCode == 200) {
-				bufferedReader = new BufferedReader(new InputStreamReader((conn.getInputStream())));
-				output = bufferedReader.readLine();
+			if (conn.getResponseCode() != 200) {
+				accessLogModel.setResBody("Failed : HTTP error code : ");
+				insertRestAccessLogs(accessLogModel);
+				throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
+			}
+			BufferedReader br1 = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+			String output;
+		
+			while ((output = br1.readLine()) != null) {
+				Log.info("Alerts set response-" + output);
 				accessLogModel.setResBody(output);
 				insertRestAccessLogs(accessLogModel);
-				Log.info("set alerts response" + output);
-				respModel = mapper.readValue(output, AlertRespModel.class);
-			} else if (responseCode == 401) {
-				Log.error("Unauthorized error in set alerts api");
-				accessLogModel.setResBody("Unauthorized");
-				insertRestAccessLogs(accessLogModel);
-				return prepareResponse.prepareUnauthorizedResponse();
-			} else {
-				Log.info("Error Connection in set alerts. Response Code -" + responseCode);
-				bufferedReader = new BufferedReader(new InputStreamReader((conn.getErrorStream())));
-				output = bufferedReader.readLine();
-				System.out.println("output--" + output);
-				accessLogModel.setResBody(output);
-				insertRestAccessLogs(accessLogModel);
-				if (StringUtil.isNotNullOrEmpty(output)) {
-					respModel = mapper.readValue(output, AlertRespModel.class);
-					return prepareResponse.prepareFailedResponse(respModel.getMessage());
-				}
+				object = JSONValue.parse(output);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			Log.error(e.getMessage());
 		}
-		return prepareResponse.prepareFailedResponse(AppConstants.FAILED_STATUS);
-
+		return object;
 	}
 
 	/**

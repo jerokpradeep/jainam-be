@@ -26,5 +26,8 @@ public class RestServiceProperties {
 	
 	@ConfigProperty(name = "appconfig.odin.url.xapikey")
 	private String xApiKey;
+	
+//	@ConfigProperty(name = "appconfig.erp.url.riseTicket")
+//	private String riseTicket;
 
 }

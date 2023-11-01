@@ -9,6 +9,8 @@ import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.core.HazelcastInstance;
 
+import in.codifi.cache.model.AdminIndexModel;
+import in.codifi.cache.model.AdminPreferenceModel;
 import in.codifi.cache.model.ContractMasterModel;
 import in.codifi.cache.model.MtfDataModel;
 import in.codifi.scrips.entity.chartdb.PromptModel;
@@ -52,9 +54,11 @@ public class HazelcastConfig {
 	private Map<String, MtfDataModel> mtfDataModel = getHz().getMap("mtfDataModel");
 	private Map<String, String> restUserSession = getHz().getMap("restUserSession");
 	private Map<String, List<PromptEntity>> promtMsgCache = getHz().getMap("promtMsgCache");
-	
 	private Map<String, List<PromptModel>> promptMaster = getHz().getMap("promptMaster");
-	
 	private Map<String, FiftytwoWeekDataEntity> fiftytwoWeekData = getHz().getMap("fiftytwoWeekData");
+	
+	// for preference
+	private Map<String, AdminPreferenceModel> adminPreferenceModel = getHz().getMap("adminPreferenceModel");
+	private Map<String, List<AdminIndexModel>> indexValue = getHz().getMap("indexValue");
 
 }

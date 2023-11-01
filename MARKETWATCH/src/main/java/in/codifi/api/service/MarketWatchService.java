@@ -628,6 +628,7 @@ public class MarketWatchService implements IMarketWatchService {
 						.get(AppConstants.PREDEFINED_MW);
 			} else {
 				predefinedMwEntities = predefinedMwRepo.findAll();
+				System.out.println("predefined Mw Entities -- "+ predefinedMwEntities);
 			}
 			HazelCacheController.getInstance().getAdvPredefinedMW().clear();
 			for (PredefinedMwEntity predefinedMW : predefinedMwEntities) {

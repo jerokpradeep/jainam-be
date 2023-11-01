@@ -21,14 +21,17 @@ import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 
+import in.codifi.cache.model.AdminIndexModel;
 import in.codifi.cache.model.ContractMasterModel;
 import in.codifi.cache.model.MtfDataModel;
 import in.codifi.scrips.config.ApplicationProperties;
 import in.codifi.scrips.config.HazelcastConfig;
+import in.codifi.scrips.entity.primary.AdminIndexEntity;
 import in.codifi.scrips.entity.primary.ContractEntity;
 import in.codifi.scrips.entity.primary.FiftytwoWeekDataEntity;
 import in.codifi.scrips.entity.primary.MTFEntity;
 import in.codifi.scrips.model.response.GenericResponse;
+import in.codifi.scrips.repository.AdminIndexRepository;
 import in.codifi.scrips.repository.ContractEntityManager;
 import in.codifi.scrips.repository.ContractRepository;
 import in.codifi.scrips.repository.FiftytwoWeekDataRepository;
@@ -55,6 +58,9 @@ public class ContractService implements ContractServiceSpecs {
 
 	@Inject
 	ScripSearchEntityManager entityManager;
+
+	@Inject
+	AdminIndexRepository adminIndexRepository;
 
 	@Inject
 	ApplicationProperties props;
@@ -104,10 +110,12 @@ public class ContractService implements ContractServiceSpecs {
 				result.setCompanyName(contractEntity.getCompanyName());
 				String key = contractEntity.getExch() + "_" + contractEntity.getToken();
 				HazelcastConfig.getInstance().getContractMaster().put(key, result);
+//				System.out.println("Key -- " + key + " -- Result -- " + result);
 			}
 			System.out.println("Loaded SucessFully");
 			System.out.println("Full Size " + HazelcastConfig.getInstance().getContractMaster().size());
 		} catch (Exception e) {
+			e.printStackTrace();
 			Log.error(e);
 			return prepareResponse.prepareFailedResponse(AppConstants.CONTRACT_LOAD_FAILED);
 		}
@@ -198,6 +206,7 @@ public class ContractService implements ContractServiceSpecs {
 			String fileName = AppConstants.CONTRACT_FILE_NMAE + date + AppConstants.SQL;
 
 			String remoteDir = props.getRemoteContractDire() + fileName;
+			System.out.println("remoteDir -- " + remoteDir);
 			boolean isFileMoved = getsqlFileFromServer(localFilePath.toString(), remoteDir);
 
 			if (isFileMoved) {
@@ -212,6 +221,7 @@ public class ContractService implements ContractServiceSpecs {
 				}
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			Log.error(e);
 		} finally {
 
@@ -283,6 +293,7 @@ public class ContractService implements ContractServiceSpecs {
 			channelSftp.exit();
 			status = true;
 		} catch (Exception e) {
+			e.getMessage();
 			Log.error(e);
 		} finally {
 			if (session != null)
@@ -578,4 +589,89 @@ public class ContractService implements ContractServiceSpecs {
 		return prepareResponse.prepareFailedResponse(AppConstants.FAILED_STATUS);
 	}
 
+	/**
+	 * method to add index value
+	 * 
+	 * @author LOKESH
+	 */
+	@Override
+	public RestResponse<GenericResponse> addIndexValue() {
+		try {
+			System.out.println(" In add Index Value");
+			List<ContractEntity> getIndexValue = contractRepository.findByExchangeSegment();
+			System.out.println(" In get Index Value" + getIndexValue);
+			if (StringUtil.isListNotNullOrEmpty(getIndexValue)) {
+				String adminindex = insertAdminIndex(getIndexValue);
+				if (adminindex.equalsIgnoreCase(AppConstants.SUCCESS_STATUS)) {
+					return prepareResponse.prepareSuccessMessage(AppConstants.INSERTED);
+				} else {
+					return prepareResponse.prepareFailedResponse(AppConstants.FAILED_STATUS);
+				}
+			} else {
+				return prepareResponse.prepareFailedResponse(AppConstants.FAILED_STATUS);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			Log.error("Error in addIndexValue: " + e.getMessage());
+			return prepareResponse.prepareFailedResponse(AppConstants.FAILED_STATUS);
+		}
+	}
+
+	private String insertAdminIndex(List<ContractEntity> getIndexValue) {
+		String status = AppConstants.FAILED_STATUS;
+		List<AdminIndexEntity> resultList = new ArrayList<>();
+		for (ContractEntity rSet : getIndexValue) {
+			AdminIndexEntity result = new AdminIndexEntity();
+			result.setExch(rSet.getExch());
+			result.setExchangeSegment(rSet.getSegment());
+			result.setToken(rSet.getToken());
+			result.setAlterToken(rSet.getAlterToken());
+			resultList.add(result);
+		}
+
+		if (!resultList.isEmpty()) {
+			List<AdminIndexEntity> indexValue = adminIndexRepository.saveAll(resultList);
+			List<AdminIndexModel> indexList = new ArrayList<>();
+			for (AdminIndexEntity rSet : indexValue) {
+				AdminIndexModel result = new AdminIndexModel();
+				result.setAlterToken(rSet.getAlterToken());
+				result.setExch(rSet.getExch());
+				result.setExchangeSegment(rSet.getExchangeSegment());
+				result.setToken(rSet.getToken());
+				indexList.add(result);
+			}
+
+			HazelcastConfig.getInstance().getIndexValue().put("indxValue", indexList);
+			List<AdminIndexModel> getIndexList = HazelcastConfig.getInstance().getIndexValue().get("indxValue");
+			System.out.println(getIndexList);
+			status = AppConstants.SUCCESS_STATUS;
+		}
+
+		return status;
+	}
+
+	/**
+	 * Method to create Archive Table For Contract Master
+	 * 
+	 * @author LOKESH
+	 * @return
+	 */
+	@Override
+	public RestResponse<GenericResponse> createArchiveTableForContractMaster() {
+		try {
+
+//			boolean deleteArchive = contractEntityManager.deleteGlobalContractMaster();
+//			if (deleteArchive) {
+			boolean isMoved = contractEntityManager.moveGlobalContractMaster();
+			if (isMoved) {
+//				Log.info("All position files are inserted sucessfully");
+				return prepareResponse.prepareSuccessMessage(AppConstants.INSERTED);
+			}
+//			}
+
+		} catch (Exception e) {
+			Log.error("update Latest PreDefined MW -- ", e);
+		}
+		return prepareResponse.prepareFailedResponse(AppConstants.FAILED_STATUS);
+	}
 }

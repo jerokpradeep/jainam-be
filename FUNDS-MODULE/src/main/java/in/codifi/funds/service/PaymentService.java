@@ -22,6 +22,7 @@ import in.codifi.cache.model.ClientDetailsModel;
 import in.codifi.cache.model.ClinetInfoModel;
 import in.codifi.funds.config.HazelcastConfig;
 import in.codifi.funds.entity.primary.BOPaymentLogEntity;
+import in.codifi.funds.entity.primary.ClientBankDataEntity;
 import in.codifi.funds.entity.primary.ClientBankDetailsEntity;
 import in.codifi.funds.entity.primary.PaymentRefEntity;
 import in.codifi.funds.entity.primary.PayoutDetailsEntity;
@@ -40,6 +41,7 @@ import in.codifi.funds.model.response.PayoutDetailsResp;
 import in.codifi.funds.model.response.PayoutResponse;
 import in.codifi.funds.model.response.RazorpayModel;
 import in.codifi.funds.repository.BankDetailsRepository;
+import in.codifi.funds.repository.ClientBankDataRepository;
 import in.codifi.funds.repository.ClientBankDetailRepository;
 import in.codifi.funds.repository.DropdownRepository;
 import in.codifi.funds.repository.PaymentRefRepository;
@@ -90,6 +92,8 @@ public class PaymentService implements PaymentServiceSpec {
 	ClientBankDetailRepository clientBankDetailRepository;
 	@Inject
 	PayoutDetailsRepository payoutDetailsRepository;
+	@Inject
+	ClientBankDataRepository clientBankDataRepository;
 
 	/**
 	 * method to create new payment details
@@ -114,15 +118,25 @@ public class PaymentService implements PaymentServiceSpec {
 			if (paymentReqModel.getAmount() < 100)
 				return prepareResponse.prepareFailedResponse(AppConstants.LESS_THEN_MINIMUM);
 
-			ClientBankDetailsEntity bankDetails = new ClientBankDetailsEntity();
-			bankDetails = clientBankDetailRepository.findByBankAcnoAndClientId(paymentReqModel.getBankActNo(),
-					info.getUserId());
+//			ClientBankDetailsEntity bankDetails = new ClientBankDetailsEntity();
+//			bankDetails = clientBankDetailRepository.findByBankAcnoAndClientId(paymentReqModel.getBankActNo(),
+//					info.getUserId());
+			
+			ClientBankDataEntity clientBankDetails = new ClientBankDataEntity();
+			clientBankDetails = clientBankDataRepository.findByBankAccountNumberAndTermCode(paymentReqModel.getBankActNo(), info.getUserId());
 
-			if (bankDetails != null) {
-				paymentReqModel.setBankActNo(bankDetails.getBankAcno());
-				paymentReqModel.setBankName(bankDetails.getClientBankName());
-				paymentReqModel.setClientName(bankDetails.getClientName());
-				paymentReqModel.setIfscCode(bankDetails.getIfscCode());
+//			if (bankDetails != null) {
+//				paymentReqModel.setBankActNo(bankDetails.getBankAcno());
+//				paymentReqModel.setBankName(bankDetails.getClientBankName());
+//				paymentReqModel.setClientName(bankDetails.getClientName());
+//				paymentReqModel.setIfscCode(bankDetails.getIfscCode());
+			if (clientBankDetails != null) {
+				paymentReqModel.setBankActNo(clientBankDetails.getBankAccountNumber());
+				paymentReqModel.setBankName(clientBankDetails.getFibsacct());
+				ClientDetailsModel clientModel = HazelcastConfig.getInstance().getClientDetails()
+						.get(info.getUserId());
+				paymentReqModel.setClientName(clientModel.getClientName());
+				paymentReqModel.setIfscCode(clientBankDetails.getIfscCode());
 				String receipt = commonMethods.randomAlphaNumeric(15);
 				paymentReqModel.setReceipt(receipt);
 				if (StringUtil.isNullOrEmpty(receipt))
@@ -343,7 +357,6 @@ public class PaymentService implements PaymentServiceSpec {
 	public RestResponse<GenericResponse> getPaymentDetails(ClinetInfoModel info) {
 		GetPaymentResposeModel paymentResponseModel = new GetPaymentResposeModel();
 		try {
-			// TODO if client details not exist need to load **//
 			if (HazelcastConfig.getInstance().getClientDetails().containsKey((info.getUserId()))) {
 				if (HazelcastConfig.getInstance().getPaymentDetails().containsKey(info.getUserId())) {
 					paymentResponseModel = HazelcastConfig.getInstance().getPaymentDetails().get(info.getUserId());
@@ -352,9 +365,7 @@ public class PaymentService implements PaymentServiceSpec {
 				} else {
 					ClientDetailsModel clientModel = HazelcastConfig.getInstance().getClientDetails()
 							.get(info.getUserId());
-
 					System.out.println("mobile--" + clientModel.getMobNo());
-
 					paymentResponseModel.setPhone(clientModel.getMobNo());
 					paymentResponseModel.setEmail(clientModel.getEmail());
 					paymentResponseModel.setSegEnable(clientModel.getExchange());
@@ -366,33 +377,41 @@ public class PaymentService implements PaymentServiceSpec {
 						paymentResponseModel.setUpiId("NA");
 					}
 					List<BankDetails> bankDetails = new ArrayList<>();
-					List<ClientBankDetailsEntity> clientBankDetails = new ArrayList<>();
-					clientBankDetails = clientBankDetailRepository.findByClientId(info.getUserId());
 
-//					bankDetails = bankDetailsEntityManager.getBankDetails(info.getUserId());
-//					if (bankDetails == null || StringUtil.isListNullOrEmpty(bankDetails) || bankDetails.size() <= 0) {
-//						Log.info("bankDetails size from DB " + bankDetails.size());
-//						/** Get bank details from back office **/
-//						bankDetails = getBankDetailsFromBo(info.getUserId());
+//					List<ClientBankDetailsEntity> clientBankDetails = new ArrayList<>();
+//					clientBankDetails = clientBankDetailRepository.findByClientId(info.getUserId());
+//					for (int i = 0; i < clientBankDetails.size(); i++) {
+//						BankDetails detail = new BankDetails();
+//						detail.setBankActNo(clientBankDetails.get(i).getBankAcno());
+//						BankDetails bankDetailsFromRazorpay = fundsRestService
+//								.getBankDetailsFromRazorpay(clientBankDetails.get(i).getIfscCode());
+//						detail.setBankCode(bankDetailsFromRazorpay.getBankCode());
+//						detail.setBankName(clientBankDetails.get(i).getClientBankName());
+//						detail.setClientName(clientBankDetails.get(i).getClientName());
+//						detail.setIfscCode(clientBankDetails.get(i).getIfscCode());
+//						bankDetails.add(detail);
 //					}
-					for (int i = 0; i < clientBankDetails.size(); i++) {
-						BankDetails detail = new BankDetails();
-						detail.setBankActNo(clientBankDetails.get(i).getBankAcno());
-						BankDetails bankDetailsFromRazorpay = fundsRestService
-								.getBankDetailsFromRazorpay(clientBankDetails.get(i).getIfscCode());
-						detail.setBankCode(bankDetailsFromRazorpay.getBankCode());
-						detail.setBankName(clientBankDetails.get(i).getClientBankName());
-						detail.setClientName(clientBankDetails.get(i).getClientName());
-						detail.setIfscCode(clientBankDetails.get(i).getIfscCode());
-						bankDetails.add(detail);
 
+					List<ClientBankDataEntity> clientBankDetails = new ArrayList<>();
+					clientBankDetails = clientBankDataRepository.findByTermCode(info.getUserId());
+					for (int i = 0; i < clientBankDetails.size(); i++) {
+						if (StringUtil.isNotNullOrEmpty(clientBankDetails.get(i).getIfscCode())) {
+							if (!clientBankDetails.get(i).getBankBranchCode().equalsIgnoreCase("CLOSED")) {
+								BankDetails detail = new BankDetails();
+								detail.setBankActNo(clientBankDetails.get(i).getBankAccountNumber());
+								BankDetails bankDetailsFromRazorpay = fundsRestService
+										.getBankDetailsFromRazorpay(clientBankDetails.get(i).getIfscCode());
+								System.out.println("BankCode -- " + bankDetailsFromRazorpay.getBankCode());
+								detail.setBankCode(bankDetailsFromRazorpay.getBankCode());
+//								detail.setBankCode(clientBankDetails.get(i).getBankCode());
+								detail.setBankName(clientBankDetails.get(i).getFibsacct());
+								detail.setClientName(clientModel.getClientName());
+								detail.setIfscCode(clientBankDetails.get(i).getIfscCode());
+								bankDetails.add(detail);
+							}
+						}
 					}
 					paymentResponseModel.setBankDetails(bankDetails);
-
-//					List<String> payoutReasons = dropdownRepository.getPayoutReasons();
-//					if (StringUtil.isListNotNullOrEmpty(payoutReasons)) {
-//						paymentResponseModel.setPayoutReasons(payoutReasons);
-//					}
 
 					HazelcastConfig.getInstance().getPaymentDetails().put(info.getUserId(), paymentResponseModel);
 					return prepareResponse.prepareSuccessResponseObject(paymentResponseModel);
@@ -696,29 +715,39 @@ public class PaymentService implements PaymentServiceSpec {
 			/** create pay out details **/
 //			createPayOut(info.getUserId(), model);
 			PayoutDetailsResp payoutDetailsResp = fundsRestService.getPayoutDetailsResp(info.getUserId());
-			BankDetails bankDetailsFromRazorpay = fundsRestService.getBankDetailsFromRazorpay(model.getIfscCode());
+//			BankDetails bankDetailsFromRazorpay = fundsRestService.getBankDetailsFromRazorpay(model.getIfscCode());
+
+			List<ClientBankDataEntity> clientBankData = clientBankDataRepository
+					.findByIfscCodeAndTermCode(model.getIfscCode(), info.getUserId());
+
+			String bankCode = "";
+			if (StringUtil.isListNotNullOrEmpty(clientBankData)) {
+				bankCode = clientBankData.get(0).getBankCode();
+			}
 
 			PayoutDetailsEntity payoutDetails = new PayoutDetailsEntity();
-			if (info.getUserId().equalsIgnoreCase("109508") || info.getUserId().equalsIgnoreCase("117995")
-					|| info.getUserId().equalsIgnoreCase("111560") || info.getUserId().equalsIgnoreCase("ES0837")
-					|| info.getUserId().equalsIgnoreCase("S00600")) {
-				String bankcode = "";
-				if (model.getIfscCode().equalsIgnoreCase("UTIB0000014")) {
-					bankcode = "AXIS";
-				} else if (model.getIfscCode().equalsIgnoreCase("ICIC0006037")) {
-					bankcode = "ICI";
-				} else if (model.getIfscCode().equalsIgnoreCase("HDFC0000751")) {
-					bankcode = "HDFC";
-				} else if (model.getIfscCode().equalsIgnoreCase("HDFC0000492")) {
-					bankcode = "HDFC";
-				} else if (model.getIfscCode().equalsIgnoreCase("600229006")) {
-					bankcode = "ICI";
-				}
-				payoutDetails = preparePayoutDetails(model, payoutDetailsResp, bankcode, info);
-			} else {
-				payoutDetails = preparePayoutDetails(model, payoutDetailsResp, bankDetailsFromRazorpay.getBankCode(),
-						info);
-			}
+//			if (info.getUserId().equalsIgnoreCase("109508") || info.getUserId().equalsIgnoreCase("117995")
+//					|| info.getUserId().equalsIgnoreCase("111560") || info.getUserId().equalsIgnoreCase("ES0837")
+//					|| info.getUserId().equalsIgnoreCase("S00600")) {
+//				String bankcode = "";
+//				if (model.getIfscCode().equalsIgnoreCase("UTIB0000014")) {
+//					bankcode = "AXIS";
+//				} else if (model.getIfscCode().equalsIgnoreCase("ICIC0006037")) {
+//					bankcode = "ICI";
+//				} else if (model.getIfscCode().equalsIgnoreCase("HDFC0000751")) {
+//					bankcode = "HDFC";
+//				} else if (model.getIfscCode().equalsIgnoreCase("HDFC0000492")) {
+//					bankcode = "HDFC";
+//				} else if (model.getIfscCode().equalsIgnoreCase("600229006")) {
+//					bankcode = "ICI";
+//				}
+//				payoutDetails = preparePayoutDetails(model, payoutDetailsResp, bankcode, info);
+//			} else {
+//				payoutDetails = preparePayoutDetails(model, payoutDetailsResp, bankDetailsFromRazorpay.getBankCode(),
+//						info);
+//			}
+
+			payoutDetails = preparePayoutDetails(model, payoutDetailsResp, bankCode, info);
 
 			PayoutDetailsEntity payoutDetailsEntity = payoutDetailsRepository.save(payoutDetails);
 			if (payoutDetailsEntity == null)
@@ -726,7 +755,8 @@ public class PaymentService implements PaymentServiceSpec {
 
 			return prepareResponse.prepareSuccessResponseObject(payoutDetailsEntity);
 		} catch (Exception e) {
-			Log.error(e);
+			e.printStackTrace();
+			Log.error("payOut -- " + e);
 		}
 		return prepareResponse.prepareFailedResponse(AppConstants.FAILED_STATUS);
 

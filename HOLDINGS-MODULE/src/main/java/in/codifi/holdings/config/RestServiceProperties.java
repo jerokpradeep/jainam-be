@@ -20,6 +20,9 @@ public class RestServiceProperties {
 
 	@ConfigProperty(name = "appconfig.odin.url.edis.summary")
 	private String edisSummaryUrl;
+	
+	@ConfigProperty(name = "appconfig.odin.url.edis.summarys")
+	private String edisSummarysUrl;
 
 	@ConfigProperty(name = "appconfig.odin.url.edis.redirect")
 	private String reDirectUrl;

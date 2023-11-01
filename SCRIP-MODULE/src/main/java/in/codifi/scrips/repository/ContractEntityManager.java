@@ -1,9 +1,13 @@
 package in.codifi.scrips.repository;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.sql.DataSource;
 import javax.transaction.Transactional;
 
 import org.jboss.resteasy.reactive.RestResponse;
@@ -21,6 +25,9 @@ public class ContractEntityManager {
 
 	@Inject
 	PrepareResponse prepareResponse;
+
+	@Inject
+	DataSource dataSource;
 
 	/**
 	 * Method to delete expired contract in DB
@@ -71,6 +78,68 @@ public class ContractEntityManager {
 			Log.error(e.getMessage());
 		}
 		return prepareResponse.prepareFailedResponse(AppConstants.DELETE_FAILED);
+	}
+
+	/**
+	 * Method to Truncate Archive Table For Contract Master
+	 * 
+	 * @author LOKESH
+	 * @return
+	 */
+	public boolean deleteGlobalContractMaster() {
+		PreparedStatement pStmt = null;
+		Connection conn = null;
+		try {
+			conn = dataSource.getConnection();
+			pStmt = conn.prepareStatement("TRUNCATE TABLE tbl_global_contract_master_details");
+			pStmt.executeUpdate();
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			Log.error(e.getMessage());
+		} finally {
+			try {
+				pStmt.close();
+				conn.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.error(e.getMessage());
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Method to Rename Table For Contract Master
+	 * 
+	 * @author LOKESH
+	 * @return
+	 */
+	public boolean moveGlobalContractMaster() {
+		PreparedStatement pStmt = null;
+		Connection conn = null;
+		try {
+			conn = dataSource.getConnection();
+			pStmt = conn.prepareStatement(
+					"RENAME TABLE tbl_global_contract_master_details_archive TO tbl_global_contract_master_details_temp,"
+							+ "tbl_global_contract_master_details TO tbl_global_contract_master_details_archive,"
+							+ "tbl_global_contract_master_details_latest TO tbl_global_contract_master_details,"
+							+ "tbl_global_contract_master_details_temp TO tbl_global_contract_master_details_latest");
+			pStmt.executeUpdate();
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			Log.error(e.getMessage());
+		} finally {
+			try {
+				pStmt.close();
+				conn.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.error(e.getMessage());
+			}
+		}
+		return false;
 	}
 
 }

@@ -2,30 +2,51 @@ package in.codifi.alerts.service.spec;
 
 import org.jboss.resteasy.reactive.RestResponse;
 
+import in.codifi.alerts.entity.primary.AlertsEntity;
+import in.codifi.alerts.model.request.RequestModel;
 import in.codifi.alerts.model.response.GenericResponse;
-import in.codifi.alerts.ws.model.AlertsReqModel;
 import in.codifi.cache.model.ClientInfoModel;
 
 public interface AlertsServiceSpec {
 
 	/**
-	 * method to create alerts
+	 * method to create Alert
 	 * 
-	 * @author SOWMIYA
-	 * @param reqModel
-	 * @param info
+	 * @author Gowthaman M
 	 * @return
 	 */
-	RestResponse<GenericResponse> createAlert(AlertsReqModel reqModel, ClientInfoModel info);
+	RestResponse<GenericResponse> createAlert(RequestModel reqModel, ClientInfoModel info);
 
 	/**
-	 * method to update trigger status
+	 * method to get alert Details
 	 * 
-	 * @author SOWMIYA
-	 * @param alertId
-	 * @param info
+	 * @author Gowthaman M
 	 * @return
 	 */
-	RestResponse<GenericResponse> updateTriggerStatus(int alertId, ClientInfoModel info);
+	RestResponse<GenericResponse> getAlertDetails(ClientInfoModel info);
+
+	/**
+	 * method to update Alert
+	 * 
+	 * @author Gowthaman M
+	 * @return
+	 */
+	RestResponse<GenericResponse> updateAlert(AlertsEntity alertsEntity, ClientInfoModel info);
+
+	/**
+	 * method to delete Alert
+	 * 
+	 * @author Gowthaman M
+	 * @return
+	 */
+	RestResponse<GenericResponse> deleteAlert(int id, ClientInfoModel info);
+
+	/**
+	 * method to update Trigger Status
+	 * 
+	 * @author Gowthaman M
+	 * @return
+	 */
+	RestResponse<GenericResponse> updateTriggerStatus(int id);
 
 }

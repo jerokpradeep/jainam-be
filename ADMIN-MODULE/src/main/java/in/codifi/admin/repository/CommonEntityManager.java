@@ -44,6 +44,7 @@ public class CommonEntityManager {
 					response.add(MobVer);
 				}
 			}
+			conn.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 			Log.error(e.getMessage());
@@ -67,6 +68,8 @@ public class CommonEntityManager {
 			pStmt.setInt(paramPos++, model.getUpdateAvailable());
 
 			isSuccessful = pStmt.execute();
+
+			conn.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 			Log.error(e.getMessage());
@@ -101,6 +104,8 @@ public class CommonEntityManager {
 			pStmt.setString(paramPos++, version);
 
 			isSuccessful = pStmt.executeUpdate();
+
+			conn.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 			Log.error(e.getMessage());
@@ -135,6 +140,8 @@ public class CommonEntityManager {
 			pStmt.setString(paramPos++, type);
 
 			isSuccessful = pStmt.executeUpdate();
+
+			conn.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 			Log.error(e.getMessage());

@@ -32,6 +32,9 @@ public class ApplicationProperties {
 
 	@ConfigProperty(name = "appconfig.odin.url.xapikey")
 	private String xApiKey;
+	
+	@ConfigProperty(name = "config.app.alert.baseurl")
+	private String alertBaseUrl;
 
 	// Alerts config
 

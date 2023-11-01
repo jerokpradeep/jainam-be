@@ -19,6 +19,7 @@ public class ClientDetailsRespModel {
 	private String email;
 	private String pan;
 	private String address;
+	private String pincode;
 	private String officeAddress;
 	private String city;
 	private String state;

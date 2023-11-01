@@ -25,5 +25,8 @@ public class ApplicationProperties {
 	@ConfigProperty(name = "appconfig.push.fcm.apikey")
 	private String fcmApiKey;
 	
+	@ConfigProperty(name = "appconfig.client.file.userdump")
+	private String useDumpPath;
+	
 
 }

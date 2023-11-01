@@ -135,9 +135,12 @@ public class KcAdminRest {
 	 * @param req
 	 * @return
 	 */
+	@SuppressWarnings("unused")
 	public String updateKcUserDetails(CreateUserRequestModel user) {
+		String message = AppConstants.USER_UPDATED;
 		String response = "";
 		String id = "";
+		int count = 1;
 		try {
 			String token = "Bearer " + getAccessToken();
 			id = getKeycloakIdFromKc(user.getUsername());
@@ -145,12 +148,22 @@ public class KcAdminRest {
 			response = AppConstants.USER_UPDATED;
 		} catch (ClientWebApplicationException e) {
 			int statusCode = e.getResponse().getStatus();
-			if (statusCode == 401)
+			if (statusCode == 401 && count > 0) {
+				count--;
 				HazelcastConfig.getInstance().getKeycloakAdminSession().clear();
-			e.printStackTrace();
-			response = AppConstants.USER_NOT_UPDATED;
+				updateKcUserDetails(user);
+			} else if (statusCode == 404) {
+				return "User Not found";
+			} else if (statusCode == 409) {
+				return "User Deatils already exist -" + user.getUsername() + "," + user.getEmail();
+			} else if (count == 0) {
+				message = "";
+			} else {
+				e.printStackTrace();
+				message = e.getMessage();
+			}
 		}
-		return response;
+		return message;
 	}
 	
 	/**

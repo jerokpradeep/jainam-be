@@ -100,4 +100,40 @@ public class Scheduler {
 
 //		contractEntityManager.deleteBSEContract();
 	}
+
+	/**
+	 * 
+	 * Scheduler to insert index value at morning 7.31 AM
+	 * 
+	 * @author LOKESH KUMAR
+	 *
+	 * @param execution
+	 * @throws ServletException
+	 */
+	@Scheduled(cron = "0 31 7 * * ?")
+	public void insertIndexValue(ScheduledExecution execution) throws ServletException {
+		Log.info("Scheduler started to insert index value ");
+		contractService.addIndexValue();
+		Log.info("Scheduler completed to insert index value");
+
+//		contractEntityManager.deleteBSEContract();
+	}
+
+//	/**
+//	 * 
+//	 * Scheduler to insert index value at morning 7.31 AM
+//	 * 
+//	 * @author LOKESH KUMAR
+//	 *
+//	 * @param execution
+//	 * @throws ServletException
+//	 */
+//	@Scheduled(cron = "0 28 7 * * ?")
+//	public void insertGlobalContractMasteArchive(ScheduledExecution execution) throws ServletException {
+//		Log.info("Scheduler started to insert index value ");
+//		contractService.createArchiveTableForContractMaster();
+//		Log.info("Scheduler completed to insert index value");
+//
+////		contractEntityManager.deleteBSEContract();
+//	}
 }

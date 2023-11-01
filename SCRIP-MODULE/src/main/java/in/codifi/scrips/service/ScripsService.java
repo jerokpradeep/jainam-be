@@ -10,8 +10,10 @@ import javax.inject.Inject;
 import org.apache.commons.lang3.ObjectUtils;
 import org.jboss.resteasy.reactive.RestResponse;
 
+import in.codifi.cache.model.AdminPreferenceModel;
 import in.codifi.cache.model.ClinetInfoModel;
 import in.codifi.cache.model.ContractMasterModel;
+import in.codifi.cache.model.MtfDataModel;
 import in.codifi.scrips.config.HazelcastConfig;
 import in.codifi.scrips.entity.chartdb.PromptModel;
 import in.codifi.scrips.entity.primary.FiftytwoWeekDataEntity;
@@ -355,10 +357,37 @@ public class ScripsService implements ScripsServiceSpecs {
 		details.setPdc(model.getPdc());
 		if (model.getExch().equalsIgnoreCase(AppConstants.NSE) || model.getExch().equalsIgnoreCase(AppConstants.BSE)) {
 			String key = model.getExch() + "_" + model.getToken();
+			System.out.println("key -- " + key);
 			FiftytwoWeekDataEntity fiftytwoWeekData = HazelcastConfig.getInstance().getFiftytwoWeekData().get(key);
-			details.setFiftyWeekHigh(fiftytwoWeekData.getHigh());
-			details.setFiftyWeeklow(fiftytwoWeekData.getLow());
+			System.out.println("fiftytwoWeekData -- " + fiftytwoWeekData);
+			if (fiftytwoWeekData != null) {
+				details.setFiftyWeekHigh(fiftytwoWeekData.getHigh());
+				details.setFiftyWeeklow(fiftytwoWeekData.getLow());
+			}
 		}
+
+		String key = model.getExch() + "_" + model.getToken();
+		AdminPreferenceModel adminPreferenceModel = HazelcastConfig.getInstance().getAdminPreferenceModel().get("mtf");
+		if (adminPreferenceModel != null) {
+			if (adminPreferenceModel.getAdminValue() == 1) {
+				MtfDataModel mtf = HazelcastConfig.getInstance().getMtfDataModel().get(key);
+				if (mtf != null) {
+					details.setMtf(true);
+				} else {
+					details.setMtf(false);
+				}
+			} else {
+				details.setMtf(false);
+			}
+		} else {
+			MtfDataModel mtf = HazelcastConfig.getInstance().getMtfDataModel().get(key);
+			if (mtf != null) {
+				details.setMtf(true);
+			} else {
+				details.setMtf(false);
+			}
+		}
+
 		details.setInsType(model.getInsType());
 		details.setExpiry(model.getExpiry());
 		return details;
@@ -375,7 +404,9 @@ public class ScripsService implements ScripsServiceSpecs {
 		try {
 			/** Verify session **/
 			String userSession = AppUtil.getUserSession(info.getUserId());
-//			String userSession = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6NzA3MDcwLCJ1c2VyaWQiOjcwNzA3MCwidGVuYW50aWQiOjcwNzA3MCwibWVtYmVySW5mbyI6eyJ0ZW5hbnRJZCI6IjIxNCIsImdyb3VwSWQiOiJITyIsInVzZXJJZCI6IkMwMDAwOCIsInRlbXBsYXRlSWQiOiJETlMiLCJ1ZElkIjoiOTc2ODY0MTlmOWNlMzc0MSIsIm9jVG9rZW4iOiIweDAxQTYzNEJDMzhFNDgxMUE5ODE0MDJDOTJCMDlENiIsInVzZXJDb2RlIjoiQUNKWVUiLCJncm91cENvZGUiOiJBQUFBQSIsImFwaWtleURhdGEiOnsiQ3VzdG9tZXJJZCI6IjIxNCIsImV4cCI6MTc3NjE1OTcyMCwiaWF0IjoxNjg5NzU5NzY3fSwic291cmNlIjoiTU9CSUxFQVBJIn0sImV4cCI6MTY5MjgxNTM5OSwiaWF0IjoxNjkyNzg4NzY4fQ.zqnZ2TtGCxsxK3ZyDbuc6eAR30pBife3u4hM4Q_mGLU";
+			System.out.println("userId -- " + info.getUserId());
+			System.out.println("userSession -- " +userSession);
+//			String userSession = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6NzA3MDcwLCJ1c2VyaWQiOjcwNzA3MCwidGVuYW50aWQiOjcwNzA3MCwibWVtYmVySW5mbyI6eyJ0ZW5hbnRJZCI6IjQxOSIsImdyb3VwSWQiOiJITyIsInVzZXJJZCI6IkozMyIsInRlbXBsYXRlSWQiOiJVQVQiLCJ1ZElkIjoiIiwib2NUb2tlbiI6IjB4MDEzMDMxMTQ1QjFEODQ2Mjg4QTVFRTJGOEY4MzBCIiwidXNlckNvZGUiOiJOWlNQSSIsImdyb3VwQ29kZSI6IkFBQUFBIiwiYXBpa2V5RGF0YSI6eyJDdXN0b21lcklkIjoiNDE5IiwiU3ViVGVuYW50SWQiOiIiLCJQcm9kdWN0U291cmNlIjoiV0FWRUFQSSIsImV4cCI6MTgyMDgzMTI4MCwiaWF0IjoxNjkxMjMxMjkzfSwic291cmNlIjoiTU9CSUxFQVBJIn0sImV4cCI6MTY5ODY5MDU5OSwiaWF0IjoxNjk4Njc0ODEwfQ.EGoJi_2xxRayMjfJZ7wZT21DhVSD6yRSvMVKAwtKcqo";
 			if (StringUtil.isNullOrEmpty(userSession))
 				return prepareResponse.prepareUnauthorizedResponse();
 

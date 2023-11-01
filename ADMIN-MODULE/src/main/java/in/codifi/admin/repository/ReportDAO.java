@@ -135,6 +135,7 @@ public class ReportDAO {
 					}
 				}
 			}
+			conn.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 			Log.error(e.getMessage());
@@ -195,6 +196,7 @@ public class ReportDAO {
 					jsonList.add(result);
 				}
 			}
+			conn.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 			Log.error(e.getMessage());
@@ -232,26 +234,27 @@ public class ReportDAO {
 			int paromPos = 1;
 			conn = datasource.getConnection();
 			pStmt = conn.prepareStatement(
-					"SELECT CLIENT_ID, CLIENT_NAME, BRANCH_CODE_NEW, BANK_ACNO, CLIENT_BANK_NAME, CLIENT_BANK_ADDRESS, DEFAULT_ACC_BANK, BANK_ACCTYPE, IFSCCODE "
-							+ "from CLIENT_BANK_DETAILS WHERE CLIENT_ID =  ?  group by  "
-							+ "CLIENT_ID, CLIENT_NAME, BRANCH_CODE_NEW, BANK_ACNO, CLIENT_BANK_NAME,CLIENT_BANK_ADDRESS, DEFAULT_ACC_BANK, BANK_ACCTYPE, IFSCCODE ");
+					"select client_id, client_name, branch_code_new, bank_acno, client_bank_name, client_bank_address, default_acc_bank, bank_acctype, ifsccode "
+							+ "from client_bank_details where client_id =  ?  group by  "
+							+ "client_id, client_name, branch_code_new, bank_acno, client_bank_name,client_bank_address, default_acc_bank, bank_acctype, ifsccode ");
 			pStmt.setString(paromPos++, clientId);
 			rSet = pStmt.executeQuery();
 			if (rSet != null) {
 				while (rSet.next()) {
 					BankDetailsResponseModel result = new BankDetailsResponseModel();
-					result.setClientId(rSet.getString("CLIENT_ID"));
-					result.setClientname(rSet.getString("CLIENT_NAME"));
-					result.setBranchCode(rSet.getString("BRANCH_CODE_NEW"));
-					result.setAccNo(rSet.getString("BANK_ACNO"));
-					result.setBankName(rSet.getString("CLIENT_BANK_NAME"));
-					result.setBankAddress(rSet.getString("CLIENT_BANK_ADDRESS"));
-					result.setDefaultAccBank(rSet.getString("DEFAULT_ACC_BANK"));
-					result.setAcctype(rSet.getString("BANK_ACCTYPE"));
-					result.setIfscode(rSet.getString("IFSCCODE"));
+					result.setClientId(rSet.getString("client_id"));
+					result.setClientname(rSet.getString("client_name"));
+					result.setBranchCode(rSet.getString("branch_code_new"));
+					result.setAccNo(rSet.getString("bank_acno"));
+					result.setBankName(rSet.getString("client_bank_name"));
+					result.setBankAddress(rSet.getString("client_bank_address"));
+					result.setDefaultAccBank(rSet.getString("default_acc_bank"));
+					result.setAcctype(rSet.getString("bank_acctype"));
+					result.setIfscode(rSet.getString("ifsccode"));
 					response.add(result);
 				}
 			}
+			conn.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 			Log.error(e.getMessage());
@@ -299,6 +302,7 @@ public class ReportDAO {
 					response.add(result);
 				}
 			}
+			conn.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 			Log.error(e.getMessage());
@@ -396,6 +400,7 @@ public class ReportDAO {
 					jsonList.add(result);
 				}
 			}
+			conn.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 			Log.error(e.getMessage());
@@ -488,6 +493,7 @@ public class ReportDAO {
 					jsonList.add(result);
 				}
 			}
+			conn.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 			Log.error(e.getMessage());
@@ -526,6 +532,7 @@ public class ReportDAO {
 					result.setTotalCount(rSet.getString("totalCount"));
 				}
 			}
+			conn.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 			Log.error(e.getMessage());
