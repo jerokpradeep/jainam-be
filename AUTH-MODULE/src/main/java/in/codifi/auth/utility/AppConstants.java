@@ -74,7 +74,7 @@ public class AppConstants {
 	public static final String CANNOT_SEND_OTP = "Can't send OTP, Please contact Adminstrator";
 	public static final String RESEND_FAILED = "Retry after 30 seconds";
 	public static final String OTP_LIMIT_EXCEED = "You have exceeded maximun limit.Please try again after 5 mins.";
-	public static final String OTP_MSG = " is your verification code as requested online, this code is valid for next 5 minutes. Regards-Chola";
+	public static final String OTP_MSG = " is your verification code as requested online, this code is valid for next 5 minutes. Regards-Jainam";
 
 	public static final String HAZEL_KEY_USER_DETAILS = "_USER_DETAILS";
 	public static final String HAZEL_KEY_REST_SESSION = "_REST_SESSION";
@@ -85,7 +85,7 @@ public class AppConstants {
 	public static final String HAZEL_KEY_OTP_RETRY_COUNT = "_RETRY_COUNT";
 	public static final String HAZEL_KEY_OTP_RESET = "RESET_";
 	public static final String HAZEL_KEY_PWD_RETRY_COUNT = "_PWD_RETRY_COUNT";
-	public static final String COMPANY_NAME = "CHOLA";
+	public static final String COMPANY_NAME = "JAINAM";
 
 	// Rest URL
 	public static final String JDATA = "jData";
@@ -126,9 +126,24 @@ public class AppConstants {
 	public static final String VERIFYTOKEN_PATH = "/auth/verifytoken";
 
 	public static final String TOTP = "TOTP";
-	//mobile lodin
+	// mobile lodin
 	public static final String ATTRIBUTE_MOBILE = "mobile";
 	public static final String ATTRIBUTE_MAIL = "email";
 	public static final String MULTIPLE_USER_LINKED = " linked with multiple client Id's. Kindly login with client code";
+
+	public static final String CLIENT_INFO_IS_NULL = "Client info is null";
+
+	public static final String BEARER_WITH_SPACE = "Bearer ";
+	public static final String LOG_OUT_SUCCESS = "Log Out Successfully";
+
+	public static final String EMAIL_OTP_SUBJECT = "Jainam Login OTP";
+
+	public static final String SOURCE_WEB = "WEB";
+	public static final String SOURCE_MOB = "MOB";
+	public static final String SOURCE_API = "API";
+	public static final String SOURCE_SSO = "SSO";
+	public static final String SYMBOL_PIPE = "|";
+
+	public static final String FILE_ALREADY_EXISTS = "File Already Exists";
 
 }

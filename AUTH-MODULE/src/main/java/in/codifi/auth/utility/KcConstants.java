@@ -16,5 +16,6 @@ public class KcConstants {
 
 	public static final String EXACT_TRUE = "true";
 	public static final String EXACT_FALSE = "false";
+	public static final String MF_USER = "MF_USER";
 
 }

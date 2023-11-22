@@ -3,9 +3,11 @@ package in.codifi.auth.service.spec;
 import org.jboss.resteasy.reactive.RestResponse;
 
 import in.codifi.auth.model.request.AuthReq;
+import in.codifi.auth.model.request.BioMetricReqModel;
 import in.codifi.auth.model.request.ForgetPassReq;
 import in.codifi.auth.model.request.UnblockReq;
 import in.codifi.auth.model.response.GenericResponse;
+import in.codifi.cache.model.ClinetInfoModel;
 import in.codifi.orders.ws.model.OdinSsoModel;
 
 public interface AuthServiceSpec {
@@ -182,7 +184,7 @@ public interface AuthServiceSpec {
 	 * @return
 	 */
 	RestResponse<GenericResponse> verifyTotp(AuthReq authReq);
-	
+
 	/**
 	 * Method to verfify our token from ODIN req
 	 * 
@@ -191,4 +193,48 @@ public interface AuthServiceSpec {
 	 */
 	RestResponse<OdinSsoModel> verifyToken(String token);
 
+	/**
+	 * Method to Log Out From Odin
+	 * 
+	 * @author LOKESH
+	 * @return
+	 */
+	RestResponse<GenericResponse> restLogOut(ClinetInfoModel info);
+
+	/**
+	 * 
+	 * Method to validate password
+	 * 
+	 * @author Dinesh Kumar
+	 *
+	 * @param authmodel
+	 * @return
+	 */
+	RestResponse<GenericResponse> validateSessionForBioLogin(AuthReq authmodel, String deviceIp);
+
+	/**
+	 * Method to enable bio metric for login
+	 * 
+	 * @author Dinesh Kumar
+	 * @param req
+	 * @return
+	 */
+	RestResponse<GenericResponse> enableBioMetric(BioMetricReqModel req);
+
+	/**
+	 * Method to generate QR code
+	 * 
+	 * @author LOKESH
+	 * @return
+	 */
+	RestResponse<GenericResponse> generateQrcode();
+
+	/**
+	 * Method to validate session for qr login
+	 * 
+	 * @author Lokesh
+	 * @param authReq
+	 * @return
+	 */
+	RestResponse<GenericResponse> validateSessionForQrLogin(AuthReq authReq);
 }

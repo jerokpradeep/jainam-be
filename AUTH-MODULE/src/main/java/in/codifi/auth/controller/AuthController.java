@@ -4,17 +4,23 @@ import java.util.Date;
 
 import javax.inject.Inject;
 import javax.ws.rs.Path;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
 
 import org.jboss.resteasy.reactive.RestResponse;
 
 import in.codifi.auth.controller.spec.AuthControllerSpec;
 import in.codifi.auth.model.request.AuthReq;
+import in.codifi.auth.model.request.BioMetricReqModel;
 import in.codifi.auth.model.request.ForgetPassReq;
 import in.codifi.auth.model.request.UnblockReq;
 import in.codifi.auth.model.response.GenericResponse;
 import in.codifi.auth.service.spec.AuthServiceSpec;
 import in.codifi.auth.utility.AppConstants;
+import in.codifi.auth.utility.AppUtils;
 import in.codifi.auth.utility.PrepareResponse;
+import in.codifi.cache.model.ClinetInfoModel;
 import in.codifi.orders.ws.model.OdinSsoModel;
 
 /**
@@ -32,7 +38,12 @@ public class AuthController implements AuthControllerSpec {
 	@Inject
 	PrepareResponse prepareResponse;
 
-	
+	@Inject
+	AppUtils appUtils;
+
+	@Context
+	ContainerRequestContext request;
+
 	/**
 	 * Service to verify our token from ODIN
 	 * 
@@ -44,8 +55,7 @@ public class AuthController implements AuthControllerSpec {
 
 		return authServiceSpec.verifyToken(token);
 	}
-	
-	
+
 	/**
 	 * 
 	 * Method to check user exist or not
@@ -308,10 +318,85 @@ public class AuthController implements AuthControllerSpec {
 		return authServiceSpec.verifyTotp(authReq);
 	}
 
-
 	@Override
 	public RestResponse<GenericResponse> email(AuthReq authReq) {
-		System.out.println("Method invoked ::: "+new Date());
+		System.out.println("Method invoked ::: " + new Date());
 		return null;
+	}
+
+	/**
+	 * Method to Log Out From Odin
+	 * 
+	 * @author LOKESH
+	 * @return
+	 */
+	@Override
+	public RestResponse<GenericResponse> restLogOut() {
+
+//		ClinetInfoModel info = appUtils.getClientInfo();
+//		System.out.println(info);
+//		if (info == null || StringUtil.isNullOrEmpty(info.getUserId())) {
+//			Log.error(AppConstants.CLIENT_INFO_IS_NULL);
+//			return prepareResponse.prepareFailedResponse(AppConstants.FAILED_STATUS);
+//		} else if (StringUtil.isNullOrEmpty(info.getUcc())) {
+//			return prepareResponse.prepareFailedResponse(AppConstants.GUEST_USER_ERROR);
+//		}
+		ClinetInfoModel info = new ClinetInfoModel();
+		info.setUserId("WCM549");
+		return authServiceSpec.restLogOut(info);
+	}
+
+	/**
+	 * Method to validate session for bio metric login
+	 * 
+	 * @author Dinesh Kumar
+	 * @param authReq
+	 * @return
+	 */
+	@Override
+	public RestResponse<GenericResponse> validateSessionForBioLogin(AuthReq authReq) {
+		if (authReq == null)
+			return prepareResponse.prepareFailedResponse(AppConstants.INVALID_PARAMETER);
+		MultivaluedMap<String, String> headers = request.getHeaders();
+		String deviceIp = headers.getFirst(AppConstants.X_FORWARDED_FOR);
+		return authServiceSpec.validateSessionForBioLogin(authReq, deviceIp);
+	}
+
+	/**
+	 * Method to enable bio metric login
+	 * 
+	 * @author Dinesh Kumar
+	 * @param authReq
+	 * @return
+	 */
+	@Override
+	public RestResponse<GenericResponse> enableBioMetric(BioMetricReqModel authReq) {
+		if (authReq == null)
+			return prepareResponse.prepareFailedResponse(AppConstants.INVALID_PARAMETER);
+		return authServiceSpec.enableBioMetric(authReq);
+	}
+
+	/**
+	 * Method to generate QR code
+	 * 
+	 * @author LOKESH
+	 * @return
+	 */
+
+	@Override
+	public RestResponse<GenericResponse> generateQrcode() {
+		return authServiceSpec.generateQrcode();
+	}
+
+	/**
+	 * Method to validate session for qr login
+	 * 
+	 * @author Lokesh
+	 * @param authReq
+	 * @return
+	 */
+	@Override
+	public RestResponse<GenericResponse> validateSessionForQrLogin(AuthReq authReq) {
+		return authServiceSpec.validateSessionForQrLogin(authReq);
 	}
 }

@@ -155,6 +155,11 @@ public class AppConstants {
 	public static final String NSE_FO = "NSE_FO";
 	public static final String CDS = "CDS";
 	public static final String NSE_CUR = "NSE_CUR";
+	public static final String MCX = "MCX";
+	public static final String MCX_FO = "MCX_FO";
+	public static final String BCD = "BCD";
+	public static final String BSE_CUR = "BSE_CUR";
+	public static final String BFO = "BFO";
 
 	public static final String NRML = "NRML";
 	public static final String DELIVERY = "DELIVERY";

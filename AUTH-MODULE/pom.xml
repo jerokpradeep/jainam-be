@@ -153,6 +153,25 @@
 			<artifactId>totp</artifactId>
 			<version>1.0</version>
 		</dependency>
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.4.7</version>
+		</dependency>
+		<dependency>
+    		<groupId>com.sun.mail</groupId>
+    		<artifactId>javax.mail</artifactId>
+    		<version>1.6.2</version> <!-- Use the latest version -->
+		</dependency>
+
+		<dependency>
+			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-mailer</artifactId>
+		</dependency>
+		<dependency>
+ 		   <groupId>io.quarkus</groupId>
+		    <artifactId>quarkus-micrometer-registry-prometheus</artifactId>
+		</dependency>	
 	</dependencies>
 	<build>
 		<plugins>

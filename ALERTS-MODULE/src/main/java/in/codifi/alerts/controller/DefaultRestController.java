@@ -40,10 +40,10 @@ public class DefaultRestController {
 	 */
 	public ClientInfoModel clientInfo() {
 		ClientInfoModel model = new ClientInfoModel();
-		model.setUserId(this.idToken.getClaim(USER_ID_KEY).toString());
+		model.setUserId(this.idToken.getClaim(USER_ID_KEY).toString().toUpperCase());
 
 		if (this.idToken.containsClaim(UCC)) {
-			model.setUcc(this.idToken.getClaim(UCC).toString());
+			model.setUcc(this.idToken.getClaim(UCC).toString().toUpperCase());
 		}
 
 		if (this.idToken.containsClaim(USER_FIRST_NAME)) {

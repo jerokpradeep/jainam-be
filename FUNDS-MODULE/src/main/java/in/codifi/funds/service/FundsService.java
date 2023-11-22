@@ -35,7 +35,7 @@ public class FundsService implements IFundsService {
 		try {
 			/** Get user session from cache **/
 			String userSession = AppUtil.getUserSession(info.getUserId());
-//			String userSession = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6NzA3MDcwLCJ1c2VyaWQiOjcwNzA3MCwidGVuYW50aWQiOjcwNzA3MCwibWVtYmVySW5mbyI6eyJ0ZW5hbnRJZCI6IjIxNCIsImdyb3VwSWQiOiJITyIsInVzZXJJZCI6IjExNDAxNCIsInRlbXBsYXRlSWQiOiJETlMiLCJ1ZElkIjoiNWQzMzYxNWI0ZWJkNjIzZSIsIm9jVG9rZW4iOiIweDAxNDg1QzcyNzBDNkQyOTE1RDc5OTlCQjkxODAxMCIsInVzZXJDb2RlIjoiQUVYVUUiLCJncm91cENvZGUiOiJBQUFBQSIsImFwaWtleURhdGEiOnsiQ3VzdG9tZXJJZCI6IjIxNCIsImV4cCI6MTY5MTc2MTE0MCwiaWF0IjoxNjYwMjI1MTk3fSwic291cmNlIjoiTU9CSUxFQVBJIn0sImV4cCI6MTY4ODQ5NTM5OSwiaWF0IjoxNjg4NDc4OTE5fQ.vvjDeZ9hTAb-ZzLgQ8lqJRTs9jen9QJnLAjD0EZzhQ4";
+//			String userSession = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6NzA3MDcwLCJ1c2VyaWQiOjcwNzA3MCwidGVuYW50aWQiOjcwNzA3MCwibWVtYmVySW5mbyI6eyJ0ZW5hbnRJZCI6IjQxOSIsImdyb3VwSWQiOiJITyIsInVzZXJJZCI6IldDTTU0OSIsInRlbXBsYXRlSWQiOiJVQVQiLCJ1ZElkIjoiIiwib2NUb2tlbiI6IjB4MDFFNEYwNDNBQzJBMkRDN0E5M0Y3MEEwNTlBOEMyIiwidXNlckNvZGUiOiJPRkhZVyIsImdyb3VwQ29kZSI6IkFBQUFBIiwiYXBpa2V5RGF0YSI6eyJDdXN0b21lcklkIjoiNDE5IiwiU3ViVGVuYW50SWQiOiIiLCJQcm9kdWN0U291cmNlIjoiV0FWRUFQSSIsImV4cCI6MTgyMDgzMTI4MCwiaWF0IjoxNjkxMjMxMjkzfSwic291cmNlIjoiTU9CSUxFQVBJIn0sImV4cCI6MTY5OTAzNjE5OSwiaWF0IjoxNjk5MDE2MDU3fQ.O4H3FdArXPy-GpKfTDM8ZBpBDaS0IxDK4i0BDkAn5OA";
 			if (StringUtil.isNullOrEmpty(userSession))
 				return prepareResponse.prepareUnauthorizedResponse();
 
@@ -61,7 +61,7 @@ public class FundsService implements IFundsService {
 		try {
 			reqModel.setUserId(model.getUserId());
 			reqModel.setGroupId("HO");
-			reqModel.setPeriodicityName("All Exchange Combined");
+			reqModel.setPeriodicityName("ALL EQ + Deri + Curr + Com Combiined");
 			reqModel.setProductType(1);
 		} catch (Exception e) {
 			Log.error(e);

@@ -29,5 +29,8 @@ public class RestProperties {
 	
 	@ConfigProperty(name = "appconfig.odin.xApiKey")
 	private String xApiKey;
+	
+	@ConfigProperty(name = "appconfig.odin.url.logout")
+	private String logout;
 
 }

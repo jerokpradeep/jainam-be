@@ -310,6 +310,12 @@ public class OrdersRestService {
 				exch = "BSE_EQ";
 			} else if (reqModel.getExchange().equalsIgnoreCase("NFO")) {
 				exch = "NSE_FO";
+			} else if (reqModel.getExchange().equalsIgnoreCase("CDS")) {
+				exch = "NSE_CUR";
+			} else if (reqModel.getExchange().equalsIgnoreCase("MCX")) {
+				exch = "MCX_FO";
+			} else if (reqModel.getExchange().equalsIgnoreCase("BCD")) {
+				exch = "BSE_CUR";
 			}
 
 //			URL url = new URL(props.getModifyOrderurl() + AppConstants.OPERATOR_SLASH + exch
@@ -444,6 +450,7 @@ public class OrdersRestService {
 					orderBookRespModel = mapper.readValue(output, OrderBookRespModel.class);
 					/** Bind the response to generic response **/
 					if (orderBookRespModel.getStatus().equalsIgnoreCase(AppConstants.REST_STATUS_SUCCESS)) {
+						System.out.println(orderBookRespModel.getData());
 						List<GenericOrderBookResp> extract = bindOrderBookData(orderBookRespModel.getData(),
 								info.getUserId());
 						return prepareResponse.prepareSuccessResponseObject(extract);
@@ -494,7 +501,8 @@ public class OrdersRestService {
 				GenericOrderBookResp extract = new GenericOrderBookResp();
 				String restExch = model.getExch();
 				String exch = "";
-
+				ObjectMapper mapper = new ObjectMapper();
+				System.out.println("model -- "+mapper.writeValueAsString(model));
 				if (restExch.equalsIgnoreCase(AppConstants.NSE_EQ)) {
 					exch = AppConstants.NSE;
 				} else if (restExch.equalsIgnoreCase(AppConstants.BSE_EQ)) {
@@ -503,6 +511,10 @@ public class OrdersRestService {
 					exch = AppConstants.NFO;
 				} else if (restExch.equalsIgnoreCase(AppConstants.NSE_CUR)) {
 					exch = AppConstants.CDS;
+				} else if (restExch.equalsIgnoreCase(AppConstants.MCX_FO)) {
+					exch = AppConstants.MCX;
+				} else if (restExch.equalsIgnoreCase(AppConstants.BSE_CUR)) {
+					exch = AppConstants.BCD;
 				}
 
 				String token = model.getScripToken();
@@ -624,10 +636,11 @@ public class OrdersRestService {
 				}
 			} else {
 				System.out.println("Error Connection in Trade Book api. Rsponse code - " + responseCode);
-				accessLogModel.setResBody(output);
+
 				insertRestAccessLogs(accessLogModel);
 				bufferedReader = new BufferedReader(new InputStreamReader((conn.getErrorStream())));
 				output = bufferedReader.readLine();
+				accessLogModel.setResBody(output);
 				if (StringUtil.isNotNullOrEmpty(output)) {
 					orderBookRespModel = mapper.readValue(output, TradeBookRespModel.class);
 					if (StringUtil.isNotNullOrEmpty(orderBookRespModel.getMessage()))
@@ -663,6 +676,10 @@ public class OrdersRestService {
 					exch = AppConstants.NFO;
 				} else if (restExch.equalsIgnoreCase(AppConstants.NSE_CUR)) {
 					exch = AppConstants.CDS;
+				} else if (restExch.equalsIgnoreCase(AppConstants.MCX_FO)) {
+					exch = AppConstants.MCX;
+				} else if (restExch.equalsIgnoreCase(AppConstants.BSE_CUR)) {
+					exch = AppConstants.BCD;
 				}
 				ContractMasterModel coModel = HazelcastConfig.getInstance().getContractMaster().get(exch + "_" + token);
 				if (coModel != null) {
@@ -1243,6 +1260,10 @@ public class OrdersRestService {
 				exch = AppConstants.NFO;
 			} else if (restExch.equalsIgnoreCase(AppConstants.NSE_CUR)) {
 				exch = AppConstants.CDS;
+			} else if (restExch.equalsIgnoreCase(AppConstants.MCX_FO)) {
+				exch = AppConstants.MCX;
+			} else if (restExch.equalsIgnoreCase(AppConstants.BSE_CUR)) {
+				exch = AppConstants.BCD;
 			}
 			ContractMasterModel coModel = HazelcastConfig.getInstance().getContractMaster().get(exch + "_" + token);
 			if (coModel != null) {
@@ -1483,6 +1504,10 @@ public class OrdersRestService {
 				exch = AppConstants.NSE_FO;
 			} else if (reqModel.getExchange().equalsIgnoreCase(AppConstants.CDS)) {
 				exch = AppConstants.NSE_CUR;
+			} else if (reqModel.getExchange().equalsIgnoreCase(AppConstants.MCX)) {
+				exch = AppConstants.MCX_FO;
+			} else if (reqModel.getExchange().equalsIgnoreCase(AppConstants.BCD)) {
+				exch = AppConstants.BSE_CUR;
 			}
 			URL url = new URL(
 					props.getModifyCoverOrderurl() + exch + AppConstants.OPERATOR_SLASH + reqModel.getOrderNo());
@@ -1966,6 +1991,10 @@ public class OrdersRestService {
 					exch = AppConstants.NFO;
 				} else if (restExch.equalsIgnoreCase(AppConstants.NSE_CUR)) {
 					exch = AppConstants.CDS;
+				} else if (restExch.equalsIgnoreCase(AppConstants.MCX_FO)) {
+					exch = AppConstants.MCX;
+				} else if (restExch.equalsIgnoreCase(AppConstants.BSE_CUR)) {
+					exch = AppConstants.BCD;
 				}
 
 				String token = model.getScripToken().toString();

@@ -8,16 +8,18 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.jboss.resteasy.reactive.RestResponse;
 
 import in.codifi.auth.model.request.AuthReq;
+import in.codifi.auth.model.request.BioMetricReqModel;
 import in.codifi.auth.model.request.ForgetPassReq;
 import in.codifi.auth.model.request.UnblockReq;
 import in.codifi.auth.model.response.GenericResponse;
 import in.codifi.orders.ws.model.OdinSsoModel;
 
 public interface AuthControllerSpec {
-	
+
 	/**
 	 * Service to verfify our token from ODIN
 	 * 
@@ -267,16 +269,78 @@ public interface AuthControllerSpec {
 	 * @param authReq
 	 * @return
 	 */
-	@Path("/topt/verify")
+	@Path("/totp/verify")
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	RestResponse<GenericResponse> verifyTotp(AuthReq authReq);
-	
-	
+
 	@Path("/email")
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	RestResponse<GenericResponse> email(AuthReq authReq);
+
+	/**
+	 * Method to Log Out From Odin
+	 * 
+	 * @author LOKESH
+	 * @return
+	 */
+	@Path("/restLogOut")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@APIResponse(description = "log out ")
+	public RestResponse<GenericResponse> restLogOut();
+
+	/**
+	 * Method to validate session for bio metric login
+	 * 
+	 * @author Dinesh Kumar
+	 * @param authReq
+	 * @return
+	 */
+	@Path("/bio/pwd/validate")
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	RestResponse<GenericResponse> validateSessionForBioLogin(AuthReq authReq);
+
+	/**
+	 * Method to enable bio metric login
+	 * 
+	 * @author Dinesh Kumar
+	 * @param authReq
+	 * @return
+	 */
+	@Path("/bio/enable")
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	RestResponse<GenericResponse> enableBioMetric(BioMetricReqModel authReq);
+
+	/**
+	 * Method to generate QR code
+	 * 
+	 * @author LOKESH
+	 * @return
+	 */
+	@Path("/generate")
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	RestResponse<GenericResponse> generateQrcode();
+	
+	/**
+	 * Method to validate session for qr login
+	 * 
+	 * @author Lokesh
+	 * @param authReq
+	 * @return
+	 */
+	@Path("/qr/validate")
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	RestResponse<GenericResponse> validateSessionForQrLogin(AuthReq authReq);
 }

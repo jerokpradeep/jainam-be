@@ -8,5 +8,6 @@ import lombok.Setter;
 public class MobUserReqModel {
 
 	private String userId;
-	private String source;
+	private String createdOn;
+	private String deviceType;
 }

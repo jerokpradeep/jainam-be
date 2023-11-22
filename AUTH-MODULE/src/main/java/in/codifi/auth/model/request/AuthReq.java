@@ -17,4 +17,7 @@ public class AuthReq {
 	private String fcmToken;
 	private String vendor;
 	private String checkSum;
+	private String token;
+	private String imei;
+	private String keyValue;
 }

@@ -53,4 +53,19 @@ public class Scheduler {
 
 	}
 
+	/**
+	 * 
+	 * Scheduler to generate qr for every 35 seconds
+	 * 
+	 * @author LOKESH //
+	 */
+//	@Scheduled(every = "35s")
+//	public void scheduleForQr(ScheduledExecution se) {
+//
+//		Log.info("qr code generated");
+//		authService.generateQrcode();
+//		Log.info("qr code cleared");
+//
+//	}
+
 }
