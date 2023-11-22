@@ -3,9 +3,6 @@
  */
 package in.codifi.sso.auth.controller;
 
-import java.util.Iterator;
-import java.util.Set;
-
 import javax.inject.Inject;
 
 import org.eclipse.microprofile.jwt.JsonWebToken;

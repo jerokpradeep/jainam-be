@@ -73,8 +73,8 @@ public class OrderExecutionService implements OrderExecutionServiceSpec {
 		try {
 			/** Verify session **/
 			Log.info("Orders  userId - " + info.getUserId());
-//			String userSession = AppUtil.getUserSession(info.getUserId());
-			String userSession = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6NzA3MDcwLCJ1c2VyaWQiOjcwNzA3MCwidGVuYW50aWQiOjcwNzA3MCwibWVtYmVySW5mbyI6eyJ0ZW5hbnRJZCI6IjQxOSIsImdyb3VwSWQiOiJITyIsInVzZXJJZCI6IkozMyIsInRlbXBsYXRlSWQiOiJVQVQiLCJ1ZElkIjoiIiwib2NUb2tlbiI6IjB4MDE3ODA0Mjg2MDZFOUQxQjMzNTE0MDBFNTE2NkExIiwidXNlckNvZGUiOiJOWlNQSSIsImdyb3VwQ29kZSI6IkFBQUFBIiwiYXBpa2V5RGF0YSI6eyJDdXN0b21lcklkIjoiNDE5IiwiU3ViVGVuYW50SWQiOiIiLCJQcm9kdWN0U291cmNlIjoiV0FWRUFQSSIsImV4cCI6MTgyMDgzMTI4MCwiaWF0IjoxNjkxMjMxMjkzfSwic291cmNlIjoiTU9CSUxFQVBJIn0sImV4cCI6MTY5ODg2MzM5OSwiaWF0IjoxNjk4ODQ2OTg3fQ.b4h-TQEYuXDr7_ay7D081e0DpCM-rfB_wz2z0dacNqo";
+			String userSession = AppUtil.getUserSession(info.getUserId());
+//			String userSession = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6NzA3MDcwLCJ1c2VyaWQiOjcwNzA3MCwidGVuYW50aWQiOjcwNzA3MCwibWVtYmVySW5mbyI6eyJ0ZW5hbnRJZCI6IjQxOSIsImdyb3VwSWQiOiJITyIsInVzZXJJZCI6IkozMyIsInRlbXBsYXRlSWQiOiJVQVQiLCJ1ZElkIjoiIiwib2NUb2tlbiI6IjB4MDE3ODA0Mjg2MDZFOUQxQjMzNTE0MDBFNTE2NkExIiwidXNlckNvZGUiOiJOWlNQSSIsImdyb3VwQ29kZSI6IkFBQUFBIiwiYXBpa2V5RGF0YSI6eyJDdXN0b21lcklkIjoiNDE5IiwiU3ViVGVuYW50SWQiOiIiLCJQcm9kdWN0U291cmNlIjoiV0FWRUFQSSIsImV4cCI6MTgyMDgzMTI4MCwiaWF0IjoxNjkxMjMxMjkzfSwic291cmNlIjoiTU9CSUxFQVBJIn0sImV4cCI6MTY5ODg2MzM5OSwiaWF0IjoxNjk4ODQ2OTg3fQ.b4h-TQEYuXDr7_ay7D081e0DpCM-rfB_wz2z0dacNqo";
 			Log.info("Orders  userSession - " + userSession);
 			if (StringUtil.isNullOrEmpty(userSession))
 				return prepareResponse.prepareUnauthorizedResponseForList();
@@ -236,7 +236,13 @@ public class OrderExecutionService implements OrderExecutionServiceSpec {
 			} else if (orderDetails.getExchange().equalsIgnoreCase(AppConstants.NFO)) {
 				coverOrderReqModel.getScripInfo().setExchange(AppConstants.NSE_FO);
 			} else if (orderDetails.getExchange().equalsIgnoreCase(AppConstants.CDS)) {
-//				coverOrderReqModel.getScripInfo().setExchange(AppConstants.NSE_CUR);
+				coverOrderReqModel.getScripInfo().setExchange(AppConstants.NSE_CUR);
+			} else if (orderDetails.getExchange().equalsIgnoreCase(AppConstants.MCX)) {
+				coverOrderReqModel.getScripInfo().setExchange(AppConstants.MCX_FO);
+			} else if (orderDetails.getExchange().equalsIgnoreCase(AppConstants.BCD)) {
+				coverOrderReqModel.getScripInfo().setExchange(AppConstants.BSE_CUR);
+			} else if (orderDetails.getExchange().equalsIgnoreCase(AppConstants.BFO)) {
+//				coverOrderReqModel.getScripInfo().setExchange(AppConstants.BSE_CUR);
 				return null;
 			} else {
 				return null;
@@ -383,13 +389,31 @@ public class OrderExecutionService implements OrderExecutionServiceSpec {
 		String placeOrderReq = null;
 		try {
 
+//			if (orderDetails.getExchange().equalsIgnoreCase(AppConstants.NSE)) {
+//				scripInfo.setExchange(AppConstants.NSE_EQ);
+//			} else if (orderDetails.getExchange().equalsIgnoreCase(AppConstants.BSE)) {
+//				scripInfo.setExchange(AppConstants.BSE_EQ);
+//			} else if (orderDetails.getExchange().equalsIgnoreCase(AppConstants.NFO)) {
+//				scripInfo.setExchange(AppConstants.NSE_FO);
+//			} 
 			if (orderDetails.getExchange().equalsIgnoreCase(AppConstants.NSE)) {
 				scripInfo.setExchange(AppConstants.NSE_EQ);
 			} else if (orderDetails.getExchange().equalsIgnoreCase(AppConstants.BSE)) {
 				scripInfo.setExchange(AppConstants.BSE_EQ);
 			} else if (orderDetails.getExchange().equalsIgnoreCase(AppConstants.NFO)) {
 				scripInfo.setExchange(AppConstants.NSE_FO);
-			} else {
+			} else if (orderDetails.getExchange().equalsIgnoreCase(AppConstants.CDS)) {
+				scripInfo.setExchange(AppConstants.NSE_CUR);
+			} else if (orderDetails.getExchange().equalsIgnoreCase(AppConstants.MCX)) {
+				scripInfo.setExchange(AppConstants.MCX_FO);
+			} else if (orderDetails.getExchange().equalsIgnoreCase(AppConstants.BCD)) {
+				scripInfo.setExchange(AppConstants.BSE_CUR);
+			} else if (orderDetails.getExchange().equalsIgnoreCase(AppConstants.BFO)) {
+//				coverOrderReqModel.getScripInfo().setExchange(AppConstants.BSE_CUR);
+				return null;
+			}
+
+			else {
 				return null;
 			}
 
@@ -479,6 +503,15 @@ public class OrderExecutionService implements OrderExecutionServiceSpec {
 		String placeOrderReq = null;
 		try {
 
+//			if (orderDetails.getExchange().equalsIgnoreCase(AppConstants.NSE)) {
+//				placeOrderReqModel.getScripInfo().setExchange(AppConstants.NSE_EQ);
+//			} else if (orderDetails.getExchange().equalsIgnoreCase(AppConstants.BSE)) {
+//				placeOrderReqModel.getScripInfo().setExchange(AppConstants.BSE_EQ);
+//			} else if (orderDetails.getExchange().equalsIgnoreCase(AppConstants.NFO)) {
+//				placeOrderReqModel.getScripInfo().setExchange(AppConstants.NSE_FO);
+//			} else if (orderDetails.getExchange().equalsIgnoreCase(AppConstants.CDS)) {
+////				placeOrderReqModel.getScripInfo().setExchange(AppConstants.NSE_CUR);
+//				return null;
 			if (orderDetails.getExchange().equalsIgnoreCase(AppConstants.NSE)) {
 				placeOrderReqModel.getScripInfo().setExchange(AppConstants.NSE_EQ);
 			} else if (orderDetails.getExchange().equalsIgnoreCase(AppConstants.BSE)) {
@@ -486,7 +519,13 @@ public class OrderExecutionService implements OrderExecutionServiceSpec {
 			} else if (orderDetails.getExchange().equalsIgnoreCase(AppConstants.NFO)) {
 				placeOrderReqModel.getScripInfo().setExchange(AppConstants.NSE_FO);
 			} else if (orderDetails.getExchange().equalsIgnoreCase(AppConstants.CDS)) {
-//				placeOrderReqModel.getScripInfo().setExchange(AppConstants.NSE_CUR);
+				placeOrderReqModel.getScripInfo().setExchange(AppConstants.NSE_CUR);
+			} else if (orderDetails.getExchange().equalsIgnoreCase(AppConstants.MCX)) {
+				placeOrderReqModel.getScripInfo().setExchange(AppConstants.MCX_FO);
+			} else if (orderDetails.getExchange().equalsIgnoreCase(AppConstants.BCD)) {
+				placeOrderReqModel.getScripInfo().setExchange(AppConstants.BSE_CUR);
+			} else if (orderDetails.getExchange().equalsIgnoreCase(AppConstants.BFO)) {
+//				coverOrderReqModel.getScripInfo().setExchange(AppConstants.BSE_CUR);
 				return null;
 			} else {
 				return null;
@@ -562,13 +601,31 @@ public class OrderExecutionService implements OrderExecutionServiceSpec {
 			for (OrderDetails orderDetail : orderDetails) {
 				placeOrderReqModel = new PlaceOrderReqModel();
 
+//				if (orderDetail.getExchange().equalsIgnoreCase(AppConstants.NSE)) {
+//					placeOrderReqModel.getScripInfo().setExchange(AppConstants.NSE_EQ);
+//				} else if (orderDetail.getExchange().equalsIgnoreCase(AppConstants.BSE)) {
+//					placeOrderReqModel.getScripInfo().setExchange(AppConstants.BSE_EQ);
+//				} else if (orderDetail.getExchange().equalsIgnoreCase(AppConstants.NFO)) {
+//					placeOrderReqModel.getScripInfo().setExchange(AppConstants.NSE_FO);
+//				} 
 				if (orderDetail.getExchange().equalsIgnoreCase(AppConstants.NSE)) {
 					placeOrderReqModel.getScripInfo().setExchange(AppConstants.NSE_EQ);
 				} else if (orderDetail.getExchange().equalsIgnoreCase(AppConstants.BSE)) {
 					placeOrderReqModel.getScripInfo().setExchange(AppConstants.BSE_EQ);
 				} else if (orderDetail.getExchange().equalsIgnoreCase(AppConstants.NFO)) {
 					placeOrderReqModel.getScripInfo().setExchange(AppConstants.NSE_FO);
-				} else {
+				} else if (orderDetail.getExchange().equalsIgnoreCase(AppConstants.CDS)) {
+					placeOrderReqModel.getScripInfo().setExchange(AppConstants.NSE_CUR);
+				} else if (orderDetail.getExchange().equalsIgnoreCase(AppConstants.MCX)) {
+					placeOrderReqModel.getScripInfo().setExchange(AppConstants.MCX_FO);
+				} else if (orderDetail.getExchange().equalsIgnoreCase(AppConstants.BCD)) {
+					placeOrderReqModel.getScripInfo().setExchange(AppConstants.BSE_CUR);
+				} else if (orderDetail.getExchange().equalsIgnoreCase(AppConstants.BFO)) {
+//					coverOrderReqModel.getScripInfo().setExchange(AppConstants.BSE_CUR);
+					return null;
+				}
+
+				else {
 					return null;
 				}
 
@@ -861,6 +918,10 @@ public class OrderExecutionService implements OrderExecutionServiceSpec {
 					orderDetails.setExchange(AppConstants.NSE_FO);
 				} else if (orderDetails.getExchange().equalsIgnoreCase(AppConstants.CDS)) {
 					orderDetails.setExchange(AppConstants.NSE_CUR);
+				} else if (orderDetails.getExchange().equalsIgnoreCase(AppConstants.MCX)) {
+					orderDetails.setExchange(AppConstants.MCX_FO);
+				} else if (orderDetails.getExchange().equalsIgnoreCase(AppConstants.BCD)) {
+					orderDetails.setExchange(AppConstants.BSE_CUR);
 				} else {
 					return prepareResponse.prepareFailedResponseBody(AppConstants.INVALID_PARAMETER);
 				}
@@ -973,6 +1034,10 @@ public class OrderExecutionService implements OrderExecutionServiceSpec {
 				exch = AppConstants.NSE_FO;
 			} else if (orderDetails.get(0).getExchange().equalsIgnoreCase(AppConstants.CDS)) {
 				exch = AppConstants.NSE_CUR;
+			} else if (orderDetails.get(0).getExchange().equalsIgnoreCase(AppConstants.MCX)) {
+				exch = AppConstants.MCX_FO;
+			} else if (orderDetails.get(0).getExchange().equalsIgnoreCase(AppConstants.BCD)) {
+				exch = AppConstants.BSE_CUR;
 			} else {
 				return prepareResponse.prepareFailedResponse(AppConstants.INVALID_EXCH);
 			}
@@ -1064,6 +1129,10 @@ public class OrderExecutionService implements OrderExecutionServiceSpec {
 					placeOrderReqModel.getScripInfo().setExchange(AppConstants.NSE_FO);
 				} else if (orderDetail.getExchange().equalsIgnoreCase(AppConstants.CDS)) {
 					placeOrderReqModel.getScripInfo().setExchange(AppConstants.NSE_CUR);
+				} else if (orderDetail.getExchange().equalsIgnoreCase(AppConstants.MCX)) {
+					placeOrderReqModel.getScripInfo().setExchange(AppConstants.MCX_FO);
+				} else if (orderDetail.getExchange().equalsIgnoreCase(AppConstants.BCD)) {
+					placeOrderReqModel.getScripInfo().setExchange(AppConstants.BSE_CUR);
 				}
 
 //				placeOrderReqModel.getScripInfo().setSymbol(orderReqModel.getTradingSymbol());
@@ -1232,7 +1301,7 @@ public class OrderExecutionService implements OrderExecutionServiceSpec {
 			legDetail.setMarketSegmentId(AppConstants.PAYMENT_PRIORITY);// TODO
 			legDetail.setToken(Integer.parseInt(marginReqModel.getToken()));
 			legDetail.setQuantity(Integer.parseInt(marginReqModel.getQty()));
-			
+
 //			String price = "";
 //			if (marginReqModel.getPrice().contains(".")) {
 //				price = marginReqModel.getPrice().replace(".", "");
@@ -1240,12 +1309,12 @@ public class OrderExecutionService implements OrderExecutionServiceSpec {
 //			} else {
 //				legDetail.setPrice(Float.parseFloat(marginReqModel.getPrice()));
 //			}
-			
+
 			String price = marginReqModel.getPrice();
 			float floatValue = Float.parseFloat(price);
 			float priceValue = floatValue *= 100;
 			legDetail.setPrice(priceValue);
-			
+
 			legDetail.setMktFlag(AppConstants.PAYMENT_PRIORITY);// TODO
 
 			if (marginReqModel.getProduct().equalsIgnoreCase(AppConstants.PRODUCT_MIS)) {

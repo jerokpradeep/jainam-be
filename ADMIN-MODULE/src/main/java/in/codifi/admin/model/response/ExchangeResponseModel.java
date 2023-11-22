@@ -25,8 +25,8 @@ public class ExchangeResponseModel {
 	private String freeze_qty;
 	private String isin;
 	private String week_tag;
-	private int sort_order_1;
-	private int sort_order_2;
-	private int sort_order_3;
+//	private int sort_order_1;
+//	private int sort_order_2;
+//	private int sort_order_3;
 	private String instrument_name;
 }

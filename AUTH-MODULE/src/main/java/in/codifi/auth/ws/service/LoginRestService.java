@@ -13,9 +13,9 @@ import java.util.concurrent.Executors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.jboss.resteasy.reactive.RestResponse;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.jboss.resteasy.reactive.RestResponse;
 
 import in.codifi.auth.config.HazelcastConfig;
 import in.codifi.auth.config.RestProperties;
@@ -23,6 +23,7 @@ import in.codifi.auth.entity.logs.RestAccessLogModel;
 import in.codifi.auth.model.request.LoginOTPReq;
 import in.codifi.auth.model.request.LoginRestReq;
 import in.codifi.auth.model.response.GenericResponse;
+import in.codifi.auth.model.response.LogOutResponseModel;
 import in.codifi.auth.model.response.OtpRestSuccessRespModel;
 import in.codifi.auth.model.response.SessionRestRespModel;
 import in.codifi.auth.repository.AccessLogManager;
@@ -31,6 +32,7 @@ import in.codifi.auth.utility.CodifiUtil;
 import in.codifi.auth.utility.PrepareResponse;
 import in.codifi.auth.utility.StringUtil;
 import in.codifi.auth.ws.model.login.LoginRestResp;
+import in.codifi.cache.model.ClinetInfoModel;
 import io.quarkus.logging.Log;
 
 @ApplicationScoped
@@ -65,7 +67,7 @@ public class LoginRestService {
 			conn.setRequestProperty(AppConstants.CONTENT_TYPE, AppConstants.APPLICATION_JSON);
 			conn.setRequestProperty(AppConstants.X_API_KEY_NAME, props.getXApiKey());
 			conn.setDoOutput(true);
-			System.out.println("req--"+mapper.writeValueAsString(req));
+			System.out.println("req--" + mapper.writeValueAsString(req));
 			try (OutputStream os = conn.getOutputStream()) {
 				byte[] input = request.getBytes(AppConstants.UTF_8);
 				os.write(input, 0, input.length);
@@ -75,12 +77,6 @@ public class LoginRestService {
 			System.out.println("loginResponseCode-- " + responseCode);
 			BufferedReader bufferedReader;
 			String output = null;
-//			if (responseCode == 401) {
-//				Log.error("Unauthorized error in client details");
-//				accessLogModel.setResBody("Unauthorized");
-//				insertRestAccessLogs(accessLogModel);
-//				return prepareResponse.prepareUnauthorizedResponse();
-//			} else
 			if (responseCode == 200) {
 				bufferedReader = new BufferedReader(new InputStreamReader((conn.getInputStream())));
 				output = bufferedReader.readLine();
@@ -88,19 +84,9 @@ public class LoginRestService {
 				insertRestAccessLogs(accessLogModel);
 				Log.info("client details response" + output);
 				loginRestResp = mapper.readValue(output, LoginRestResp.class);
-//				if (loginRestResp.getStatus().equalsIgnoreCase(AppConstants.REST_STATUS_NOT_OK)) {
-//					return prepareResponse.prepareFailedResponseForRestService(AppConstants.FAILED_STATUS);
-//				} else {
-//					SessionRestRespModel response = bindSession(loginRestResp);
-//					HazelcastConfig.getInstance().getRestUserSession().clear();
-//					String hzUserSessionKey = "APITEST" + AppConstants.HAZEL_KEY_REST_SESSION;
-//					HazelcastConfig.getInstance().getRestUserSession().put(hzUserSessionKey, response.getSession());
-//					String userSession = HazelcastConfig.getInstance().getRestUserSession().get(hzUserSessionKey);
-//					return prepareResponse.prepareSuccessResponseObject(userSession);
-//				}
 				return loginRestResp;
 			} else {
-				Log.info("Error Connection in client details. Response Code -" + responseCode);
+				Log.info("Error Connection in Login Rest Service. sso Login Response Code - " + responseCode);
 				bufferedReader = new BufferedReader(new InputStreamReader((conn.getErrorStream())));
 				output = bufferedReader.readLine();
 				System.out.println("output--" + output);
@@ -300,6 +286,89 @@ public class LoginRestService {
 			e.printStackTrace();
 		}
 		return prepareResponse.prepareFailedResponse(AppConstants.FAILED_STATUS);
+	}
+
+	/**
+	 * Method to Log Out From Odin
+	 * 
+	 * @author LOKESH
+	 * @return
+	 */
+	public RestResponse<GenericResponse> deleteLogOut(String userSession, ClinetInfoModel info) {
+		LogOutResponseModel logOutRespModel = new LogOutResponseModel();
+		ObjectMapper mapper = new ObjectMapper();
+		RestAccessLogModel accessLogModel = new RestAccessLogModel();
+		String output = null;
+		try {
+			accessLogModel.setMethod("Logout");
+			accessLogModel.setModule(AppConstants.MODULE_LOGIN);
+			accessLogModel.setUserId(info.getUserId());
+			accessLogModel.setInTime(new Timestamp(new Date().getTime()));
+			CodifiUtil.trustedManagement();
+			URL url = new URL(props.getLogout());
+			accessLogModel.setUrl(url.toString());
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.setRequestMethod(AppConstants.DELETE_METHOD);
+			conn.setRequestProperty(AppConstants.ACCEPT, AppConstants.APPLICATION_JSON);
+			conn.setRequestProperty(AppConstants.AUTHORIZATION, AppConstants.BEARER_WITH_SPACE + userSession);
+			conn.setRequestProperty(AppConstants.X_API_KEY_NAME, props.getXApiKey());
+			conn.setDoOutput(true);
+			int responseCode = conn.getResponseCode();
+			System.out.println("Rest Log Out Info responseCode -- " + responseCode);
+			BufferedReader bufferedReader;
+			if (responseCode == 401) {
+				accessLogModel.setOutTime(new Timestamp(new Date().getTime()));
+				accessLogModel.setResBody(AppConstants.UNAUTHORIZED);
+				insertRestAccessLogs(accessLogModel);
+				return prepareResponse.prepareUnauthorizedResponse();
+
+			} else if (responseCode == 200) {
+				bufferedReader = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+				output = bufferedReader.readLine();
+				System.out.println("output -- " + output);
+				accessLogModel.setOutTime(new Timestamp(new Date().getTime()));
+				accessLogModel.setResBody(output);
+				insertRestAccessLogs(accessLogModel);
+				if (StringUtil.isNotNullOrEmpty(output)) {
+					logOutRespModel = mapper.readValue(output, LogOutResponseModel.class);
+					/** Bind the response to generic response **/
+//					if ((logOutRespModel.getStatus().equalsIgnoreCase("error"))) {
+//						return prepareResponse.prepareFailedResponse(AppConstants.NO_RECORD_FOUND);
+//				} else
+					if (logOutRespModel.getStatus().equalsIgnoreCase(AppConstants.REST_STATUS_SUCCESS)) {
+						return prepareResponse.prepareSuccessResponseObject(AppConstants.LOG_OUT_SUCCESS);
+//						return prepareResponse.prepareSuccessMessage(AppConstants.SUCCESS_STATUS);
+					} else if (logOutRespModel.getStatus().equalsIgnoreCase(AppConstants.REST_STATUS_ERROR)) {
+						return prepareResponse.prepareFailedResponseForRestService(logOutRespModel.getMessage());
+					} else {
+						return prepareResponse.prepareFailedResponseForRestService(
+								StringUtil.isNotNullOrEmpty(logOutRespModel.getMessage()) ? logOutRespModel.getMessage()
+										: AppConstants.FAILED_STATUS);
+					}
+				}
+			} else {
+				System.out.println("Error Connection Rest Log Out API. Rsponse code - " + responseCode);
+				accessLogModel.setResBody(output);
+				insertRestAccessLogs(accessLogModel);
+				bufferedReader = new BufferedReader(new InputStreamReader((conn.getErrorStream())));
+				output = bufferedReader.readLine();
+				accessLogModel.setOutTime(new Timestamp(new Date().getTime()));
+				accessLogModel.setOutTime(new Timestamp(new Date().getTime()));
+				if (StringUtil.isNotNullOrEmpty(output)) {
+					logOutRespModel = mapper.readValue(output, LogOutResponseModel.class);
+					if (StringUtil.isNotNullOrEmpty(logOutRespModel.getMessage()))
+						return prepareResponse.prepareFailedResponseForRestService(logOutRespModel.getMessage());
+				} else {
+					return prepareResponse.prepareFailedResponseForRestService(AppConstants.FAILED_STATUS);
+				}
+
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			Log.error("Rest Log Out Info -- " + e.getMessage());
+		}
+		return prepareResponse.prepareFailedResponseForRestService(AppConstants.FAILED_STATUS);
 	}
 
 }

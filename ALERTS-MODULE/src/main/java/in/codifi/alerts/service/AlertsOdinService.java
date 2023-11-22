@@ -1,5 +1,7 @@
 package in.codifi.alerts.service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -12,6 +14,7 @@ import org.jboss.resteasy.reactive.RestResponse;
 import in.codifi.alerts.config.HazelcastConfig;
 import in.codifi.alerts.entity.primary.AlertsEntity;
 import in.codifi.alerts.model.request.RequestModel;
+import in.codifi.alerts.model.response.AlertResp;
 import in.codifi.alerts.model.response.GenericResponse;
 import in.codifi.alerts.repository.AlertsRepository;
 import in.codifi.alerts.service.spec.AlertsOdinServiceSpec;
@@ -49,15 +52,48 @@ public class AlertsOdinService implements AlertsOdinServiceSpec {
 	@Override
 	public RestResponse<GenericResponse> getAlerts(ClientInfoModel info) {
 		String userSession = AppUtil.getUserSession(info.getUserId());
-//		String userSession = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6NzA3MDcwLCJ1c2VyaWQiOjcwNzA3MCwidGVuYW50aWQiOjcwNzA3MCwibWVtYmVySW5mbyI6eyJ0ZW5hbnRJZCI6IjQxOSIsImdyb3VwSWQiOiJITyIsInVzZXJJZCI6IkozMyIsInRlbXBsYXRlSWQiOiJVQVQiLCJ1ZElkIjoiIiwib2NUb2tlbiI6IjB4MDEyOEYyNUNFMDkzQjRGNjZDQkZFNTk4REMyMEU1IiwidXNlckNvZGUiOiJOWlNQSSIsImdyb3VwQ29kZSI6IkFBQUFBIiwiYXBpa2V5RGF0YSI6eyJDdXN0b21lcklkIjoiNDE5IiwiU3ViVGVuYW50SWQiOiIiLCJQcm9kdWN0U291cmNlIjoiV0FWRUFQSSIsImV4cCI6MTgyMDgzMTI4MCwiaWF0IjoxNjkxMjMxMjkzfSwic291cmNlIjoiTU9CSUxFQVBJIn0sImV4cCI6MTY5ODc3Njk5OSwiaWF0IjoxNjk4NzM5NjQzfQ.HBTZnlT7UjTlzCht-fzv8gQCl_r_lZpiVjNsDywgQG0";
+//		String userSession = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6OTA5MDkwLCJ1c2VyaWQiOjkwOTA5MCwidGVuYW50aWQiOjkwOTA5MCwibWVtYmVySW5mbyI6eyJ0ZW5hbnRJZCI6IjIxNCIsImdyb3VwSWQiOiJITyIsInVzZXJJZCI6IjExNzk5NSIsInRlbXBsYXRlSWQiOiJETlMiLCJ1ZElkIjoiYjcwZDZmMTM4MWVjNzUyMSIsIm9jVG9rZW4iOiIweDAxODVFREUxQzk0QzE1OTQ4MDhDNzI3MUNFREJBMiIsInVzZXJDb2RlIjoiQUZET0IiLCJncm91cENvZGUiOiJBQUFBQSIsImFwaWtleURhdGEiOnsiQ3VzdG9tZXJJZCI6IjIxNCIsImV4cCI6MTc3NjE1OTcyMCwiaWF0IjoxNjg5NzU5NzY3fSwic291cmNlIjoiTU9CSUxFQVBJIn0sImV4cCI6MTY5ODc3Njk5OSwiaWF0IjoxNjk4NzI1Nzg3fQ.5CBTS7BNIxL3CEaUjPIXZ4k3lNPDZKoYNb6iSdareRk";
 		System.out.println("userSession--" + userSession);
 		if (StringUtil.isNullOrEmpty(userSession))
 			return prepareResponse.prepareUnauthorizedResponse();
 		restService.getAlerts(userSession, info);
 		List<AlertsEntity> getAlert = alertsRepository.getAlertDetails(info.getUserId());
-		if (StringUtil.isListNullOrEmpty(getAlert))
+
+		List<AlertResp> alertResponse = new ArrayList<>();
+		for (AlertsEntity alerts : getAlert) {
+			AlertResp alert = new AlertResp();
+			alert.setAlertId(alerts.getAlertId());
+			alert.setActiveStatus(alerts.getActiveStatus());
+			alert.setAlertName(alerts.getAlertName());
+			alert.setAlertType(alerts.getAlertType());
+			alert.setCreatedBy(alerts.getCreatedBy());
+			
+			String dateStr = alerts.getCreatedOn().toString();
+			DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
+	        LocalDateTime dateTime = LocalDateTime.parse(dateStr, inputFormatter);
+	        String convertedDate = dateTime.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"));
+	        System.out.println(convertedDate);
+			
+	        alert.setCreatedOn(convertedDate);
+			alert.setExch(alerts.getExch());
+			alert.setExchSeg(alerts.getExchSeg());
+			alert.setExpiry(alerts.getExpiry());
+			alert.setId(alerts.getId());
+			alert.setOperator(alerts.getOperator());
+			alert.setScripName(alerts.getScripName());
+			alert.setToken(alerts.getToken());
+			alert.setTriggeredTime(alerts.getTriggeredTime());
+			alert.setTriggerStatus(alerts.getTriggerStatus());
+			alert.setUpdatedBy(alerts.getUpdatedBy());
+			alert.setUpdatedOn(alerts.getUpdatedOn());
+			alert.setUserId(alerts.getUserId());
+			alert.setValue(alerts.getValue());
+			alertResponse.add(alert);
+		}
+
+		if (StringUtil.isListNullOrEmpty(alertResponse))
 			return prepareResponse.prepareFailedResponse(AppConstants.NO_DATA);
-		return prepareResponse.prepareSuccessResponseObject(getAlert);
+		return prepareResponse.prepareSuccessResponseObject(alertResponse);
 	}
 
 	/**
@@ -70,6 +106,7 @@ public class AlertsOdinService implements AlertsOdinServiceSpec {
 	@Override
 	public RestResponse<GenericResponse> createAlerts(RequestModel req, ClientInfoModel info) {
 		String userSession = AppUtil.getUserSession(info.getUserId());
+		System.out.println("userId -- "+info.getUserId());
 //		String userSession = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6NzA3MDcwLCJ1c2VyaWQiOjcwNzA3MCwidGVuYW50aWQiOjcwNzA3MCwibWVtYmVySW5mbyI6eyJ0ZW5hbnRJZCI6IjQxOSIsImdyb3VwSWQiOiJITyIsInVzZXJJZCI6IkozMyIsInRlbXBsYXRlSWQiOiJVQVQiLCJ1ZElkIjoiIiwib2NUb2tlbiI6IjB4MDEyOEYyNUNFMDkzQjRGNjZDQkZFNTk4REMyMEU1IiwidXNlckNvZGUiOiJOWlNQSSIsImdyb3VwQ29kZSI6IkFBQUFBIiwiYXBpa2V5RGF0YSI6eyJDdXN0b21lcklkIjoiNDE5IiwiU3ViVGVuYW50SWQiOiIiLCJQcm9kdWN0U291cmNlIjoiV0FWRUFQSSIsImV4cCI6MTgyMDgzMTI4MCwiaWF0IjoxNjkxMjMxMjkzfSwic291cmNlIjoiTU9CSUxFQVBJIn0sImV4cCI6MTY5ODc3Njk5OSwiaWF0IjoxNjk4NzM5NjQzfQ.HBTZnlT7UjTlzCht-fzv8gQCl_r_lZpiVjNsDywgQG0";
 		System.out.println("userSession--" + userSession);
 		if (StringUtil.isNullOrEmpty(userSession))
@@ -401,8 +438,8 @@ public class AlertsOdinService implements AlertsOdinServiceSpec {
 
 	@Override
 	public RestResponse<GenericResponse> deleteAlert(String alertId, ClientInfoModel info) {
-//		String userSession = AppUtil.getUserSession(info.getUserId());
-		String userSession = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6OTA5MDkwLCJ1c2VyaWQiOjkwOTA5MCwidGVuYW50aWQiOjkwOTA5MCwibWVtYmVySW5mbyI6eyJ0ZW5hbnRJZCI6IjIxNCIsImdyb3VwSWQiOiJITyIsInVzZXJJZCI6IjExNzk5NSIsInRlbXBsYXRlSWQiOiJETlMiLCJ1ZElkIjoiYjcwZDZmMTM4MWVjNzUyMSIsIm9jVG9rZW4iOiIweDAxNkI0QTE0QzkzMDY2QjIyNzFEMjAzNjlEQ0FBNiIsInVzZXJDb2RlIjoiQUZET0IiLCJncm91cENvZGUiOiJBQUFBQSIsImFwaWtleURhdGEiOnsiQ3VzdG9tZXJJZCI6IjIxNCIsImV4cCI6MTc3NjE1OTcyMCwiaWF0IjoxNjg5NzU5NzY3fSwic291cmNlIjoiTU9CSUxFQVBJIn0sImV4cCI6MTY5NjYxNjk5OSwiaWF0IjoxNjk2NTc5NTMwfQ.LU5bgvF84OgubuM5gpp9V8wjaTod4sp75VmMXp2ZhHs";
+		String userSession = AppUtil.getUserSession(info.getUserId());
+//		String userSession = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6OTA5MDkwLCJ1c2VyaWQiOjkwOTA5MCwidGVuYW50aWQiOjkwOTA5MCwibWVtYmVySW5mbyI6eyJ0ZW5hbnRJZCI6IjIxNCIsImdyb3VwSWQiOiJITyIsInVzZXJJZCI6IjExNzk5NSIsInRlbXBsYXRlSWQiOiJETlMiLCJ1ZElkIjoiYjcwZDZmMTM4MWVjNzUyMSIsIm9jVG9rZW4iOiIweDAxNkI0QTE0QzkzMDY2QjIyNzFEMjAzNjlEQ0FBNiIsInVzZXJDb2RlIjoiQUZET0IiLCJncm91cENvZGUiOiJBQUFBQSIsImFwaWtleURhdGEiOnsiQ3VzdG9tZXJJZCI6IjIxNCIsImV4cCI6MTc3NjE1OTcyMCwiaWF0IjoxNjg5NzU5NzY3fSwic291cmNlIjoiTU9CSUxFQVBJIn0sImV4cCI6MTY5NjYxNjk5OSwiaWF0IjoxNjk2NTc5NTMwfQ.LU5bgvF84OgubuM5gpp9V8wjaTod4sp75VmMXp2ZhHs";
 		System.out.println("userSession--" + userSession);
 		if (StringUtil.isNullOrEmpty(userSession))
 			return prepareResponse.prepareUnauthorizedResponse();

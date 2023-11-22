@@ -3,13 +3,14 @@ package in.codifi.auth.config;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.microprofile.config.ConfigProvider;
-
 import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.map.IMap;
 
+import org.eclipse.microprofile.config.ConfigProvider;
+
+import in.codifi.auth.entity.primary.MobileBioMetricEntity;
 import in.codifi.auth.model.response.UsersLoggedInRespModel;
 import in.codifi.auth.ws.model.kc.GetIntroSpectResponse;
 import in.codifi.auth.ws.model.kc.GetTokenResponse;
@@ -63,6 +64,7 @@ public class HazelcastConfig {
 	IMap<String, Integer> retryOtpCount = getHz().getMap("otp");
 	IMap<String, Boolean> holdResendOtp = getHz().getMap("otp");
 	IMap<String, Integer> passwordRetryCount = getHz().getMap("passwordRetryCount");
+	IMap<String, Integer> qrcodecount = getHz().getMap("qrcodecount");
 
 	private Map<String, String> restApiClinetInfo = getHz().getMap("restApiClinetInfo");
 
@@ -74,5 +76,12 @@ public class HazelcastConfig {
 	private Map<String, UsersLoggedInRespModel> ssoLoggedInUsers = getHz().getMap("webLoggedInUsers");
 	
 	private Map<String, String> logResponseModel = getHz().getMap("logResponseModel");
+	
+	private Map<String, MobileBioMetricEntity> bioMetricDeatils = getHz().getMap("bioMetricDeatils");
+	private Map<String, GetTokenResponse> ssoKeycloakSession = getHz().getMap("ssoKeycloakSession");
+	private Map<String, GetIntroSpectResponse> ssokeycloakUserInfo = getHz().getMap("ssokeycloakUserInfo");
+	private Map<String, GetIntroSpectResponse> apikeycloakUserInfo = getHz().getMap("apikeycloakUserInfo");
+	private Map<String, GetTokenResponse> apiKeycloakSession = getHz().getMap("apiKeycloakSession");
+	private Map<String, Integer> qrcount = getHz().getMap("qrcount");
 
 }

@@ -22,11 +22,14 @@ import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 
 import in.codifi.auth.config.FilePropertiesConfig;
+import in.codifi.auth.config.HazelcastConfig;
+import in.codifi.auth.controller.DefaultRestController;
 import in.codifi.auth.entity.primary.TotpDetailsEntity;
+import in.codifi.cache.model.ClinetInfoModel;
 import io.quarkus.logging.Log;
 
 @ApplicationScoped
-public class AppUtils {
+public class AppUtils extends DefaultRestController {
 
 	@Inject
 	FilePropertiesConfig filePropsConfig;
@@ -115,7 +118,7 @@ public class AppUtils {
 		}
 		return base64EncodedImageBytes;
 	}
-	
+
 	/**
 	 * Method to validate give input is mobile number
 	 * 
@@ -129,7 +132,7 @@ public class AppUtils {
 		Matcher matcher = pattern.matcher(input);
 		return matcher.matches();
 	}
-	
+
 	/**
 	 * Method to validate give input is Email
 	 * 
@@ -145,4 +148,23 @@ public class AppUtils {
 		return matcher.matches();
 	}
 
+	/**
+	 * 
+	 * Method to get client info
+	 * 
+	 * @author Dinesh Kumar
+	 *
+	 * @return
+	 */
+	public ClinetInfoModel getClientInfo() {
+		ClinetInfoModel model = clientInfo();
+		return model;
+	}
+
+	public static String getUserSession(String userId) {
+		String userSession = "";
+		String hzUserSessionKey = userId + AppConstants.HAZEL_KEY_REST_SESSION;
+		userSession = HazelcastConfig.getInstance().getRestUserSession().get(hzUserSessionKey);
+		return userSession;
+	}
 }

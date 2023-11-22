@@ -258,10 +258,10 @@ public class AdminLogsDAO {
 			LocalDate currentDate = LocalDate.now();
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy");
 			String outputDate = formatter.format(currentDate);
+			conn = datasource.getConnection();
 
 			for (int i = 1; i < 23; i++) {
 				String Formatted = String.format("%02d", i);
-				conn = datasource.getConnection();
 				pStmt = conn.prepareStatement(
 						"select distinct uri as uri from tbl_" + outputDate + "_access_log_" + Formatted);
 				rSet = pStmt.executeQuery();
@@ -629,14 +629,16 @@ public class AdminLogsDAO {
 		MobUserReqModel MobVer = null;
 		try {
 			conn = datasource.getConnection();
-			pStmt = conn.prepareStatement("select  user_id ,source FROM tbl_user_loggedin_report where source = 'mob'");
+			pStmt = conn
+					.prepareStatement("select  user_id ,created_on FROM tbl_user_loggedin_report where source = 'mob'");
 			rSet = pStmt.executeQuery();
 			if (rSet != null) {
 				response = new ArrayList<MobUserReqModel>();
 				while (rSet.next()) {
 					MobVer = new MobUserReqModel();
 					MobVer.setUserId(rSet.getString("user_id"));
-					MobVer.setSource(rSet.getString("source"));
+					MobVer.setCreatedOn(rSet.getString("created_on"));
+					MobVer.setDeviceType(rSet.getString("device_type"));
 					response.add(MobVer);
 				}
 			}
@@ -662,14 +664,14 @@ public class AdminLogsDAO {
 		MobUserReqModel MobVer = null;
 		try {
 			conn = datasource.getConnection();
-			pStmt = conn.prepareStatement("select  user_id ,source FROM tbl_user_loggedin_report where source = 'web'");
+			pStmt = conn.prepareStatement("select  user_id ,created_on FROM tbl_user_loggedin_report where source = 'web'");
 			rSet = pStmt.executeQuery();
 			if (rSet != null) {
 				response = new ArrayList<MobUserReqModel>();
 				while (rSet.next()) {
 					MobVer = new MobUserReqModel();
 					MobVer.setUserId(rSet.getString("user_id"));
-					MobVer.setSource(rSet.getString("source"));
+					MobVer.setCreatedOn(rSet.getString("created_on"));
 					response.add(MobVer);
 				}
 			}
@@ -695,14 +697,14 @@ public class AdminLogsDAO {
 		MobUserReqModel MobVer = null;
 		try {
 			conn = datasource.getConnection();
-			pStmt = conn.prepareStatement("select  user_id ,source FROM tbl_user_loggedin_report where source = 'api'");
+			pStmt = conn.prepareStatement("select  user_id ,created_on FROM tbl_user_loggedin_report where source = 'api'");
 			rSet = pStmt.executeQuery();
 			if (rSet != null) {
 				response = new ArrayList<MobUserReqModel>();
 				while (rSet.next()) {
 					MobVer = new MobUserReqModel();
 					MobVer.setUserId(rSet.getString("user_id"));
-					MobVer.setSource(rSet.getString("source"));
+					MobVer.setCreatedOn(rSet.getString("created_on"));
 					response.add(MobVer);
 				}
 			}
@@ -728,13 +730,14 @@ public class AdminLogsDAO {
 		MobUserReqModel MobVer = null;
 		try {
 			conn = datasource.getConnection();
-			pStmt = conn.prepareStatement("select  distinct(user_id) as user_id FROM tbl_user_loggedin_report");
+			pStmt = conn.prepareStatement("select  distinct(user_id) as user_id,created_on FROM tbl_user_loggedin_report");
 			rSet = pStmt.executeQuery();
 			if (rSet != null) {
 				response = new ArrayList<MobUserReqModel>();
 				while (rSet.next()) {
 					MobVer = new MobUserReqModel();
 					MobVer.setUserId(rSet.getString("user_id"));
+					MobVer.setCreatedOn(rSet.getString("created_on"));
 					response.add(MobVer);
 				}
 			}

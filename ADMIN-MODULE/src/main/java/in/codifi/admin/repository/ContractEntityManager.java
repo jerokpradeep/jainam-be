@@ -229,9 +229,9 @@ public class ContractEntityManager {
 		try {
 			Query query = entityManager
 					.createNativeQuery("select exchange_segment, group_name, symbol, instrument_name ,token"
-							+ " FROM tbl_global_contract_master_details"
+							+ " FROM tbl_global_contract_master_details_archive"
 							+ " where exchange_segment = :exchSeg AND token NOT IN "
-							+ " (SELECT token FROM tbl_global_contract_master_details_archive where exchange_segment = :exchSeg)");
+							+ " (SELECT token FROM tbl_global_contract_master_details where exchange_segment = :exchSeg)");
 			query.setParameter("exchSeg", exchangeSeg);
 			@SuppressWarnings("unchecked")
 			List<Object[]> result = query.getResultList();
