@@ -10,7 +10,10 @@ public class VerifyClientResp {
 	private String isExist;
 	private String mobileNo;
 	private String emailID;
-	private String name; 
+	private String name;
 	private String userId;
-	
+	private boolean isUpdateReq;
+	private String roll;
+	private boolean isBioEnabled;
+
 }

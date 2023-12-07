@@ -330,7 +330,7 @@ public interface AuthControllerSpec {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	RestResponse<GenericResponse> generateQrcode();
-	
+
 	/**
 	 * Method to validate session for qr login
 	 * 
@@ -343,4 +343,16 @@ public interface AuthControllerSpec {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	RestResponse<GenericResponse> validateSessionForQrLogin(AuthReq authReq);
+
+	/**
+	 * Method to get token
+	 * 
+	 * @author LOKESH
+	 * @return
+	 */
+	@Path("/getqrvalue")
+	@GET
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	RestResponse<GenericResponse> getToken();
 }

@@ -377,7 +377,8 @@ public class AlertsOdinRestService {
 	 * @param info
 	 * @return
 	 */
-	public RestResponse<GenericResponse> deleteAlert(String alertId, String userSession, ClientInfoModel info) {
+	public RestResponse<GenericResponse> deleteAlert(String alertId,
+			String userSession, ClientInfoModel info) {
 		AlertRespModel alertRespModel = new AlertRespModel();
 		RestAccessLogModel accessLogModel = new RestAccessLogModel();
 		ObjectMapper mapper = new ObjectMapper();
@@ -387,13 +388,13 @@ public class AlertsOdinRestService {
 			accessLogModel.setModule(AppConstants.MODULE_ALERTS);
 			accessLogModel.setUserId(info.getUserId());
 			accessLogModel.setInTime(new Timestamp(new Date().getTime()));
-			
+
 			String str = alertId.substring(1, alertId.length() - 1);
 
 			CodifiUtil.trustedManagement();
-			URL url = new URL(props.getOdinCreateAlert() + "/" + info.getUserId() + "/" + alertId);
+			URL url = new URL(props.getDeleteAlertUrl() + "/" + info.getUserId() + "/" + alertId);
 //			URL url = new URL(props.getOdinCreateAlert() + "/" + info.getUserId() + "/" + str);
-			System.out.println("delete Alert URL -- "+url);
+			System.out.println("delete Alert URL -- " + url);
 			accessLogModel.setUrl(url.toString());
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			conn.setRequestMethod(AppConstants.DELETE_METHOD);

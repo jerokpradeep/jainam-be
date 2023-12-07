@@ -190,4 +190,6 @@ public class AppConstants {
 
 	public static final String GTD = "GTD";
 
+	public static final String ORDER_SLICE_LIMIT = "Single order slicing limit exceeded";
+
 }

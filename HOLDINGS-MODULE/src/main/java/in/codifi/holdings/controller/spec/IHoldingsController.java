@@ -21,7 +21,7 @@ public interface IHoldingsController {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	RestResponse<GenericResponse> getHoldings();
-	
+
 	/**
 	 * Method to update poa status
 	 * 
@@ -32,5 +32,16 @@ public interface IHoldingsController {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	RestResponse<GenericResponse> getPoa();
+
+	/**
+	 * Method to get holdings for MTF product
+	 * 
+	 * @author Gowthaman M
+	 * @return
+	 */
+	@Path("/mtf")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	RestResponse<GenericResponse> getMTFHoldings();
 
 }

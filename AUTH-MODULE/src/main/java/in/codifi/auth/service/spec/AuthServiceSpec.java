@@ -237,4 +237,12 @@ public interface AuthServiceSpec {
 	 * @return
 	 */
 	RestResponse<GenericResponse> validateSessionForQrLogin(AuthReq authReq);
+
+	/**
+	 * Method to get token
+	 * 
+	 * @author LOKESH
+	 * @return
+	 */
+	RestResponse<GenericResponse> getToken();
 }

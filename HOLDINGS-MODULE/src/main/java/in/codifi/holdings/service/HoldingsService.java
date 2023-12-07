@@ -52,7 +52,7 @@ public class HoldingsService implements IHoldingsService {
 		try {
 			/** Get user session from cache **/
 			String userSession = AppUtil.getUserSession(info.getUserId());
-//			String userSession = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6OTA5MDkwLCJ1c2VyaWQiOjkwOTA5MCwidGVuYW50aWQiOjkwOTA5MCwibWVtYmVySW5mbyI6eyJ0ZW5hbnRJZCI6IjIxNCIsImdyb3VwSWQiOiJITyIsInVzZXJJZCI6IkMwMDAwOCIsInRlbXBsYXRlSWQiOiJETlMiLCJ1ZElkIjoiOTc2ODY0MTlmOWNlMzc0MSIsIm9jVG9rZW4iOiIweDAxNjQxQ0UxNzE0MUIwNzM1RjU1QUM4M0EyNzE3QyIsInVzZXJDb2RlIjoiQUNKWVUiLCJncm91cENvZGUiOiJBQUFBQSIsImFwaWtleURhdGEiOnsiQ3VzdG9tZXJJZCI6IjIxNCIsImV4cCI6MTc3NjE1OTcyMCwiaWF0IjoxNjg5NzU5NzY3fSwic291cmNlIjoiTU9CSUxFQVBJIn0sImV4cCI6MTY5NDQ1Njk5OSwiaWF0IjoxNjk0NDEwNzEwfQ.mnoT2BrBhdKetrpiSxhm3CR8DUrYG2VvlD-L4dh9nUg";
+//			String userSession = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6NzA3MDcwLCJ1c2VyaWQiOjcwNzA3MCwidGVuYW50aWQiOjcwNzA3MCwibWVtYmVySW5mbyI6eyJ0ZW5hbnRJZCI6IjQxOSIsImdyb3VwSWQiOiJITyIsInVzZXJJZCI6IkozMyIsInRlbXBsYXRlSWQiOiJVQVQiLCJ1ZElkIjoiIiwib2NUb2tlbiI6IjB4MDFCMEU4Q0QxMDZBMDRCRjhDRTIxQjFFNjAyNDBEIiwidXNlckNvZGUiOiJOWlNQSSIsImdyb3VwQ29kZSI6IkFBQUFBIiwiYXBpa2V5RGF0YSI6eyJDdXN0b21lcklkIjoiNDE5IiwiU3ViVGVuYW50SWQiOiIiLCJQcm9kdWN0U291cmNlIjoiV0FWRUFQSSIsImV4cCI6MTgyMDgzMTI4MCwiaWF0IjoxNjkxMjMxMjkzfSwic291cmNlIjoiTU9CSUxFQVBJIn0sImV4cCI6MTcwMTEwOTc5OSwiaWF0IjoxNzAxMDYzODM2fQ.7d4jygqeqQy0Z_yuI6CVazVqshNQvDZjp6rjvweSt28";
 			if (StringUtil.isNullOrEmpty(userSession))
 				return prepareResponse.prepareUnauthorizedResponse();
 			/** Prepare holding request **/
@@ -146,18 +146,20 @@ public class HoldingsService implements IHoldingsService {
 		try {
 			/** Get user session from cache **/
 			String userSession = AppUtil.getUserSession(info.getUserId());
+
+//			String userSession = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6NzA3MDcwLCJ1c2VyaWQiOjcwNzA3MCwidGVuYW50aWQiOjcwNzA3MCwibWVtYmVySW5mbyI6eyJ0ZW5hbnRJZCI6IjQxOSIsImdyb3VwSWQiOiJITyIsInVzZXJJZCI6IkozMyIsInRlbXBsYXRlSWQiOiJVQVQiLCJ1ZElkIjoiIiwib2NUb2tlbiI6IjB4MDFCMEU4Q0QxMDZBMDRCRjhDRTIxQjFFNjAyNDBEIiwidXNlckNvZGUiOiJOWlNQSSIsImdyb3VwQ29kZSI6IkFBQUFBIiwiYXBpa2V5RGF0YSI6eyJDdXN0b21lcklkIjoiNDE5IiwiU3ViVGVuYW50SWQiOiIiLCJQcm9kdWN0U291cmNlIjoiV0FWRUFQSSIsImV4cCI6MTgyMDgzMTI4MCwiaWF0IjoxNjkxMjMxMjkzfSwic291cmNlIjoiTU9CSUxFQVBJIn0sImV4cCI6MTcwMTEwOTc5OSwiaWF0IjoxNzAxMDYzODM2fQ.7d4jygqeqQy0Z_yuI6CVazVqshNQvDZjp6rjvweSt28";
 			if (StringUtil.isNullOrEmpty(userSession))
 				return prepareResponse.prepareUnauthorizedResponse();
 
 			/** Prepare holding request **/
 			HoldingsReqModel reqModel = new HoldingsReqModel();
 			reqModel.setProduct(AppConstants.REST_PRODUCT_MTF);
-			String request = prepareHodingRequest(reqModel, userSession, info);
+//			String request = prepareHodingRequest(reqModel, userSession, info);
 			if (StringUtil.isNullOrEmpty(userSession))
 				return prepareResponse.prepareFailedResponse(AppConstants.FAILED_STATUS);
 
 			/** Get holding data from Odin API **/
-			return restService.getHoldings(userSession, AppConstants.PRODUCT_MTF);
+			return restService.getHoldings(userSession, info.getUserId());
 		} catch (Exception e) {
 			Log.error(e);
 		}

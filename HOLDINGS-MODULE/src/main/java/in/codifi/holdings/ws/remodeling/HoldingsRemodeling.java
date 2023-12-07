@@ -66,6 +66,10 @@ public class HoldingsRemodeling {
 							exch = AppConstants.NFO;
 						} else if (exch.equalsIgnoreCase(AppConstants.NSE_CUR)) {
 							exch = AppConstants.CDS;
+						} else if (exch.equalsIgnoreCase(AppConstants.MCX_FO)) {
+							exch = AppConstants.MCX;
+						} else if (exch.equalsIgnoreCase(AppConstants.BSE_CUR)) {
+							exch = AppConstants.BCD;
 						}
 						symbolDetail.setExchange(exch);
 						symbolDetail.setToken(token);

@@ -52,6 +52,7 @@ public class HoldingsRestService {
 	 * Method to connect rest service and get Holdings
 	 * 
 	 * @author Gowthaman M
+	 * @param product
 	 * @param accessLogModel
 	 */
 	public RestResponse<GenericResponse> getHoldings(String userSession, String userId) {

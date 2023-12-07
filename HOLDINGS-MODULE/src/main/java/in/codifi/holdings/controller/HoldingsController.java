@@ -42,10 +42,10 @@ public class HoldingsController implements IHoldingsController {
 			return prepareResponse.prepareFailedResponse(AppConstants.GUEST_USER_ERROR);
 		}
 //		ClinetInfoModel info = new ClinetInfoModel();
-//		info.setUserId("C00008");
+//		info.setUserId("j33");
 		return holdingsService.getHoldings(info);
 	}
-	
+
 	/**
 	 * Method to update poa status
 	 * 
@@ -57,4 +57,25 @@ public class HoldingsController implements IHoldingsController {
 		return holdingsService.getPoa();
 	}
 
+	/**
+	 * Method to get holdings for MTF product
+	 * 
+	 * @author Gowthaman M
+	 * @return
+	 */
+	@Override
+	public RestResponse<GenericResponse> getMTFHoldings() {
+
+		ClinetInfoModel info = appUtil.getClientInfo();
+		if (info == null || StringUtil.isNullOrEmpty(info.getUserId())) {
+			Log.error("Client info is null");
+			return prepareResponse.prepareFailedResponse(AppConstants.FAILED_STATUS);
+		} else if (StringUtil.isNullOrEmpty(info.getUcc())) {
+			return prepareResponse.prepareFailedResponse(AppConstants.GUEST_USER_ERROR);
+		}
+
+//		ClinetInfoModel info = new ClinetInfoModel();
+//		info.setUserId("j33");
+		return holdingsService.getMTFHoldings(info);
+	}
 }
