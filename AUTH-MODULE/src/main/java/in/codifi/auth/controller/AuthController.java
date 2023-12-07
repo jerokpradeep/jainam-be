@@ -400,6 +400,7 @@ public class AuthController implements AuthControllerSpec {
 		return authServiceSpec.validateSessionForQrLogin(authReq);
 	}
 
+
 	/**
 	 * Method to get token
 	 * 
@@ -410,4 +411,5 @@ public class AuthController implements AuthControllerSpec {
 	public RestResponse<GenericResponse> getToken() {
 		return authServiceSpec.getToken();
 	}
+
 }

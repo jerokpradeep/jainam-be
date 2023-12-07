@@ -2298,6 +2298,7 @@ public class AuthService implements AuthServiceSpec {
 
 			MatrixToImageWriter.writeToStream(matrix, "png", out);
 
+
 			byte[] imageBytes = out.toByteArray();
 			String base64Image = Base64.getEncoder().encodeToString(imageBytes);
 
@@ -2367,9 +2368,8 @@ public class AuthService implements AuthServiceSpec {
 
 //			HazelcastConfig.getInstance().getQrcodecount().remove(text);
 			HazelcastConfig.getInstance().getQrcode().put(qrValidate, value, 10, TimeUnit.SECONDS);
-
 			System.out.println(entity);
-
+      
 			if (entity != null) {
 				return prepareResponse.prepareSuccessMessage(AppConstants.STATUS_OK);
 			} else {
@@ -2382,6 +2382,7 @@ public class AuthService implements AuthServiceSpec {
 		}
 		return prepareResponse.prepareFailedResponse(AppConstants.FAILED_STATUS);
 	}
+
 
 	private LoginRestResp updateRestSessio(AuthReq authReq) {
 		String hzUserSessionKey = authReq.getUserId() + AppConstants.HAZEL_KEY_REST_SESSION;
@@ -2432,6 +2433,7 @@ public class AuthService implements AuthServiceSpec {
 		}
 		return false;
 	}
+
 
 	@Override
 	public RestResponse<GenericResponse> getToken() {

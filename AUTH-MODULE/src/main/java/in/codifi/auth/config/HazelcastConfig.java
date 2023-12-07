@@ -66,7 +66,7 @@ public class HazelcastConfig {
 	IMap<String, Integer> passwordRetryCount = getHz().getMap("passwordRetryCount");
 	IMap<String, String> qrcodecount = getHz().getMap("qrcodecount");
 	IMap<String, String> qrcode = getHz().getMap("qrcode");
-	
+
 	private Map<String, String> restApiClinetInfo = getHz().getMap("restApiClinetInfo");
 
 	private Map<String, String> vendorAuthCode = getHz().getMap("vendorAuthCode");

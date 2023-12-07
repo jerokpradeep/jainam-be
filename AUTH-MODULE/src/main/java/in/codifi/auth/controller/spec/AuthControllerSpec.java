@@ -344,6 +344,7 @@ public interface AuthControllerSpec {
 	@Produces(MediaType.APPLICATION_JSON)
 	RestResponse<GenericResponse> validateSessionForQrLogin(AuthReq authReq);
 
+
 	/**
 	 * Method to get token
 	 * 
@@ -355,4 +356,5 @@ public interface AuthControllerSpec {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	RestResponse<GenericResponse> getToken();
+
 }

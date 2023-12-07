@@ -75,6 +75,7 @@ public class AlertsOdinService implements AlertsOdinServiceSpec {
 			System.out.println(convertedDate);
 
 			alert.setCreatedOn(convertedDate);
+
 			alert.setExch(alerts.getExch());
 			alert.setExchSeg(alerts.getExchSeg());
 			alert.setExpiry(alerts.getExpiry());
@@ -106,7 +107,9 @@ public class AlertsOdinService implements AlertsOdinServiceSpec {
 	@Override
 	public RestResponse<GenericResponse> createAlerts(RequestModel req, ClientInfoModel info) {
 		String userSession = AppUtil.getUserSession(info.getUserId());
+    
 		System.out.println("userId -- " + info.getUserId());
+
 //		String userSession = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6NzA3MDcwLCJ1c2VyaWQiOjcwNzA3MCwidGVuYW50aWQiOjcwNzA3MCwibWVtYmVySW5mbyI6eyJ0ZW5hbnRJZCI6IjQxOSIsImdyb3VwSWQiOiJITyIsInVzZXJJZCI6IkozMyIsInRlbXBsYXRlSWQiOiJVQVQiLCJ1ZElkIjoiIiwib2NUb2tlbiI6IjB4MDEyOEYyNUNFMDkzQjRGNjZDQkZFNTk4REMyMEU1IiwidXNlckNvZGUiOiJOWlNQSSIsImdyb3VwQ29kZSI6IkFBQUFBIiwiYXBpa2V5RGF0YSI6eyJDdXN0b21lcklkIjoiNDE5IiwiU3ViVGVuYW50SWQiOiIiLCJQcm9kdWN0U291cmNlIjoiV0FWRUFQSSIsImV4cCI6MTgyMDgzMTI4MCwiaWF0IjoxNjkxMjMxMjkzfSwic291cmNlIjoiTU9CSUxFQVBJIn0sImV4cCI6MTY5ODc3Njk5OSwiaWF0IjoxNjk4NzM5NjQzfQ.HBTZnlT7UjTlzCht-fzv8gQCl_r_lZpiVjNsDywgQG0";
 		System.out.println("userSession--" + userSession);
 		if (StringUtil.isNullOrEmpty(userSession))

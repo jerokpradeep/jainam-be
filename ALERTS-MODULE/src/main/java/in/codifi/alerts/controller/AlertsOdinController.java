@@ -138,6 +138,7 @@ public class AlertsOdinController implements AlertsOdinControllerSpec {
 	 */
 	@Override
 	public RestResponse<GenericResponse> deleteAlert(String alertId) {
+
 //		ClientInfoModel info = appUtil.getClientInfo();
 //		if (info == null || StringUtil.isNullOrEmpty(info.getUserId())) {
 //			Log.error("Client info is null");
@@ -147,6 +148,7 @@ public class AlertsOdinController implements AlertsOdinControllerSpec {
 //		}
 		ClientInfoModel info = new ClientInfoModel();
 		info.setUserId("wcm549");
+
 		return alertsService.deleteAlert(alertId, info);
 	}
 
