@@ -229,7 +229,8 @@ public class EdisService implements EdisServiceSpec {
 
 				String encodedUrl = Base64.getUrlEncoder().encodeToString(sb.toString().getBytes());
 				sb.setLength(AppConstants.INT_ZERO);
-				sb.insert(AppConstants.INT_ZERO, restProp.getReDirectUrl());
+//				sb.insert(AppConstants.INT_ZERO, restProp.getReDirectUrl());
+				sb.insert(AppConstants.INT_ZERO, "https://edis.cdslindia.com/eDIS/VerifyDIS/");
 				sb.append(encodedUrl);
 
 				accessLogModel.setMethod("redirectUrl");

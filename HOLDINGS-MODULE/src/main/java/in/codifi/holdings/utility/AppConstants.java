@@ -82,6 +82,8 @@ public class AppConstants {
 	public static final String BSE_EQ = "BSE_EQ";
 	public static final String NSE_FO = "NSE_FO";
 	public static final String NSE_CUR = "NSE_CUR";
+	public static final String MCX_FO = "MCX_FO";
+	public static final String BSE_CUR = "BSE_CUR";
 
 	public static final String AMO = "AMO";
 	public static final String BRACKET = "Bracket";

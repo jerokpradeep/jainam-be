@@ -64,7 +64,8 @@ public class HazelcastConfig {
 	IMap<String, Integer> retryOtpCount = getHz().getMap("otp");
 	IMap<String, Boolean> holdResendOtp = getHz().getMap("otp");
 	IMap<String, Integer> passwordRetryCount = getHz().getMap("passwordRetryCount");
-	IMap<String, Integer> qrcodecount = getHz().getMap("qrcodecount");
+	IMap<String, String> qrcodecount = getHz().getMap("qrcodecount");
+	IMap<String, String> qrcode = getHz().getMap("qrcode");
 
 	private Map<String, String> restApiClinetInfo = getHz().getMap("restApiClinetInfo");
 
@@ -82,6 +83,6 @@ public class HazelcastConfig {
 	private Map<String, GetIntroSpectResponse> ssokeycloakUserInfo = getHz().getMap("ssokeycloakUserInfo");
 	private Map<String, GetIntroSpectResponse> apikeycloakUserInfo = getHz().getMap("apikeycloakUserInfo");
 	private Map<String, GetTokenResponse> apiKeycloakSession = getHz().getMap("apiKeycloakSession");
-	private Map<String, Integer> qrcount = getHz().getMap("qrcount");
+//	private Map<String, String> qrcode = getHz().getMap("qrcode");
 
 }

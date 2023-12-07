@@ -399,4 +399,17 @@ public class AuthController implements AuthControllerSpec {
 	public RestResponse<GenericResponse> validateSessionForQrLogin(AuthReq authReq) {
 		return authServiceSpec.validateSessionForQrLogin(authReq);
 	}
+
+
+	/**
+	 * Method to get token
+	 * 
+	 * @author LOKESH
+	 * @return
+	 */
+	@Override
+	public RestResponse<GenericResponse> getToken() {
+		return authServiceSpec.getToken();
+	}
+
 }

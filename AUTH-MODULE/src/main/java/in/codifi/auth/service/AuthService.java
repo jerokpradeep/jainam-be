@@ -2,11 +2,7 @@ package in.codifi.auth.service;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -228,6 +224,18 @@ public class AuthService implements AuthServiceSpec {
 				if (userInfo.get(0).getUsername() != null) {
 					verifyClientResp.setUserId(userInfo.get(0).getUsername());
 				}
+				verifyClientResp.setRoll("Client");
+
+				if (StringUtil.isNotNullOrEmpty(authmodel.getDeviceId())
+						&& StringUtil.isNotNullOrEmpty(authmodel.getDeviceType())) {
+					MobileBioMetricEntity deatils = getBioMetricDetails(authmodel.getUserId());
+					if (deatils != null && StringUtil.isNotNullOrEmpty(deatils.getDeviceType())) {
+						if (deatils.getDeviceId().equalsIgnoreCase(authmodel.getDeviceId())
+								&& deatils.getBioMetricEnabled() == 1) {
+							verifyClientResp.setBioEnabled(true);
+						}
+					}
+				}
 				return prepareResponse.prepareSuccessResponseObject(verifyClientResp);
 			} else {
 				verifyClientResp.setIsExist(AppConstants.NO);
@@ -240,6 +248,31 @@ public class AuthService implements AuthServiceSpec {
 			Log.error(e.getMessage());
 		}
 		return prepareResponse.prepareFailedResponse(AppConstants.FAILED_STATUS);
+	}
+
+	/**
+	 * Method to load Bio Metric Details
+	 * 
+	 * @param userId
+	 */
+	private MobileBioMetricEntity getBioMetricDetails(String userId) {
+		MobileBioMetricEntity entity = null;
+		try {
+			if (HazelcastConfig.getInstance().getBioMetricDeatils() != null
+					&& HazelcastConfig.getInstance().getBioMetricDeatils().get(userId) != null) {
+				entity = HazelcastConfig.getInstance().getBioMetricDeatils().get(userId);
+			} else {
+				List<MobileBioMetricEntity> entityList = bioMetricRepository.findAllByUserIdAndActiveStatus(userId, 1);
+				if (StringUtil.isListNotNullOrEmpty(entityList) && entityList.size() > 0) {
+					entity = entityList.get(0);
+				}
+				HazelcastConfig.getInstance().getBioMetricDeatils().put(userId, entity);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			Log.error(e.getMessage());
+		}
+		return entity;
 	}
 
 	/**
@@ -281,6 +314,7 @@ public class AuthService implements AuthServiceSpec {
 				if (userInfo.get(0).getUsername() != null) {
 					verifyClientResp.setUserId(userInfo.get(0).getUsername());
 				}
+
 				return prepareResponse.prepareSuccessResponseObject(verifyClientResp);
 			} else {
 				verifyClientResp.setIsExist(AppConstants.NO);
@@ -2162,34 +2196,32 @@ public class AuthService implements AuthServiceSpec {
 		byte[] qrCodeData = null;
 		ResponseModel responseModel = null;
 		String str = null;
-		String hzUserSessionKey = "j33" + AppConstants.HAZEL_KEY_REST_SESSION;
+//		String hzUserSessionKey = "j33" + AppConstants.HAZEL_KEY_REST_SESSION;
 		try {
-			int count = 1;
+			String key = "QR";
 			String uniqueCode = generateUniqueCode();
-//			String uuid = "{uuid:"+ uniqueCode +",unique_web_id:"+uniqueCode+"}";
 //			String webcode = uuid;
-			String session = HazelcastConfig.getInstance().getRestUserSession().get(hzUserSessionKey);
-			String webcode = "uuid = " + uniqueCode + ",web_unique_id = " + session;
+//			String session = HazelcastConfig.getInstance().getRestUserSession().get(hzUserSessionKey);
+			String webcode = "{\"uuid\":\"" + uniqueCode + "\"}";
+//			String webcode = "{\"uuid\":\"" + uniqueCode + "\",\"unique_web_id\":\"" + session + "\"}";
 
 			int width = 400;
 			int height = 400;
 
-			if (HazelcastConfig.getInstance().getQrcodecount().get(webcode) != null) {
-				count = HazelcastConfig.getInstance().getQrcodecount().get(webcode);
-				count++;
+			if (HazelcastConfig.getInstance().getQrcodecount().get(uniqueCode) != null) {
+				key = HazelcastConfig.getInstance().getQrcodecount().get(uniqueCode);
 			}
 
 //			HazelcastConfig.getInstance().getQrcodecount().remove(text);
-			HazelcastConfig.getInstance().getQrcodecount().put(webcode, count, 35, TimeUnit.SECONDS);
+			HazelcastConfig.getInstance().getQrcodecount().put(key, uniqueCode, 35, TimeUnit.SECONDS);
 
-			System.out.println(webcode);
+			System.out.println(uniqueCode);
 
-			String newtext = webcode;
-
-			qrCodeData = getQRCode(newtext, width, height);
+			qrCodeData = getQRCode(webcode, width, height);
 			str = new String(qrCodeData);
 			responseModel = new ResponseModel();
 			responseModel.setByteCode(str);
+			responseModel.setQrName(uniqueCode);
 			System.out.println(responseModel.getByteCode());
 //					combinedStr = str + "     ("+ text + ")";
 //					/** Save the QR code image to the local disk D */
@@ -2265,9 +2297,10 @@ public class AuthService implements AuthServiceSpec {
 		try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 
 			MatrixToImageWriter.writeToStream(matrix, "png", out);
-			
-			 byte[] imageBytes = out.toByteArray();
-		        String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+
+
+			byte[] imageBytes = out.toByteArray();
+			String base64Image = Base64.getEncoder().encodeToString(imageBytes);
 
 //			Path pathToImage = Paths.get(text1);
 //			// 1. Convert image to an array of bytes
@@ -2314,14 +2347,29 @@ public class AuthService implements AuthServiceSpec {
 	 */
 	@Override
 	public RestResponse<GenericResponse> validateSessionForQrLogin(AuthReq authReq) {
+
 		try {
+			String qrValidate = "QrValidate";
 			if (!validateQrParam(authReq))
 				return prepareResponse.prepareFailedResponse(AppConstants.INVALID_PARAMETER);
+			String value = authReq.getUserId() + "=" + authReq.getKeyValue();
+//			String keyvalue = authReq.getKeyValue();
 			QrLoginEntity Entity = new QrLoginEntity();
 			Entity.setUserId(authReq.getUserId());
 			Entity.setKeyValue(authReq.getKeyValue());
 
 			QrLoginEntity entity = qrLoginRepository.save(Entity);
+
+			if (HazelcastConfig.getInstance().getQrcode().get(qrValidate) != null) {
+				value = HazelcastConfig.getInstance().getQrcode().get(qrValidate);
+				System.out.println(value);
+
+			}
+
+//			HazelcastConfig.getInstance().getQrcodecount().remove(text);
+			HazelcastConfig.getInstance().getQrcode().put(qrValidate, value, 10, TimeUnit.SECONDS);
+			System.out.println(entity);
+      
 			if (entity != null) {
 				return prepareResponse.prepareSuccessMessage(AppConstants.STATUS_OK);
 			} else {
@@ -2333,6 +2381,43 @@ public class AuthService implements AuthServiceSpec {
 			Log.error(e.getMessage());
 		}
 		return prepareResponse.prepareFailedResponse(AppConstants.FAILED_STATUS);
+	}
+
+
+	private LoginRestResp updateRestSessio(AuthReq authReq) {
+		String hzUserSessionKey = authReq.getUserId() + AppConstants.HAZEL_KEY_REST_SESSION;
+		LoginRestResp loginRestResp = new LoginRestResp();
+//		ExecutorService pool = Executors.newSingleThreadExecutor();
+//		pool.execute(new Runnable() {
+//			@Override
+//			public void run() {
+		try {
+			/** Check if rest user session is active, if not get new session **/
+			if (!HazelcastConfig.getInstance().getIsRestUserSessionActive().get(hzUserSessionKey)) {
+
+				/** Prepare request body **/
+				LoginRestReq request = prepareSsoLoginRequest(authReq);
+				if (request != null) {
+					loginRestResp = loginRestService.ssoLogin(request);
+					if (loginRestResp != null && StringUtil.isNotNullOrEmpty(loginRestResp.getStatus())) {
+						if (loginRestResp.getStatus().equalsIgnoreCase(AppConstants.REST_STATUS_ERROR)) {
+							System.out.println("Failed to get REST Session -" + loginRestResp.getErrors());
+							Log.error("Failed to get REST Session -" + loginRestResp.getErrors());
+						} else if (loginRestResp.getStatus().equalsIgnoreCase(AppConstants.REST_STATUS_SUCCESS)) {
+							System.out.println("LoginResponse -----" + loginRestResp);
+							updateUserCache(loginRestResp, authReq.getUserId());
+						}
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		// }
+//		});
+//		pool.shutdown();
+		return loginRestResp;
 	}
 
 	/**
@@ -2347,6 +2432,81 @@ public class AuthService implements AuthServiceSpec {
 			return true;
 		}
 		return false;
+	}
+
+
+	@Override
+	public RestResponse<GenericResponse> getToken() {
+		AuthReq authReq = new AuthReq();
+		String QR = "QR";
+		String qrValidate = "QrValidate";
+		String value = HazelcastConfig.getInstance().getQrcodecount().get(QR);
+		String value1 = HazelcastConfig.getInstance().getQrcode().get(qrValidate);
+		int equalIndex = value1.indexOf('=');
+		String result = value1.substring(0, equalIndex);
+		String result1 = value1.substring(equalIndex + 1);
+		authReq.setUserId(result);
+		authReq.setSource("WEB");
+		try {
+
+			System.out.println(result);
+			System.out.println(result1);
+			System.out.println(value);
+			System.out.println(value1);
+			if (result1.equalsIgnoreCase(value)) {
+//				RestResponse<GenericResponse> authresp = validate2FA(authReq);
+				LoginRestResp req = new LoginRestResp();
+				req = updateRestSessio(authReq);
+				return prepareResponse.prepareSuccessResponseObject(req);
+			} else {
+				return prepareResponse.prepareFailedResponse(AppConstants.TOKEN_NOT_VERIFIED);
+			}
+//				
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			Log.error(e.getMessage());
+		}
+		return prepareResponse.prepareFailedResponse(AppConstants.FAILED_STATUS);
+	}
+
+	private RestResponse<GenericResponse> validate2FA(AuthReq authReq) {
+		try {
+			/** Validate Request **/
+			if (StringUtil.isNullOrEmpty(authReq.getUserId()) || StringUtil.isNullOrEmpty(authReq.getSource()))
+				return prepareResponse.prepareFailedResponse(AppConstants.INVALID_PARAMETER);
+
+//			String validateResp = validateOTP(authReq.getUserId(), authReq.getSource(), authReq.getOtp());
+
+//			if (validateResp.equalsIgnoreCase(AppConstants.SUCCESS_STATUS)) {
+
+			/** get user info from cache. If does not exist get it from keycloak **/
+			List<GetUserInfoResp> userInfo = new ArrayList<>();
+			if (HazelcastConfig.getInstance().getKeycloakUserDetails().containsKey(authReq.getUserId())) {
+				userInfo = HazelcastConfig.getInstance().getKeycloakUserDetails().get(authReq.getUserId());
+			} else {
+				userInfo = kcAdminRest.getUserInfo(authReq.getUserId());
+			}
+			String userName = "";
+			userName = StringUtil.isNotNullOrEmpty(userInfo.get(0).getFirstName()) ? userInfo.get(0).getFirstName()
+					: "";
+			userName = userName + " "
+					+ (StringUtil.isNotNullOrEmpty(userInfo.get(0).getLastName()) ? userInfo.get(0).getLastName() : "");
+			/** update fcmToken into device mapping **/
+			updateDeviceMapping(authReq.getUserId(), authReq.getFcmToken(), authReq.getSource(),
+					userName.toUpperCase().trim());
+
+			/** update rest session **/
+			updateRestSession(authReq);
+			return prepareRepForActiveUser(authReq);
+//			} else {
+//				return prepareResponse.prepareFailedResponse(validateResp);
+//			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			Log.error(e.getMessage());
+		}
+		return prepareResponse.prepareFailedResponse(AppConstants.FAILED_STATUS);
 	}
 
 }

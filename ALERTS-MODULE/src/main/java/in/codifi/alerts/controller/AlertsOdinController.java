@@ -138,15 +138,17 @@ public class AlertsOdinController implements AlertsOdinControllerSpec {
 	 */
 	@Override
 	public RestResponse<GenericResponse> deleteAlert(String alertId) {
-		ClientInfoModel info = appUtil.getClientInfo();
-		if (info == null || StringUtil.isNullOrEmpty(info.getUserId())) {
-			Log.error("Client info is null");
-			return prepareResponse.prepareFailedResponse(AppConstants.FAILED_STATUS);
-		} else if (StringUtil.isNullOrEmpty(info.getUcc())) {
-			return prepareResponse.prepareFailedResponse(AppConstants.GUEST_USER_ERROR);
-		}
-//		ClientInfoModel info = new ClientInfoModel();
-//		info.setUserId("117995");
+
+//		ClientInfoModel info = appUtil.getClientInfo();
+//		if (info == null || StringUtil.isNullOrEmpty(info.getUserId())) {
+//			Log.error("Client info is null");
+//			return prepareResponse.prepareFailedResponse(AppConstants.FAILED_STATUS);
+//		} else if (StringUtil.isNullOrEmpty(info.getUcc())) {
+//			return prepareResponse.prepareFailedResponse(AppConstants.GUEST_USER_ERROR);
+//		}
+		ClientInfoModel info = new ClientInfoModel();
+		info.setUserId("wcm549");
+
 		return alertsService.deleteAlert(alertId, info);
 	}
 

@@ -67,14 +67,15 @@ public class AlertsOdinService implements AlertsOdinServiceSpec {
 			alert.setAlertName(alerts.getAlertName());
 			alert.setAlertType(alerts.getAlertType());
 			alert.setCreatedBy(alerts.getCreatedBy());
-			
+
 			String dateStr = alerts.getCreatedOn().toString();
 			DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
-	        LocalDateTime dateTime = LocalDateTime.parse(dateStr, inputFormatter);
-	        String convertedDate = dateTime.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"));
-	        System.out.println(convertedDate);
-			
-	        alert.setCreatedOn(convertedDate);
+			LocalDateTime dateTime = LocalDateTime.parse(dateStr, inputFormatter);
+			String convertedDate = dateTime.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"));
+			System.out.println(convertedDate);
+
+			alert.setCreatedOn(convertedDate);
+
 			alert.setExch(alerts.getExch());
 			alert.setExchSeg(alerts.getExchSeg());
 			alert.setExpiry(alerts.getExpiry());
@@ -106,7 +107,9 @@ public class AlertsOdinService implements AlertsOdinServiceSpec {
 	@Override
 	public RestResponse<GenericResponse> createAlerts(RequestModel req, ClientInfoModel info) {
 		String userSession = AppUtil.getUserSession(info.getUserId());
-		System.out.println("userId -- "+info.getUserId());
+    
+		System.out.println("userId -- " + info.getUserId());
+
 //		String userSession = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6NzA3MDcwLCJ1c2VyaWQiOjcwNzA3MCwidGVuYW50aWQiOjcwNzA3MCwibWVtYmVySW5mbyI6eyJ0ZW5hbnRJZCI6IjQxOSIsImdyb3VwSWQiOiJITyIsInVzZXJJZCI6IkozMyIsInRlbXBsYXRlSWQiOiJVQVQiLCJ1ZElkIjoiIiwib2NUb2tlbiI6IjB4MDEyOEYyNUNFMDkzQjRGNjZDQkZFNTk4REMyMEU1IiwidXNlckNvZGUiOiJOWlNQSSIsImdyb3VwQ29kZSI6IkFBQUFBIiwiYXBpa2V5RGF0YSI6eyJDdXN0b21lcklkIjoiNDE5IiwiU3ViVGVuYW50SWQiOiIiLCJQcm9kdWN0U291cmNlIjoiV0FWRUFQSSIsImV4cCI6MTgyMDgzMTI4MCwiaWF0IjoxNjkxMjMxMjkzfSwic291cmNlIjoiTU9CSUxFQVBJIn0sImV4cCI6MTY5ODc3Njk5OSwiaWF0IjoxNjk4NzM5NjQzfQ.HBTZnlT7UjTlzCht-fzv8gQCl_r_lZpiVjNsDywgQG0";
 		System.out.println("userSession--" + userSession);
 		if (StringUtil.isNullOrEmpty(userSession))
@@ -207,12 +210,12 @@ public class AlertsOdinService implements AlertsOdinServiceSpec {
 		Operand1Model operand1Model = new Operand1Model();
 		Operand2Model operand2Model = new Operand2Model();
 		DataRespModel dataRespModel = new DataRespModel();
-		
+
 		String token = req.getToken();
 		String exch = req.getExch().toUpperCase();
 		ContractMasterModel contractMasterModel = HazelcastConfig.getInstance().getContractMaster()
 				.get(exch + "_" + token);
-		
+
 		try {
 			operand1Model.setField("LastTradedPrice");
 			if (req.getExch().equalsIgnoreCase(AppConstants.NSE)) {
@@ -242,7 +245,7 @@ public class AlertsOdinService implements AlertsOdinServiceSpec {
 			conditionRespModelsList.add(conditionRespModel);
 
 			dataRespModel.setAlertType(AppConstants.PRICE);
-			if(req.getExch().equalsIgnoreCase(AppConstants.NSE)) {
+			if (req.getExch().equalsIgnoreCase(AppConstants.NSE)) {
 				dataRespModel.setCategory(contractMasterModel.getGroupName());
 			} else {
 				dataRespModel.setCategory("");
@@ -289,7 +292,7 @@ public class AlertsOdinService implements AlertsOdinServiceSpec {
 			return prepareResponse.prepareFailedResponse(AppConstants.INVALID_ALERT);
 		/** Method to prepare Update Alerts request **/
 		ModifyAlertsReqModel updateReq = prepareUpdateAlerts(req, info);
-		/** Method to Update Alerts request in odin**/
+		/** Method to Update Alerts request in odin **/
 		RestResponse<GenericResponse> alert = restService.updateAlerts(updateReq, userSession, info);
 		String alertId = alert.getEntity().getMessage();
 		AlertsEntity alertsEntity = prepareUpdate(req, info.getUserId(), alertId);
@@ -437,9 +440,10 @@ public class AlertsOdinService implements AlertsOdinServiceSpec {
 	}
 
 	@Override
-	public RestResponse<GenericResponse> deleteAlert(String alertId, ClientInfoModel info) {
-		String userSession = AppUtil.getUserSession(info.getUserId());
-//		String userSession = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6OTA5MDkwLCJ1c2VyaWQiOjkwOTA5MCwidGVuYW50aWQiOjkwOTA5MCwibWVtYmVySW5mbyI6eyJ0ZW5hbnRJZCI6IjIxNCIsImdyb3VwSWQiOiJITyIsInVzZXJJZCI6IjExNzk5NSIsInRlbXBsYXRlSWQiOiJETlMiLCJ1ZElkIjoiYjcwZDZmMTM4MWVjNzUyMSIsIm9jVG9rZW4iOiIweDAxNkI0QTE0QzkzMDY2QjIyNzFEMjAzNjlEQ0FBNiIsInVzZXJDb2RlIjoiQUZET0IiLCJncm91cENvZGUiOiJBQUFBQSIsImFwaWtleURhdGEiOnsiQ3VzdG9tZXJJZCI6IjIxNCIsImV4cCI6MTc3NjE1OTcyMCwiaWF0IjoxNjg5NzU5NzY3fSwic291cmNlIjoiTU9CSUxFQVBJIn0sImV4cCI6MTY5NjYxNjk5OSwiaWF0IjoxNjk2NTc5NTMwfQ.LU5bgvF84OgubuM5gpp9V8wjaTod4sp75VmMXp2ZhHs";
+	public RestResponse<GenericResponse> deleteAlert(String alertId,
+			ClientInfoModel info) {
+//		String userSession = AppUtil.getUserSession(info.getUserId());
+		String userSession = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6NzA3MDcwLCJ1c2VyaWQiOjcwNzA3MCwidGVuYW50aWQiOjcwNzA3MCwibWVtYmVySW5mbyI6eyJ0ZW5hbnRJZCI6IjQxOSIsImdyb3VwSWQiOiJITyIsInVzZXJJZCI6IldDTTU0OSIsInRlbXBsYXRlSWQiOiJVQVQiLCJ1ZElkIjoiIiwib2NUb2tlbiI6IjB4MDEzMzdDRTIwMThFMTNDMUFDM0E3MEU1RUExRkZBIiwidXNlckNvZGUiOiJPRkhZVyIsImdyb3VwQ29kZSI6IkFBQUFBIiwiYXBpa2V5RGF0YSI6eyJDdXN0b21lcklkIjoiNDE5IiwiU3ViVGVuYW50SWQiOiIiLCJQcm9kdWN0U291cmNlIjoiV0FWRUFQSSIsImV4cCI6MTgyMDgzMTI4MCwiaWF0IjoxNjkxMjMxMjkzfSwic291cmNlIjoiTU9CSUxFQVBJIn0sImV4cCI6MTcwMTU0MTc5OSwiaWF0IjoxNzAxNDkzMzE3fQ.b4BusuH7QG1c1QaE4ROjQaO29jfbkzf-jeG1fz-A73M";
 		System.out.println("userSession--" + userSession);
 		if (StringUtil.isNullOrEmpty(userSession))
 			return prepareResponse.prepareUnauthorizedResponse();

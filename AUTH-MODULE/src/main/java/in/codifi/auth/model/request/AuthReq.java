@@ -20,4 +20,5 @@ public class AuthReq {
 	private String token;
 	private String imei;
 	private String keyValue;
+	private String deviceType;
 }

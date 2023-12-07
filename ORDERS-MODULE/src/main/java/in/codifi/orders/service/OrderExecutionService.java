@@ -105,6 +105,16 @@ public class OrderExecutionService implements OrderExecutionServiceSpec {
 
 		List<OrderDetails> newordersReq = new ArrayList<>();
 		newordersReq = sliceOrder(ordersReq);
+		
+		if (newordersReq.size() > 25) {
+			Log.error(AppConstants.ORDER_SLICE_LIMIT + " - UserId - " + info.getUserId());
+			List<GenericResponse> resp = new ArrayList<>();
+			GenericResponse response = new GenericResponse();
+			response = prepareResponse.prepareFailedResponseBody(AppConstants.ORDER_SLICE_LIMIT);
+			resp.add(response);
+			return resp;
+		}
+		
 //		for (OrderDetails orderDetails : ordersReq) {
 		for (OrderDetails orderDetails : newordersReq) {
 			Callable<GenericResponse> task = () -> {

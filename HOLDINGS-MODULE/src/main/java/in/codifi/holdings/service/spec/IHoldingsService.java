@@ -15,7 +15,7 @@ public interface IHoldingsService {
 	 * @return
 	 */
 	RestResponse<GenericResponse> getHoldings(ClinetInfoModel info);
-	
+
 	/**
 	 * Method to update poa status
 	 * 
