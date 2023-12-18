@@ -44,7 +44,7 @@ public class OrderInfoController implements OrderInfoControllerSpec {
 			return prepareResponse.prepareFailedResponse(AppConstants.GUEST_USER_ERROR);
 		}
 //		ClinetInfoModel info = new ClinetInfoModel();
-//		info.setUserId("111560");
+//		info.setUserId("wcm549");
 		return orderInfoService.getOrderBookInfo(info); 
 	}
 

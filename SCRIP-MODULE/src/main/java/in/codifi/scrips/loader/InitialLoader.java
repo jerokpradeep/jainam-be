@@ -42,7 +42,7 @@ public class InitialLoader extends HttpServlet {
 		contractService.loadContractMaster();
 		contractService.loadMTFData();
 		Log.info("All the pre-Lodings are ended");
-		contractEntityManager.deleteBSEContract();
+//		contractEntityManager.deleteBSEContract();
 		scripsService.loadAsmGsm();
 		Log.info("AsmGsm loaded successfully");
 

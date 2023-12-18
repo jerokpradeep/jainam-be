@@ -3,16 +3,18 @@ package in.codifi.common.config;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.microprofile.config.ConfigProvider;
-
 import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.core.HazelcastInstance;
+
+import org.eclipse.microprofile.config.ConfigProvider;
 
 import in.codifi.cache.model.AnalysisRespModel;
 import in.codifi.cache.model.ContractMasterModel;
 import in.codifi.cache.model.EventDataModel;
 import in.codifi.common.entity.primary.EQSectorEntity;
+import in.codifi.common.entity.primary.EtfEntity;
+import in.codifi.common.entity.primary.FutureEntity;
 import in.codifi.common.entity.primary.IndicesEntity;
 import in.codifi.common.entity.primary.VersionEntity;
 import in.codifi.common.model.response.AnnoucementsDataResp;
@@ -69,8 +71,11 @@ public class HazelcastConfig {
 
 	private Map<String, IndexDetailsResp> indices = getHz().getMap("indices");
 	private Map<String, WIResultResponse> worldIndices = getHz().getMap("worldIndices");
-	
+
 	private Map<String, IndexDetailsRespModify> indicesModify = getHz().getMap("indices");
+
+	private Map<String, List<EtfEntity>> etfDetails = getHz().getMap("etfDetails");
+	private Map<String, List<FutureEntity>> futureDetails = getHz().getMap("futureDetails");
 
 	// FII DII
 	private Map<String, FIIDIIResp> activityData = getHz().getMap("activityData");

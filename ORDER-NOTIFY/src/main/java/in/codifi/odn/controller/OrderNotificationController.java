@@ -27,7 +27,7 @@ public class OrderNotificationController implements OrderNotificationControllerS
 	public void sendPushNotification() {
 		WebsocketConnectionResp orderFeedMode = WebsocketConnectionResp.builder()
 				.symbol("TEST").orderStatus(1)
-				.ucc("117995").build();
+				.ucc("M3903").build();
 		this.orderNotificationServiceSpec.sendPushNotification(orderFeedMode);
 
 	}

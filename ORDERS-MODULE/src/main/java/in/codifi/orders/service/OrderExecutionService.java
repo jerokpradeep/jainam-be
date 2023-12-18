@@ -74,7 +74,7 @@ public class OrderExecutionService implements OrderExecutionServiceSpec {
 			/** Verify session **/
 			Log.info("Orders  userId - " + info.getUserId());
 			String userSession = AppUtil.getUserSession(info.getUserId());
-//			String userSession = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6NzA3MDcwLCJ1c2VyaWQiOjcwNzA3MCwidGVuYW50aWQiOjcwNzA3MCwibWVtYmVySW5mbyI6eyJ0ZW5hbnRJZCI6IjQxOSIsImdyb3VwSWQiOiJITyIsInVzZXJJZCI6IkozMyIsInRlbXBsYXRlSWQiOiJVQVQiLCJ1ZElkIjoiIiwib2NUb2tlbiI6IjB4MDE3ODA0Mjg2MDZFOUQxQjMzNTE0MDBFNTE2NkExIiwidXNlckNvZGUiOiJOWlNQSSIsImdyb3VwQ29kZSI6IkFBQUFBIiwiYXBpa2V5RGF0YSI6eyJDdXN0b21lcklkIjoiNDE5IiwiU3ViVGVuYW50SWQiOiIiLCJQcm9kdWN0U291cmNlIjoiV0FWRUFQSSIsImV4cCI6MTgyMDgzMTI4MCwiaWF0IjoxNjkxMjMxMjkzfSwic291cmNlIjoiTU9CSUxFQVBJIn0sImV4cCI6MTY5ODg2MzM5OSwiaWF0IjoxNjk4ODQ2OTg3fQ.b4h-TQEYuXDr7_ay7D081e0DpCM-rfB_wz2z0dacNqo";
+//			String userSession = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6NzA3MDcwLCJ1c2VyaWQiOjcwNzA3MCwidGVuYW50aWQiOjcwNzA3MCwibWVtYmVySW5mbyI6eyJ0ZW5hbnRJZCI6IjQxOSIsImdyb3VwSWQiOiJITyIsInVzZXJJZCI6IldDTTU0OSIsInRlbXBsYXRlSWQiOiJVQVQiLCJ1ZElkIjoiIiwib2NUb2tlbiI6IjB4MDFGMUU1QzdBMjU0QTg1NTg2NDE1RDQ2MUJFQzBDIiwidXNlckNvZGUiOiJPRkhZVyIsImdyb3VwQ29kZSI6IkFBQUFBIiwiYXBpa2V5RGF0YSI6eyJDdXN0b21lcklkIjoiNDE5IiwiU3ViVGVuYW50SWQiOiIiLCJQcm9kdWN0U291cmNlIjoiV0FWRUFQSSIsImV4cCI6MTgyMDgzMTI4MCwiaWF0IjoxNjkxMjMxMjkzfSwic291cmNlIjoiTU9CSUxFQVBJIn0sImV4cCI6MTcwMjY2NDk5OSwiaWF0IjoxNzAyNjI5MDU5fQ.M0UawxnvZwcHm0e1L5MH8aV8KaAogx9j-0loqYdqhag";
 			Log.info("Orders  userSession - " + userSession);
 			if (StringUtil.isNullOrEmpty(userSession))
 				return prepareResponse.prepareUnauthorizedResponseForList();
@@ -105,7 +105,7 @@ public class OrderExecutionService implements OrderExecutionServiceSpec {
 
 		List<OrderDetails> newordersReq = new ArrayList<>();
 		newordersReq = sliceOrder(ordersReq);
-		
+
 		if (newordersReq.size() > 25) {
 			Log.error(AppConstants.ORDER_SLICE_LIMIT + " - UserId - " + info.getUserId());
 			List<GenericResponse> resp = new ArrayList<>();
@@ -114,7 +114,7 @@ public class OrderExecutionService implements OrderExecutionServiceSpec {
 			resp.add(response);
 			return resp;
 		}
-		
+
 //		for (OrderDetails orderDetails : ordersReq) {
 		for (OrderDetails orderDetails : newordersReq) {
 			Callable<GenericResponse> task = () -> {
@@ -549,7 +549,9 @@ public class OrderExecutionService implements OrderExecutionServiceSpec {
 			// Swap value start
 			// Added on 24-06-23 //TODO consult with Dinesh bro
 			if (placeOrderReqModel.getScripInfo().getExchange().equalsIgnoreCase(AppConstants.NSE_FO)
-					&& orderDetails.getProduct().equalsIgnoreCase(AppConstants.NRML)) {
+					|| placeOrderReqModel.getScripInfo().getExchange().equalsIgnoreCase(AppConstants.NSE_CUR)
+							&& orderDetails.getProduct().equalsIgnoreCase(AppConstants.NRML)
+					|| orderDetails.getProduct().equalsIgnoreCase(AppConstants.MIS)) {
 				placeOrderReqModel.setProductType(AppConstants.DELIVERY);
 			} else {
 				placeOrderReqModel
@@ -1236,7 +1238,7 @@ public class OrderExecutionService implements OrderExecutionServiceSpec {
 
 			/** Verify session **/
 			String userSession = AppUtil.getUserSession(info.getUserId());
-//			String userSession = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6NzA3MDcwLCJ1c2VyaWQiOjcwNzA3MCwidGVuYW50aWQiOjcwNzA3MCwibWVtYmVySW5mbyI6eyJ0ZW5hbnRJZCI6IjIxNCIsImdyb3VwSWQiOiJITyIsInVzZXJJZCI6IkMwMDAwOCIsInRlbXBsYXRlSWQiOiJETlMiLCJ1ZElkIjoiOTc2ODY0MTlmOWNlMzc0MSIsIm9jVG9rZW4iOiIweDAxOUMyRkEwQTZCMzk2REQ1ODdBREQ4OEUyQjIxOCIsInVzZXJDb2RlIjoiQUNKWVUiLCJncm91cENvZGUiOiJBQUFBQSIsImFwaWtleURhdGEiOnsiQ3VzdG9tZXJJZCI6IjIxNCIsImV4cCI6MTc3NjE1OTcyMCwiaWF0IjoxNjg5NzU5NzY3fSwic291cmNlIjoiTU9CSUxFQVBJIn0sImV4cCI6MTY5MjI5Njk5OSwiaWF0IjoxNjkyMjczODExfQ.5dlt7w5JmW_bU4EuUSfgAR5cLSq8RJJTE3DwGeaRMxs";
+//			String userSession = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6NzA3MDcwLCJ1c2VyaWQiOjcwNzA3MCwidGVuYW50aWQiOjcwNzA3MCwibWVtYmVySW5mbyI6eyJ0ZW5hbnRJZCI6IjQxOSIsImdyb3VwSWQiOiJITyIsInVzZXJJZCI6IldDTTU0OSIsInRlbXBsYXRlSWQiOiJVQVQiLCJ1ZElkIjoiIiwib2NUb2tlbiI6IjB4MDFBN0Y5M0E2OEM2MDEyRUY3OUNGRTZCQzVGODk0IiwidXNlckNvZGUiOiJPRkhZVyIsImdyb3VwQ29kZSI6IkFBQUFBIiwiYXBpa2V5RGF0YSI6eyJDdXN0b21lcklkIjoiNDE5IiwiU3ViVGVuYW50SWQiOiIiLCJQcm9kdWN0U291cmNlIjoiV0FWRUFQSSIsImV4cCI6MTgyMDgzMTI4MCwiaWF0IjoxNjkxMjMxMjkzfSwic291cmNlIjoiTU9CSUxFQVBJIn0sImV4cCI6MTcwMjQ5MjE5OSwiaWF0IjoxNzAyNDUxNzU5fQ.j5oU_xlNv91dT404LPZ68GIfBkjnZ0Y-G-BWnnONcGk";
 			if (StringUtil.isNullOrEmpty(userSession))
 				return prepareResponse.prepareUnauthorizedResponse();
 

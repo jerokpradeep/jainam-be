@@ -11,6 +11,8 @@ import javax.persistence.Query;
 
 import in.codifi.common.config.HazelcastConfig;
 import in.codifi.common.entity.primary.EQSectorDetailsEntity;
+import in.codifi.common.entity.primary.EtfDetailsEntity;
+import in.codifi.common.entity.primary.FutureDetailsEntity;
 import in.codifi.common.entity.primary.IndicesEntity;
 import io.quarkus.hibernate.orm.PersistenceUnit;
 import io.quarkus.logging.Log;
@@ -157,7 +159,7 @@ public class ContractEntityManger {
 
 		return token;
 	}
-	
+
 	/**
 	 * Method to get token NFO
 	 * 
@@ -184,7 +186,7 @@ public class ContractEntityManger {
 
 		return token;
 	}
-	
+
 	/**
 	 * Method to get token NFO
 	 * 
@@ -209,6 +211,86 @@ public class ContractEntityManger {
 		}
 
 		return token;
+	}
+
+	/**
+	 * Method to get ETF data
+	 * 
+	 * @author DINESH KUMAR
+	 *
+	 * @param scrips
+	 * @param exch
+	 * @return
+	 */
+	public List<EtfDetailsEntity> getEtfDetails(List<String> scrips) {
+		List<EtfDetailsEntity> respone = new ArrayList<>();
+		try {
+			List<String> exch = new ArrayList<>();
+			exch.add("NSE");
+			exch.add("BSE");
+			Query query = entityManager.createNativeQuery(
+					"select token,symbol,trading_symbol,formatted_ins_name,exch,exchange_segment from tbl_global_contract_master_details"
+							+ " where exch IN (:exch) and symbol IN (:symbol)");
+
+			query.setParameter("exch", exch);
+			query.setParameter("symbol", scrips);
+			List<Object[]> result = query.getResultList();
+
+			for (Object[] values : result) {
+				EtfDetailsEntity detailsEntity = new EtfDetailsEntity();
+				detailsEntity.setToken((String) values[0]);
+				detailsEntity.setSymbol((String) values[1]);
+				detailsEntity.setTradingSymbol((String) values[2]);
+				detailsEntity.setFormattedInsName((String) values[3]);
+				detailsEntity.setExchange((String) values[4]);
+				detailsEntity.setSegment((String) values[5]);
+				respone.add(detailsEntity);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			Log.error(e.getMessage());
+		}
+		return respone;
+	}
+
+	/**
+	 * method to get future details from global contract master
+	 * 
+	 * @author SOWMIYA
+	 * @param exch
+	 * @param symbol
+	 * @param insType
+	 * @return
+	 */
+	public List<FutureDetailsEntity> getFutureDetails(String exch, String symbol, String insType) {
+		List<FutureDetailsEntity> futureDetails = new ArrayList<>();
+		try {
+			Query query = entityManager.createNativeQuery(
+					"select formatted_ins_name,exch,expiry_date,token,pdc,symbol from tbl_global_contract_master_details"
+							+ " where exch = :exch and" + " symbol = :symbol and instrument_type = :instType");
+
+			query.setParameter("exch", exch);
+			query.setParameter("symbol", symbol);
+			query.setParameter("instType", insType);
+
+			@SuppressWarnings("unchecked")
+			List<Object[]> result = query.getResultList();
+			for (Object[] values : result) {
+				FutureDetailsEntity entity = new FutureDetailsEntity();
+				entity.setScripName((String) values[0]);
+				entity.setExchange((String) values[1]);
+				entity.setExpiry((Date) values[2]);
+				entity.setToken((String) values[3]);
+				entity.setPdc((String) values[4]);
+				entity.setSymbol((String) values[5]);
+				futureDetails.add(entity);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			Log.error(e.getMessage());
+		}
+		return futureDetails;
 	}
 
 }
