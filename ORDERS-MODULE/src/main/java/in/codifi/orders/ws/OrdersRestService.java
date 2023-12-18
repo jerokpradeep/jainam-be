@@ -465,10 +465,10 @@ public class OrdersRestService {
 				}
 			} else {
 				System.out.println("Error Connection in Order Book api. Rsponse code - " + responseCode);
-				accessLogModel.setResBody(output);
-				insertRestAccessLogs(accessLogModel);
 				bufferedReader = new BufferedReader(new InputStreamReader((conn.getErrorStream())));
 				output = bufferedReader.readLine();
+				accessLogModel.setResBody(responseCode + " -- " + output);
+				insertRestAccessLogs(accessLogModel);
 				if (StringUtil.isNotNullOrEmpty(output)) {
 					orderBookRespModel = mapper.readValue(output, OrderBookRespModel.class);
 					if (StringUtil.isNotNullOrEmpty(orderBookRespModel.getMessage()))
@@ -502,7 +502,7 @@ public class OrdersRestService {
 				String restExch = model.getExch();
 				String exch = "";
 				ObjectMapper mapper = new ObjectMapper();
-				System.out.println("model -- "+mapper.writeValueAsString(model));
+				System.out.println("model -- " + mapper.writeValueAsString(model));
 				if (restExch.equalsIgnoreCase(AppConstants.NSE_EQ)) {
 					exch = AppConstants.NSE;
 				} else if (restExch.equalsIgnoreCase(AppConstants.BSE_EQ)) {
@@ -524,13 +524,17 @@ public class OrdersRestService {
 							? coModel.getFormattedInsName()
 							: "";
 					extract.setFormattedInsName(scripName);
+					String companyname = StringUtil.isNotNullOrEmpty(coModel.getCompanyName())
+							? coModel.getCompanyName()
+							: "";
+					extract.setCompanyName(companyname);
 				}
 
 				extract.setOrderNo(model.getOrderId());
 				extract.setUserId(userId);
 				extract.setActId(userId);
 				extract.setExchange(exch);
-				extract.setCompanyName(coModel.getCompanyName());
+
 				extract.setTradingSymbol(model.getSymbol());
 				extract.setQty(model.getTotalQty());
 				extract.setTransType(model.getTransType());
@@ -852,8 +856,11 @@ public class OrdersRestService {
 			accessLogModel.setUserId(userId);
 			accessLogModel.setInTime(new Timestamp(new Date().getTime()));
 			CodifiUtil.trustedManagement();
+//			URL url = new URL(props.getCancelOrderUrl() + AppConstants.OPERATOR_SLASH + reqModel.getExchange()
+//					+ AppConstants.OPERATOR_SLASH + reqModel.getOrderNo());
 			URL url = new URL(props.getCancelOrderUrl() + AppConstants.OPERATOR_SLASH + reqModel.getExchange()
-					+ AppConstants.OPERATOR_SLASH + reqModel.getOrderNo());
+					+ AppConstants.OPERATOR_SLASH + URLEncoder.encode(reqModel.getOrderNo(), AppConstants.UTF_8));
+
 			accessLogModel.setReqBody(url.toString());
 			accessLogModel.setUrl(url.toString());
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -1587,8 +1594,12 @@ public class OrdersRestService {
 			accessLogModel.setUserId(userId);
 			accessLogModel.setInTime(new Timestamp(new Date().getTime()));
 			CodifiUtil.trustedManagement();
+//			URL url = new URL(props.getCancelOrderUrl() + AppConstants.OPERATOR_SLASH + reqModel.getExchange()
+//					+ AppConstants.OPERATOR_SLASH + reqModel.getOrderNo());
+
 			URL url = new URL(props.getCancelOrderUrl() + AppConstants.OPERATOR_SLASH + reqModel.getExchange()
-					+ AppConstants.OPERATOR_SLASH + reqModel.getOrderNo());
+					+ AppConstants.OPERATOR_SLASH + URLEncoder.encode(reqModel.getOrderNo(), AppConstants.UTF_8));
+
 			accessLogModel.setReqBody(url.toString());
 			accessLogModel.setUrl(url.toString());
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();

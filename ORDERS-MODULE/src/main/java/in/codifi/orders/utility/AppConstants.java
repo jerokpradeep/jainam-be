@@ -163,6 +163,7 @@ public class AppConstants {
 
 	public static final String NRML = "NRML";
 	public static final String DELIVERY = "DELIVERY";
+	public static final String MIS = "MIS";
 
 	// brokerage
 	public static final String PRODUCT_EQUAL_TO = "Product=";

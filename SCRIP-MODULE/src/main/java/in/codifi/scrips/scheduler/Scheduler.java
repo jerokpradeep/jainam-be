@@ -58,9 +58,9 @@ public class Scheduler {
 		contractService.reloadContractMasterFile();
 		contractService.loadContractMaster();
 		contractService.loadMTFData();
-		Log.info("Started to delete contract master not in NSE, BSE and NSO");
-		contractService.deleteBSEContract();
-		Log.info("Delete contract master not in NSE, BSE and NSO ended");
+//		Log.info("Started to delete contract master not in NSE, BSE and NSO");
+//		contractService.deleteBSEContract();
+//		Log.info("Delete contract master not in NSE, BSE and NSO ended");
 		Log.info("Scheduler completed to Load Contract Master");
 	}
 
@@ -77,9 +77,9 @@ public class Scheduler {
 		contractService.reloadContractMasterFile();
 		contractService.loadContractMaster();
 		contractService.loadMTFData();
-		Log.info("Started to delete contract master not in NSE, BSE and NSO");
-		contractService.deleteBSEContract();
-		Log.info("Delete contract master not in NSE, BSE and NSO ended");
+//		Log.info("Started to delete contract master not in NSE, BSE and NSO");
+//		contractService.deleteBSEContract();
+//		Log.info("Delete contract master not in NSE, BSE and NSO ended");
 		Log.info("Scheduler completed to Load Contract Master");
 	}
 

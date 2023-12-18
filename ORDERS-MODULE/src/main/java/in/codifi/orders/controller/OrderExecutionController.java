@@ -56,7 +56,7 @@ public class OrderExecutionController implements OrderExecutionControllerSpec {
 			return prepareResponse.prepareFailedResponseForList(AppConstants.GUEST_USER_ERROR);
 		}
 //		ClinetInfoModel info = new ClinetInfoModel();
-//		info.setUserId("C00008");
+//		info.setUserId("WCM549");
 		return serviceSpec.placeOrder(orderDetails, info);
 	}
 
@@ -218,7 +218,7 @@ public class OrderExecutionController implements OrderExecutionControllerSpec {
 		}
 
 //		ClinetInfoModel info = new ClinetInfoModel();
-//		info.setUserId("C00008");
+//		info.setUserId("WCM549");
 		return serviceSpec.getOrderMargin(marginReqModel, info);
 	}
 

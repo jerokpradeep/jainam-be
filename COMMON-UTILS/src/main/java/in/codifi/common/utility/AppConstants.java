@@ -37,7 +37,7 @@ public class AppConstants {
 	public static final String INVALID_PARAMETER = "Invalid Parameter";
 	public static final String GUEST_USER_ERROR = "Guest User";
 	public static final String ALL = "ALL";
-	
+
 	public static final String INVALID_OS = "Invalid OS";
 
 	// AppUtil
@@ -109,7 +109,7 @@ public class AppConstants {
 	public static final String INVALID_SEGMENT = "Invalid Segment";
 	public static final String LOADED = "Loaded Successfully";
 	public static final String VERSION_UPDATED = "Version Updated";
-	
+
 	public static final String NSE = "NSE";
 	public static final String BSE = "BSE";
 	public static final String NFO = "NFO";
@@ -117,5 +117,9 @@ public class AppConstants {
 	public static final String BSE_EQ = "BSE_EQ";
 	public static final String NSE_FO = "NSE_FO";
 	public static final String INVALID_EXCH = "Invalid exchange";
+
+	public static final String HAZEL_KEY_ETF = "ETF";
+	public static final String HAZEL_KEY_FUTURES = "FUTURES";
+	public static final String NO_SCRIP = "No Scrip";
 
 }
