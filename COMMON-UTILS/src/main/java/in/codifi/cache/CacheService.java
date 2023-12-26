@@ -35,6 +35,7 @@ public class CacheService {
 		HazelcastConfig.getInstance().getIndicesDetails().clear();
 		HazelcastConfig.getInstance().getSectors().clear();
 		HazelcastConfig.getInstance().getActivityData().clear();
+		HazelcastConfig.getInstance().getFutureDetails().clear();
 		return prepareResponse.prepareSuccessMessage(AppConstants.SUCCESS_STATUS);
 	}
 

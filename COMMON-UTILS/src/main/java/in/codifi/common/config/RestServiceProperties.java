@@ -83,10 +83,10 @@ public class RestServiceProperties {
 
 	@ConfigProperty(name = "config.analysis.service.url.annoucementsdata")
 	private String annoucementsdata;
-	
+
 	@ConfigProperty(name = "config.analysis.service.url.movingaverage")
 	private String movingAverage;
-	
+
 	@ConfigProperty(name = "config.analysis.service.url.putcallratio")
 	private String putCallRatio;
 
@@ -107,13 +107,13 @@ public class RestServiceProperties {
 
 	@ConfigProperty(name = "config.analysis.service.url.gethealthtotalscoreurl.endpoints")
 	private String healthTotalScoreEndpoints;
-	
+
 	@ConfigProperty(name = "config.analysis.service.url.exchangeMessages")
 	private String exchangeMessages;
-	
+
 	@ConfigProperty(name = "config.analysis.service.url.brokerMessages")
 	private String brokerMessages;
-	
+
 	@ConfigProperty(name = "config.analysis.service.url.supportandresistance")
 	private String supportAndResistance;
 

@@ -558,6 +558,7 @@ public class ContractService implements ContractServiceSpecs {
 	public void loadPromptData() {
 		promptDao.loadPromptData();
 	}
+	
 
 	@Override
 	public RestResponse<GenericResponse> loadFiftytwoWeekData() {
