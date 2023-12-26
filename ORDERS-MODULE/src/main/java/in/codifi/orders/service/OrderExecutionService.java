@@ -74,7 +74,7 @@ public class OrderExecutionService implements OrderExecutionServiceSpec {
 			/** Verify session **/
 			Log.info("Orders  userId - " + info.getUserId());
 			String userSession = AppUtil.getUserSession(info.getUserId());
-//			String userSession = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6NzA3MDcwLCJ1c2VyaWQiOjcwNzA3MCwidGVuYW50aWQiOjcwNzA3MCwibWVtYmVySW5mbyI6eyJ0ZW5hbnRJZCI6IjQxOSIsImdyb3VwSWQiOiJITyIsInVzZXJJZCI6IldDTTU0OSIsInRlbXBsYXRlSWQiOiJVQVQiLCJ1ZElkIjoiIiwib2NUb2tlbiI6IjB4MDFGMUU1QzdBMjU0QTg1NTg2NDE1RDQ2MUJFQzBDIiwidXNlckNvZGUiOiJPRkhZVyIsImdyb3VwQ29kZSI6IkFBQUFBIiwiYXBpa2V5RGF0YSI6eyJDdXN0b21lcklkIjoiNDE5IiwiU3ViVGVuYW50SWQiOiIiLCJQcm9kdWN0U291cmNlIjoiV0FWRUFQSSIsImV4cCI6MTgyMDgzMTI4MCwiaWF0IjoxNjkxMjMxMjkzfSwic291cmNlIjoiTU9CSUxFQVBJIn0sImV4cCI6MTcwMjY2NDk5OSwiaWF0IjoxNzAyNjI5MDU5fQ.M0UawxnvZwcHm0e1L5MH8aV8KaAogx9j-0loqYdqhag";
+//			String userSession = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJJZCI6NzA3MDcwLCJ1c2VyaWQiOjcwNzA3MCwidGVuYW50aWQiOjcwNzA3MCwibWVtYmVySW5mbyI6eyJ0ZW5hbnRJZCI6IjQxOSIsImdyb3VwSWQiOiJITyIsInVzZXJJZCI6IldDTTU0OSIsInRlbXBsYXRlSWQiOiJVQVQiLCJ1ZElkIjoiIiwib2NUb2tlbiI6IjB4MDE2MDk4MkQ1QzYyMTM5NkU4QTdGODA5NjJBNTdCIiwidXNlckNvZGUiOiJPRkhZVyIsImdyb3VwQ29kZSI6IkFBQUFBIiwiYXBpa2V5RGF0YSI6eyJDdXN0b21lcklkIjoiNDE5IiwiU3ViVGVuYW50SWQiOiIiLCJQcm9kdWN0U291cmNlIjoiV0FWRUFQSSIsImV4cCI6MTgyMDgzMTI4MCwiaWF0IjoxNjkxMjMxMjkzfSwic291cmNlIjoiTU9CSUxFQVBJIn0sImV4cCI6MTcwMzE4MzM5OSwiaWF0IjoxNzAzMTYyNDI4fQ.mKnXuAO4ShGEHexU_2s9yrb9DZB_phQ7iqBeyQgWgLg";
 			Log.info("Orders  userSession - " + userSession);
 			if (StringUtil.isNullOrEmpty(userSession))
 				return prepareResponse.prepareUnauthorizedResponseForList();
@@ -548,11 +548,19 @@ public class OrderExecutionService implements OrderExecutionServiceSpec {
 
 			// Swap value start
 			// Added on 24-06-23 //TODO consult with Dinesh bro
+//			if (placeOrderReqModel.getScripInfo().getExchange().equalsIgnoreCase(AppConstants.NSE_FO)
+//					|| placeOrderReqModel.getScripInfo().getExchange().equalsIgnoreCase(AppConstants.NSE_CUR)
+//							&& orderDetails.getProduct().equalsIgnoreCase(AppConstants.NRML)
+//					|| orderDetails.getProduct().equalsIgnoreCase(AppConstants.MIS)) {
+//				placeOrderReqModel.setProductType(AppConstants.DELIVERY);
+//			}
 			if (placeOrderReqModel.getScripInfo().getExchange().equalsIgnoreCase(AppConstants.NSE_FO)
-					|| placeOrderReqModel.getScripInfo().getExchange().equalsIgnoreCase(AppConstants.NSE_CUR)
-							&& orderDetails.getProduct().equalsIgnoreCase(AppConstants.NRML)
-					|| orderDetails.getProduct().equalsIgnoreCase(AppConstants.MIS)) {
-				placeOrderReqModel.setProductType(AppConstants.DELIVERY);
+					|| placeOrderReqModel.getScripInfo().getExchange().equalsIgnoreCase(AppConstants.NSE_CUR)) {
+				if (orderDetails.getProduct().equalsIgnoreCase(AppConstants.NRML)
+						|| orderDetails.getProduct().equalsIgnoreCase(AppConstants.MIS)) {
+					placeOrderReqModel.setProductType(AppConstants.DELIVERY);
+				}
+
 			} else {
 				placeOrderReqModel
 						.setProductType(HazelcastConfig.getInstance().getProductTypes().get(orderDetails.getProduct()));

@@ -1,7 +1,6 @@
 package in.codifi.odn.service;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -25,14 +24,13 @@ import in.codifi.odn.config.ApplicationProperties;
 import in.codifi.odn.config.EmailConfig;
 import in.codifi.odn.config.EmailProperties;
 import in.codifi.odn.service.spec.EmailServiceSpec;
-import in.codifi.odn.utility.EmailUtils;
 import io.quarkus.logging.Log;
 
 @ApplicationScoped
 public class EmailService implements EmailServiceSpec {
 
-	@Inject
-	EmailUtils emailUtils;
+//	@Inject
+//	EmailUtils emailUtils;
 
 	@Inject
 	EmailConfig emailConfig;

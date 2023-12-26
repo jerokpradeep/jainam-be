@@ -18,7 +18,7 @@ import io.quarkus.logging.Log;
 @ApplicationScoped
 public class PromptDao {
 
-	@Named("chartdb")
+//	@Named("jainam")
 	@Inject
 	DataSource dataSource;
 
